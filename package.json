@@ -1,0 +1,24 @@
+{
+    "name": "Planshark",
+    "version": "0.0.1",
+    "license": "MIT License",
+    "main": "planshark.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Vladimir37/Planshark/"
+    },
+    "scripts": {
+        "start": "node planshark.js"
+    },
+    "dependencies": {
+        "body-parser": "*",
+        "cookie-parser": "*",
+        "express": "*",
+        "jade": "*",
+        "serve-favicon": "*",
+        "mysql": "*",
+        "sequelize": "*",
+        "easy-encryption": "*",
+        "random-token": "*"
+    }
+}
