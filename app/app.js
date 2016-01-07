@@ -2,8 +2,9 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var error = require('./router/errors');
+var errors = require('./router/errors');
 var index = require('./router/index');
+var api = require('./router/api');
 
 var app = express();
 
@@ -19,7 +20,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 //API
-
+app.use('/api', api);
 
 //Main page
 app.use('/', index);

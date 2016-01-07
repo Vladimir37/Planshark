@@ -4,3 +4,5 @@ function render_jade(file) {
         res.render(file);
     };
 };
+
+module.exports = render_jade;

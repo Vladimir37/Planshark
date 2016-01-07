@@ -6,3 +6,5 @@ var router = express.Router();
 
 //index page
 router.get('/', render('main/index'));
+
+module.exports = router;
