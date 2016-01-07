@@ -1,3 +1,6 @@
-/**
- * Created by vladimir on 06.01.16.
- */
+var http = require('http');
+
+var app = require('./app/app');
+var config = require('./config/app');
+
+http.createServer(app).listen(config.port);
