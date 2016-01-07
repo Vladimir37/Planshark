@@ -3,6 +3,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var error = require('./router/errors');
+var index = require('./router/index');
 
 var app = express();
 
@@ -17,7 +18,11 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+//API
+
+
 //Main page
+app.use('/', index);
 
 
 //Errors
