@@ -1,6 +1,6 @@
 var Sequelize = require('sequelize');
 
-var db_config = require('../../configs/db');
+var db_config = require('../../config/db');
 
 var sequelize = new Sequelize(db_config.database, db_config.login, db_config.pass, {
     dialect: db_config.dialect,
@@ -65,5 +65,59 @@ tables.tasks = sequelize.define('tasks', {
         defaultValue: 1
     },
     expiration: Sequelize.TEXT,
-    closedAt: Sequelize.DATETIME
+    closedAt: Sequelize.DATE
 });
+
+tables.users_groups = sequelize.define('users_groups', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    room: Sequelize.INTEGER,
+    name: Sequelize.TEXT,
+    color: Sequelize.TEXT,
+    creating: Sequelize.INTEGER,
+    editing: Sequelize.INTEGER,
+    reassignment: Sequelize.INTEGER,
+    deleting: Sequelize.INTEGER,
+    user_creating: Sequelize.INTEGER
+});
+
+tables.tasks = sequelize.define('tasks_groups', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    room: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
+    user: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
+    name: Sequelize.TEXT,
+    color: Sequelize.TEXT
+});
+
+tables.rooms = sequelize.define('rooms', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    master: Sequelize.INTEGER
+});
+
+//synchronization tables
+for(table in tables) {
+    tables[table].sync().then(function() {
+        //success
+    }, function(err) {
+        console.log('Database error: ' + err);
+    });
+};
+
+module.exports = tables;
