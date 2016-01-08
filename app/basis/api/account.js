@@ -39,26 +39,86 @@ function login(req, res, next) {
 };
 
 //check unoccupied name
-function free_name(req, res, next) {
-    var name = req.body.login;
-    if(!name) {
+function free_name(type, func) {
+    //type: name/mail
+    return function(req, res, next) {
+        var name = req.body[type];
+        if (!name) {
+            if(func) {
+                return 3;
+            }
+            res.end('3');
+        }
+        else {
+            db[type + 's'].findOne({
+                where: {
+                    [type]: name
+                }
+            }).then(function (user) {
+                if (user) {
+                    if(func) {
+                        return 1;
+                    }
+                    res.end('1');
+                }
+                else {
+                    if(func) {
+                        return 0;
+                    }
+                    res.end('0');
+                }
+            }, function (err) {
+                console.log(err);
+                if(func) {
+                    return 2;
+                }
+                res.end('2');
+            });
+        }
+    }
+};
+
+//creating new user
+function registration(req, res, next) {
+    var type = req.body.type;
+    var mail = req.body.mail;
+    var name = req.body.name;
+    var raw_pass = req.body.pass;
+    var pass = crypt.encrypt(pass);
+    if((type != 'personal' || type != 'company') || !mail || !name || !raw_pass || !pass) {
         res.end('3');
     }
     else {
-        db.users.findOne({
-            where: {
-                name: name
-            }
-        }).then(function(user) {
-            if(user) {
-                res.end('1');
+        new Promise(function(resolve, reject) {
+            var name_status = free_name('name', true)(req, res, next);
+            if(name_status == 0) {
+                resolve(0);
             }
             else {
-                res.end('0');
+                reject(['name', name_status]);
             }
-        }, function(err) {
-            console.log(err);
-            res.end('2');
-        });
+        }).then(function() {
+            var mail_status = free_name('mail', true)(req, res, next);
+            if(mail_status == 0) {
+                if(type == 'personal') {
+                    return db.users.create({
+                        name,
+                        pass,
+                        mail,
+                        room: null,
+                        u_group:
+                    });
+                }
+                else {
+                    return new Promise();
+                }
+            }
+            else {
+                throw ['mail', mail_status];
+            }
+        }).then(function() {
+            //
+            //
+        })
     }
 };

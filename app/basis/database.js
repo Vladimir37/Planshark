@@ -26,13 +26,14 @@ tables.users = sequelize.define('users', {
     },
     name: Sequelize.TEXT,
     pass: Sequelize.TEXT,
+    mail: Sequelize.TEXT,
     room: {
         type: Sequelize.INTEGER,
         allowNull: true
     },
     u_group: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        defaultValue: 0
     }
 });
 
@@ -50,7 +51,7 @@ tables.tasks = sequelize.define('tasks', {
     performer: Sequelize.INTEGER,
     t_group: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        defaultValue: 0
     },
     u_group: {
         type: Sequelize.INTEGER,
