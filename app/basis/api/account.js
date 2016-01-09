@@ -95,30 +95,42 @@ function registration(req, res, next) {
                 resolve(0);
             }
             else {
-                reject(['name', name_status]);
+                reject('1');
             }
         }).then(function() {
             var mail_status = free_name('mail', true)(req, res, next);
             if(mail_status == 0) {
-                if(type == 'personal') {
-                    return db.users.create({
-                        name,
-                        pass,
-                        mail,
-                        room: null,
-                        u_group:
-                    });
-                }
-                else {
-                    return new Promise();
-                }
+                return db.users.create({
+                    name,
+                    pass,
+                    mail,
+                    room: null
+                });
             }
             else {
-                throw ['mail', mail_status];
+                throw '2';
+            }
+        }).then(function(new_user) {
+            if(type == 'company') {
+                return db.rooms.create({
+                    master: new_user.id
+                });
+            }
+        }).then(function(new_rooms) {
+            if(type == 'company') {
+                return db.users.update({
+                    room: new_rooms.id
+                }, {
+                    where: {
+                        id: new_rooms.master
+                    }
+                });
             }
         }).then(function() {
-            //
-            //
-        })
+            res.end('0');
+        }).catch(function(err) {
+            console.log(err);
+            res.end(err);
+        });
     }
 };
