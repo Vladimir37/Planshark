@@ -5,6 +5,7 @@ function creating(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
+    var author_group = res.user_status.group;
     //task data
     var performer = req.body.performer;
     var t_group = req.body.t_group || null;
@@ -23,6 +24,39 @@ function creating(req, res, next) {
             name: task_name,
             description: task_description,
             expiration
+        }).then(function() {
+            res.end('0');
+        }, function(err) {
+            res.end('1');
         });
     }
+    //company
+    else {
+        db.users_groups.findById(author_group).then(function(a_group) {
+            if(!a_group || !a_group.creating) {
+                throw '1';
+            }
+            else {
+                return db.tasks.create({
+                    room,
+                    author,
+                    performer,
+                    t_group,
+                    u_group,
+                    priority,
+                    name: task_name,
+                    description: task_description,
+                    expiration
+                });
+            }
+        }).then(function() {
+            res.end('0');
+        }).catch(function(err) {
+            res.end('1');
+        })
+    }
 };
+
+//
+
+exports.create = creating;

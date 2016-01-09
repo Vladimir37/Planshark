@@ -1,7 +1,7 @@
 var express = require('express');
 
 var status = require('../../basis/status');
-var tasks = require('../basis/api/tasks');
+var tasks = require('../../basis/api/tasks');
 
 var router = express.Router();
 
@@ -9,6 +9,6 @@ var router = express.Router();
 router.use(status.hard);
 
 //creating new task
-router.post('/create');
+router.post('/create', tasks.create);
 
 module.exports = router;

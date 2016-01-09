@@ -48,6 +48,10 @@ tables.tasks = sequelize.define('tasks', {
         allowNull: true
     },
     author: Sequelize.INTEGER,
+    editor: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
     performer: Sequelize.INTEGER,
     t_group: {
         type: Sequelize.INTEGER,
@@ -88,7 +92,7 @@ tables.users_groups = sequelize.define('users_groups', {
     user_creating: Sequelize.INTEGER
 });
 
-tables.tasks = sequelize.define('tasks_groups', {
+tables.tasks_groups = sequelize.define('tasks_groups', {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
