@@ -65,7 +65,10 @@ tables.tasks = sequelize.define('tasks', {
         type: Sequelize.INTEGER,
         defaultValue: 1
     },
-    expiration: Sequelize.TEXT,
+    expiration: {
+        type: Sequelize.DATE,
+        allowNull: true
+    },
     closedAt: Sequelize.DATE
 });
 

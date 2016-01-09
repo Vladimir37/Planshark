@@ -134,3 +134,6 @@ function registration(req, res, next) {
         });
     }
 };
+
+exports.login = login;
+exports.registration = registration;

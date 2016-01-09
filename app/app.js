@@ -2,6 +2,7 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var status = require('./basis/status');
 var errors = require('./router/errors');
 var index = require('./router/index');
 var api = require('./router/api');
@@ -18,6 +19,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+//Determination user status
+app.use(status.soft);
 
 //API
 app.use('/api', api);
