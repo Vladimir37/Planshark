@@ -11,4 +11,10 @@ router.use(status.hard);
 //creating new task
 router.post('/create', tasks.create);
 
+//editing task
+router.post('/edit', tasks.edit);
+
+//reassign task
+router.post('/reassign', status.medium, tasks.reassign);
+
 module.exports = router;
