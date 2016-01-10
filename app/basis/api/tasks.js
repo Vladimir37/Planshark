@@ -195,10 +195,105 @@ function reassignment(req, res, next) {
 
 //deleting task
 function deleting(req, res, next) {
-    //
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    var author_group = res.user_status.group;
+    //task data
+    var task_id = req.body.task_id;
+    //right to delete
+    var delete_right = false;
+    //personal
+    if(!room) {
+        db.tasks.destroy({
+            where: {
+                id: task_id,
+                author
+            }
+        }).then(function() {
+            res.end('0');
+        }, function(err) {
+            console.log(err);
+            res.end('1');
+        });
+    }
+    //company
+    else {
+        author_group == 0 ? delete_right = true : delete_right = false;
+        db.users_groups.findById(author_group).then(function(group) {
+            group.deleting == 1 ? delete_right = true : delete_right = false;
+            return Promise.resolve();
+        }).catch(function(err) {
+            if(delete_right) {
+                return Promise.resolve();
+            }
+            else {
+                res.end('1');
+            }
+        }).then(function() {
+            return db.tasks.destroy({
+                where: {
+                    id: task_id,
+                    room
+                }
+            });
+        }).then(function() {
+            res.end('0');
+        }, function(err) {
+            console.log(err);
+            res.end('1');
+        });
+    }
+};
+
+//closing task
+function closing(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    //task data
+    var task_id = req.body.task_id;
+    var answer = req.body.answer;
+    //personal
+    if(!room) {
+        db.tasks.update({
+            active: 0,
+            answer,
+            closedAt: new Date()
+        }, {
+            where: {
+                id: task_id,
+                author
+            }
+        }).then(function() {
+            res.end('0');
+        }, function(err) {
+            console.log(err);
+            res.end('1');
+        });
+    }
+    //company
+    else {
+        db.tasks.update({
+            active: 0,
+            answer,
+            closedAt: new Date()
+        }, {
+            where: {
+                id: task_id,
+                room
+            }
+        }).then(function() {
+            res.end('0');
+        }, function(err) {
+            console.log(err);
+            res.end('1');
+        });
+    }
 };
 
 exports.create = creating;
 exports.edit = editing;
 exports.reassign = reassignment;
-exports.delete = deleting;
+exports.deleting = deleting;
+exports.close = closing;

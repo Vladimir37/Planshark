@@ -17,4 +17,10 @@ router.post('/edit', tasks.edit);
 //reassign task
 router.post('/reassign', status.medium, tasks.reassign);
 
+//deleting task
+router.post('/delete', tasks.deleting);
+
+//answer to task
+router.post('/close', tasks.close);
+
 module.exports = router;
