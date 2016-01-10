@@ -57,6 +57,36 @@ function creating(req, res, next) {
     }
 };
 
-//
+//editing task
+function editing(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    var author_group = res.user_status.group;
+    //task data
+    var performer = req.body.performer;
+    var t_group = req.body.t_group || null;
+    var u_group = req.body.u_group || null;
+    var priority = req.body.priority;
+    var task_name = req.body.name;
+    var task_description = req.body.description;
+    var expiration = req.body.expiration || null;
+    //personal
+    if(!room) {
+        db.tasks.update({
+            t_group,
+            priority,
+            name: task_name,
+            description: task_description,
+            editor: author,
+            expiration
+        }).then(function() {
+            res.end('0');
+        }, function(err) {
+            res.end('1');
+        });
+    }
+};
 
 exports.create = creating;
+exports.edit = editing;

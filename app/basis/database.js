@@ -106,6 +106,10 @@ tables.tasks_groups = sequelize.define('tasks_groups', {
         type: Sequelize.INTEGER,
         allowNull: true
     },
+    u_groups: {
+        type: Sequelize.TEXT,
+        defaultValue: '[]'
+    },
     name: Sequelize.TEXT,
     color: Sequelize.TEXT
 });
