@@ -7,6 +7,6 @@ var router = express.Router();
 
 //user group
 //creating group
-router.post('/create', status.medium, manage.creating);
+router.post('/create', status.medium, manage.create);
 
 module.exports = router;
