@@ -221,6 +221,9 @@ function deleting(req, res, next) {
     else {
         author_group == 0 ? delete_right = true : delete_right = false;
         db.users_groups.findById(author_group).then(function(group) {
+            if(!group) {
+                throw '1';
+            }
             group.deleting == 1 ? delete_right = true : delete_right = false;
             return Promise.resolve();
         }).catch(function(err) {
