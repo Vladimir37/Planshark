@@ -14,5 +14,7 @@ router.post('/create', task_manage.create);
 router.post('/edit', task_manage.edit);
 //deleting task group
 router.post('/deleting', task_manage.deleting);
+//adding task to group
+router.post('/add', task_manage.add);
 
 module.exports = router;
