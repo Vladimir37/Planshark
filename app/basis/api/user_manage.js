@@ -109,4 +109,102 @@ function editing(req, res, next) {
     });
 };
 
+//deleting user group
+function deleting(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    var author_group = res.user_status.group;
+    //group data
+    var group_id = req.body.id;
+    //right to delete
+    var delete_right = false;
+    author_group == 0 ? delete_right = true : delete_right = false;
+    db.users_groups.findById(author_group).then(function(group) {
+        if(!group) {
+            throw '1';
+        }
+        group.u_group_manage == 1 ? delete_right = true : delete_right = false;
+        return Promise.resolve();
+    }).catch(function(err) {
+        console.log(err);
+        if(delete_right) {
+            return Promise.resolve();
+        }
+        else {
+            res.end('1');
+        }
+    }).then(function() {
+        return db.users_groups.destroy({
+            where: {
+                id: group_id,
+                room
+            }
+        })
+    }).then(function() {
+        res.end('0');
+    }, function(err) {
+        console.log(err);
+        res.end('1');
+    });
+};
+
+//add user to group
+function adding(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    var author_group = res.user_status.group;
+    //group data
+    var user_id = req.body.u_id;
+    var group_id = req.body.g_id;
+    //right to delete
+    var add_right = false;
+    author_group == 0 ? add_right = true : add_right = false;
+    db.users_groups.findById(author_group).then(function(group) {
+        if(!group) {
+            throw '1';
+        }
+        group.u_group_manage == 1 ? add_right = true : add_right = false;
+        return db.users_groups.findOne({
+            where: {
+                id: group_id,
+                room
+            }
+        });
+    }).then(function(group) {
+        if(!group) {
+            add_right = false;
+            throw '1';
+        }
+        else {
+            return Promise.resolve();
+        }
+    }).catch(function(err) {
+        console.log(err);
+        if(add_right) {
+            return Promise.resolve();
+        }
+        else {
+            res.end('1');
+        }
+    }).then(function() {
+        return db.users.update({
+            u_group: group_id
+        }, {
+            where: {
+                id: user_id
+            }
+        });
+    }).then(function() {
+        res.end('0');
+    }, function(err) {
+        console.log(err);
+        res.end('1');
+    });
+};
+
 exports.create = creating;
+exports.edit = editing;
+exports.deleting = deleting;
+exports.add = adding;

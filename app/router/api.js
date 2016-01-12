@@ -2,7 +2,7 @@ var express = require('express');
 
 var account = require('./api/account');
 var tasks = require('./api/tasks');
-var manage = require('./api/manage');
+var user_manage = require('./api/user_manage');
 
 var router = express.Router();
 
@@ -14,6 +14,6 @@ router.post('/account', account);
 router.post('/tasks', tasks);
 
 //operation with tasks group and users
-router.post('/manage', manage);
+router.post('/manage', user_manage);
 
 module.exports = router;
