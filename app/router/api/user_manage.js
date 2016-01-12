@@ -16,5 +16,7 @@ router.post('/deleting', status.medium, user_manage.deleting);
 router.post('/add', status.medium, user_manage.add);
 //creating new user
 router.post('/new', status.medium, user_manage.new_user);
+//blocking and deleting user
+router.post('/block', status.medium, user_manage.block);
 
 module.exports = router;

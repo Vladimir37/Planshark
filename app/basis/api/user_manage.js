@@ -220,7 +220,7 @@ function new_user(req, res, next) {
     var author = res.user_status.id;
     var room = res.user_status.room;
     var author_group = res.user_status.group;
-    //group data
+    //user data
     var target_group = req.body.g_id || 0;
     var name = req.body.name;
     var pass_raw = req.body.pass;
@@ -250,8 +250,40 @@ function new_user(req, res, next) {
     })
 };
 
+//blocking and deleting user
+function blocking(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    var author_group = res.user_status.group;
+    //user data
+    var target_user = req.body.id;
+    //right to blocking
+    var block_right = false;
+    author_group == 0 ? block_right = true : block_right = false;
+    if(!block_right) {
+        res.end('1');
+    }
+    else {
+        db.users.update({
+            active: 0
+        }, {
+            where: {
+                id: target_user,
+                room
+            }
+        }).then(function() {
+            res.end('0');
+        }, function(err) {
+            console.log(err);
+            res.end('1');
+        });
+    }
+};
+
 exports.create = creating;
 exports.edit = editing;
 exports.deleting = deleting;
 exports.add = adding;
 exports.new_user = new_user;
+exports.block = blocking;

@@ -34,6 +34,10 @@ tables.users = sequelize.define('users', {
     u_group: {
         type: Sequelize.INTEGER,
         defaultValue: 0
+    },
+    active: {
+        type: Sequelize.INTEGER,
+        defaultValue: 1
     }
 });
 
