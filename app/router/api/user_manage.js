@@ -5,18 +5,22 @@ var user_manage = require('../../basis/api/user_manage');
 
 var router = express.Router();
 
+router.use(status.medium);
+
 //user group
 //creating group
-router.post('/create', status.medium, user_manage.create);
+router.post('/create', user_manage.create);
 //editing group
-router.post('/edit', status.medium, user_manage.edit);
+router.post('/edit', user_manage.edit);
 //deleting group
-router.post('/deleting', status.medium, user_manage.deleting);
+router.post('/deleting', user_manage.deleting);
+
+//operation with users
 //adding user to group
-router.post('/add', status.medium, user_manage.add);
+router.post('/add', user_manage.add);
 //creating new user
-router.post('/new', status.medium, user_manage.new_user);
+router.post('/new', user_manage.new_user);
 //blocking and deleting user
-router.post('/block', status.medium, user_manage.block);
+router.post('/block', user_manage.block);
 
 module.exports = router;
