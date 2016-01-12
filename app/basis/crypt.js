@@ -8,6 +8,7 @@ var crypt = new Crypt(config);
 // encrypt
 function encrypt(text) {
     try {
+        text = text.toString();
         return crypt.encrypt(text)
     }
     catch(err) {

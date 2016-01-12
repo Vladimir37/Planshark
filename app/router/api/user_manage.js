@@ -14,5 +14,7 @@ router.post('/edit', status.medium, user_manage.edit);
 router.post('/deleting', status.medium, user_manage.deleting);
 //adding user to group
 router.post('/add', status.medium, user_manage.add);
+//creating new user
+router.post('/new', status.medium, user_manage.new_user);
 
 module.exports = router;

@@ -89,7 +89,6 @@ tables.users_groups = sequelize.define('users_groups', {
     editing: Sequelize.INTEGER,
     reassignment: Sequelize.INTEGER,
     deleting: Sequelize.INTEGER,
-    user_creating: Sequelize.INTEGER,
     t_group_manage: Sequelize.INTEGER,
     u_group_manage: Sequelize.INTEGER
 });

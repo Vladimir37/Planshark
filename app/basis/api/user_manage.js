@@ -1,4 +1,5 @@
 var db = require('../database');
+var crypt = require('../crypt');
 
 //creating user group
 function creating(req, res, next) {
@@ -140,10 +141,19 @@ function deleting(req, res, next) {
                 id: group_id,
                 room
             }
-        })
+        });
+    }).then(function() {
+        return db.users.update({
+            u_group: 0
+        }, {
+            where: {
+                u_group: group_id,
+                room
+            }
+        });
     }).then(function() {
         res.end('0');
-    }, function(err) {
+    }).catch(function(err) {
         console.log(err);
         res.end('1');
     });
@@ -204,7 +214,44 @@ function adding(req, res, next) {
     });
 };
 
+//creating new user
+function new_user(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    var author_group = res.user_status.group;
+    //group data
+    var target_group = req.body.g_id || 0;
+    var name = req.body.name;
+    var pass_raw = req.body.pass;
+    var mail = req.body.mail;
+    //pass processing
+    var pass = crypt.encrypt(pass_raw);
+    //right to creating users
+    var create_right = false;
+    author_group == 0 ? create_right = true : create_right = false;
+    db.users_groups.findById(author_group).then(function(group) {
+        if(!group || !pass) {
+            throw '1';
+        }
+        group.u_group_manage == 1 ? create_right = true : create_right = false;
+        return db.users.create({
+            name,
+            pass,
+            mail,
+            room,
+            u_group: target_group
+        }).then(function() {
+            res.end('0');
+        }).catch(function(err) {
+            console.log(err);
+            res.end('1');
+        });
+    })
+};
+
 exports.create = creating;
 exports.edit = editing;
 exports.deleting = deleting;
 exports.add = adding;
+exports.new_user = new_user;
