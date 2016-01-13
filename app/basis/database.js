@@ -73,7 +73,10 @@ tables.tasks = sequelize.define('tasks', {
         type: Sequelize.INTEGER,
         allowNull: true
     },
-    performer: Sequelize.INTEGER,
+    performer: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
     t_group: {
         type: Sequelize.INTEGER,
         defaultValue: 0

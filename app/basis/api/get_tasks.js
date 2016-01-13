@@ -1,7 +1,7 @@
 var db = require('../database');
 var serializing = require('../serializing');
 
-//get tasks for user
+//get active tasks for user
 function active_tasks(req, res, next) {
     //author data
     var author = res.user_status.id;
@@ -19,12 +19,32 @@ function active_tasks(req, res, next) {
         }, function(err) {
             console.log(err);
             res.end(serializing(1));
-        })
+        });
     }
     //company
     else {
-        //
+        db.tasks.findAll({
+            where: {
+                room,
+                active: 1,
+                $or: {
+                    u_group: author_group,
+                    performer: author
+                }
+            }
+        }).then(function(result) {
+            res.end(serializing(0, result));
+        }, function(err) {
+            console.log(err);
+            res.end(serializing(1));
+        });
     }
 };
 
-exports.get_tasks = get_tasks;
+//get inactive tasks for user
+function inactive_tasks(req, res, next) {
+    //
+};
+
+exports.active_tasks = active_tasks;
+exports.inactive_tasks = inactive_tasks;

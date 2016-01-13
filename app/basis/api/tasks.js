@@ -7,7 +7,7 @@ function creating(req, res, next) {
     var room = res.user_status.room;
     var author_group = res.user_status.group;
     //task data
-    var performer = req.body.performer;
+    var performer = req.body.performer || null;
     var t_group = req.body.t_group || null;
     var u_group = req.body.u_group || null;
     var priority = req.body.priority;

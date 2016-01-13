@@ -7,7 +7,10 @@ var router = express.Router();
 
 router.use(status.hard);
 
-//get tasks list for user
-router.get('/active', get_tasks.get_tasks);
+//get active tasks list for user
+router.get('/active', get_tasks.active_tasks);
+
+//get inactive tasks list for user
+router.get('/inactive', get_tasks.inactive_tasks);
 
 module.exports = router;
