@@ -8,8 +8,6 @@ function creating(req, res, next) {
     //group data
     var group_name = req.body.name;
     var group_color = req.body.color;
-    //access u_groups
-    var group_access = req.body.groups;
     //right to work with tasks group
     var tasks_right = false;
     author_group == 0 ? tasks_right = true : tasks_right = false;
@@ -30,7 +28,6 @@ function creating(req, res, next) {
     }).then(function() {
         return db.tasks_groups.create({
             room,
-            u_groups: group_access,
             name: group_name,
             color: group_color
         });

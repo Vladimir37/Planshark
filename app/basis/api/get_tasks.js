@@ -1,4 +1,5 @@
 var db = require('../database');
+var serializing = require('../serializing');
 
 //get tasks for user
 function active_tasks(req, res, next) {
@@ -10,9 +11,19 @@ function active_tasks(req, res, next) {
     if(!room) {
         db.tasks.findAll({
             where: {
-                user
+                user: author,
+                active: 1
             }
+        }).then(function(result) {
+            res.end(serializing(0, result));
+        }, function(err) {
+            console.log(err);
+            res.end(serializing(1));
         })
+    }
+    //company
+    else {
+        //
     }
 };
 

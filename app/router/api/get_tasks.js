@@ -8,6 +8,6 @@ var router = express.Router();
 router.use(status.hard);
 
 //get tasks list for user
-router.get('/get', get_tasks.get_tasks);
+router.get('/active', get_tasks.get_tasks);
 
 module.exports = router;

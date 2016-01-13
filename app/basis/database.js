@@ -41,6 +41,23 @@ tables.users = sequelize.define('users', {
     }
 });
 
+tables.users_groups = sequelize.define('users_groups', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    room: Sequelize.INTEGER,
+    name: Sequelize.TEXT,
+    color: Sequelize.TEXT,
+    creating: Sequelize.INTEGER,
+    editing: Sequelize.INTEGER,
+    reassignment: Sequelize.INTEGER,
+    deleting: Sequelize.INTEGER,
+    t_group_manage: Sequelize.INTEGER,
+    u_group_manage: Sequelize.INTEGER
+});
+
 tables.tasks = sequelize.define('tasks', {
     id: {
         type: Sequelize.INTEGER,
@@ -80,23 +97,6 @@ tables.tasks = sequelize.define('tasks', {
     closedAt: Sequelize.DATE
 });
 
-tables.users_groups = sequelize.define('users_groups', {
-    id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    room: Sequelize.INTEGER,
-    name: Sequelize.TEXT,
-    color: Sequelize.TEXT,
-    creating: Sequelize.INTEGER,
-    editing: Sequelize.INTEGER,
-    reassignment: Sequelize.INTEGER,
-    deleting: Sequelize.INTEGER,
-    t_group_manage: Sequelize.INTEGER,
-    u_group_manage: Sequelize.INTEGER
-});
-
 tables.tasks_groups = sequelize.define('tasks_groups', {
     id: {
         type: Sequelize.INTEGER,
@@ -111,7 +111,6 @@ tables.tasks_groups = sequelize.define('tasks_groups', {
         type: Sequelize.INTEGER,
         allowNull: true
     },
-    u_groups: Sequelize.TEXT,
     name: Sequelize.TEXT,
     color: Sequelize.TEXT
 });
