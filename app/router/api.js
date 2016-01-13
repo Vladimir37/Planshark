@@ -20,4 +20,8 @@ router.post('/user_manage', user_manage);
 //operation with tasks and task groups
 router.post('/task_manage', task_manage);
 
+//GET
+//tasks for user
+
+
 module.exports = router;
