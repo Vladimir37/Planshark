@@ -1,0 +1,6 @@
+{
+    "service": "serv",
+    "from": "addr",
+    "login": "login",
+    "pass": "pass"
+}
