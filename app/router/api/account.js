@@ -10,4 +10,7 @@ router.post('/login', account.login);
 //creating new account
 router.post('/registration', account.registration);
 
+//change password
+router.post('/change', account.change);
+
 module.exports = router;

@@ -135,5 +135,43 @@ function registration(req, res, next) {
     }
 };
 
+//change password
+function change(req, res, next) {
+    var mail = req.body.mail;
+    var old_pass = req.body.old_pass;
+    var new_pass_one = req.body.new_pass_one;
+    var new_pass_two = req.body.new_pass_two;
+    if(new_pass_one != new_pass_two || !new_pass_one || !new_pass_two) {
+        res.end('1');
+    }
+    else {
+        db.users.findOne({
+            where: {
+                mail
+            }
+        }).then(function(user) {
+            var target_pass = crypt.decrypt(user.pass);
+            if(!user || target_pass != old_pass) {
+                throw '1';
+            }
+            else {
+                var new_pass_encrypt = crypt.encrypt(new_pass_one);
+                return db.users.update({
+                    pass: new_pass_encrypt
+                }, {
+                    where: {
+                        mail
+                    }
+                });
+            }
+        }).then(function() {
+            res.end('0');
+        }).catch(function(err) {
+            res.end('1');
+        })
+    }
+};
+
 exports.login = login;
 exports.registration = registration;
+exports.change = change;
