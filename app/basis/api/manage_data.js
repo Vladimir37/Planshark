@@ -68,6 +68,9 @@ function users(req, res, next) {
             }
         });
     }).then(function(users) {
+        for(var i = 0; i < users.length; i++) {
+            delete users[i].pass;
+        };
         res.end(serializing(0, users));
     }).catch(function(err) {
         console.log(err);
@@ -97,7 +100,32 @@ function tasks_group(req, res, next) {
         });
     }
     else {
-        //
+        db.users_groups.findById(author_group).then(function(group) {
+            if(!group) {
+                throw '1';
+            }
+            group.t_group_manage == 1 ? view_right = true : view_right = false;
+            return Promise.resolve();
+        }).catch(function(err) {
+            console.log(err);
+            if(view_right) {
+                return Promise.resolve();
+            }
+            else {
+                res.end(serializing(1));
+            }
+        }).then(function() {
+            return db.tasks_groups.findAll({
+                where: {
+                    room
+                }
+            });
+        }).then(function(groups) {
+            res.end(serializing(0, groups));
+        }).catch(function(err) {
+            console.log(err);
+            res.end(serializing(1));
+        });
     }
 };
 
