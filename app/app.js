@@ -11,7 +11,7 @@ var app = express();
 
 //render templates
 app.set('view engine', 'jade');
-app.set('views', __dirname +  '/../client/views');
+app.set('views', __dirname +  '/../client/view');
 
 //POST request and cookies
 app.use(cookieParser());
@@ -22,6 +22,9 @@ app.use(bodyParser.urlencoded({
 
 //Determination user status
 app.use(status.soft);
+
+//public source
+app.use('/src', express.static(__dirname + '/../client/source'));
 
 //API
 app.use('/api', api);

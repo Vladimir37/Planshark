@@ -772,7 +772,7 @@ module.exports = function(less, options) {
             },
             info: function(msg) {
                 if (options.logLevel >= logLevel_info) {
-                    console.log(msg);
+                    //console.log(msg);
                 }
             },
             warn: function(msg) {
