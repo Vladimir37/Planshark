@@ -13,4 +13,7 @@ router.post('/registration', account.registration);
 //change password
 router.post('/change', account.change);
 
+//password reminder
+router.post('/reminder', account.reminder);
+
 module.exports = router;

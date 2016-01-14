@@ -13,7 +13,7 @@ var transporter = nodemailer.createTransport({
 });
 
 //Функция отправки
-function send(name, address, subject, text, obj) {
+function send(name, address, subject, obj) {
     obj = obj || {};
     //read letter
     jade.renderFile('client/view/mail/' + name + '.jade', obj, function(err, result) {
@@ -26,7 +26,7 @@ function send(name, address, subject, text, obj) {
                 from: config.from,
                 to: address,
                 subject: subject,
-                html: text
+                html: result
             };
             //Send result
             transporter.sendMail(mailOptions, function(error, info){

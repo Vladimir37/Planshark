@@ -1,5 +1,6 @@
 var db = require('../database');
 var crypt = require('../crypt');
+var mail = require('../mail');
 
 //login interface
 function login(req, res, next) {
@@ -116,6 +117,9 @@ function registration(req, res, next) {
                     master: new_user.id
                 });
             }
+            else {
+                res.end('0');
+            }
         }).then(function(new_rooms) {
             if(type == 'company') {
                 return db.users.update({
@@ -127,10 +131,11 @@ function registration(req, res, next) {
                 });
             }
         }).then(function() {
+            mail('registration', mail, 'Registration in Planshark', {name, pass});
             res.end('0');
         }).catch(function(err) {
             console.log(err);
-            res.end(err);
+            res.end('1');
         });
     }
 };
@@ -165,6 +170,7 @@ function change(req, res, next) {
                 });
             }
         }).then(function() {
+            mail('change', mail, 'Password in Planshark', {new_pass_one});
             res.end('0');
         }).catch(function(err) {
             res.end('1');
@@ -172,6 +178,25 @@ function change(req, res, next) {
     }
 };
 
+//pass reminder
+function reminder(req, res, next) {
+    var mail = req.body.mail;
+    db.users.findOne({
+        where: {
+            mail
+        }
+    }).then(function(user) {
+        if(!user) {
+            res.end('0');
+        }
+        else {
+            var pass = crypt.decrypt(user.pass);
+            mail('reminder', mail, 'Password in Planshark', {pass, name: user.name});
+        }
+    })
+};
+
 exports.login = login;
 exports.registration = registration;
 exports.change = change;
+exports.reminder = reminder;
