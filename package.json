@@ -1,6 +1,6 @@
 {
     "name": "Planshark",
-    "version": "0.0.1",
+    "version": "0.5.0",
     "license": "MIT License",
     "main": "planshark.js",
     "repository": {
@@ -19,6 +19,7 @@
         "mysql": "*",
         "sequelize": "*",
         "easy-encryption": "*",
+        "nodemailer": "*",
         "random-token": "*"
     }
 }
