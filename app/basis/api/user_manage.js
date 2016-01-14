@@ -235,19 +235,28 @@ function new_user(req, res, next) {
             throw '1';
         }
         group.u_group_manage == 1 ? create_right = true : create_right = false;
+        return Promise.resolve();
+    }).catch(function(err) {
+        if(create_right) {
+            return Promise.resolve();
+        }
+        else {
+            res.end('1');
+        }
+    }).then(function() {
         return db.users.create({
             name,
             pass,
             mail,
             room,
             u_group: target_group
-        }).then(function() {
-            res.end('0');
-        }).catch(function(err) {
-            console.log(err);
-            res.end('1');
         });
-    })
+    }).then(function() {
+        res.end('0');
+    }, function(err) {
+        console.log(err);
+        res.end('1');
+    });
 };
 
 //blocking and deleting user
