@@ -2,9 +2,12 @@ var db = require('../database');
 var crypt = require('../crypt');
 var mail = require('../mail');
 
+//RegExp for mail
+var re_mail = new RegExp('.+@.+\..+');
+
 //login interface
 function login(req, res, next) {
-    var login = req.body.login;
+    var login = req.body.name;
     var pass = req.body.pass;
     var remember = req.body.remember;
     if(!login || !pass) {
@@ -63,6 +66,12 @@ function free_name(type, func) {
                     res.end('1');
                 }
                 else {
+                    if(type == 'mail' && !re_mail(name)) {
+                        if(func) {
+                            return 4;
+                        }
+                        res.end('4');
+                    }
                     if(func) {
                         return 0;
                     }

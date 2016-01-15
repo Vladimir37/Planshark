@@ -1,4 +1,32 @@
 extends ../basis/layout
 
+block scripts
+    script(src="/src/js/index.js" type="text/babel")
+
 block content
-    h1 Index
+    section.index
+        article.index_but_main
+            article.index_but.login.active Login
+            article.index_but.register Registration
+        article.form.index_form.login_form
+            input(type="text" name="name" placeholder="Name" data-req="true")
+            br
+            input(type="password" name="pass" placeholder="Password" data-req="true")
+            br
+            label Remember me
+                input(type="checkbox" name="remember")
+            br
+            button.sub Login
+        article.form.index_form.register_form.hidden
+            input(type="text" name="mail" placeholder="E-mail" data-req="true")
+            br
+            input(type="text" name="name" placeholder="Name" data-req="true")
+            br
+            input(type="password" name="pass" placeholder="Password" data-req="true")
+            br
+            label Personal
+                input(type="radio" name="type" value="personal" checked)
+            label Company
+                input(type="radio" name="type" value="company")
+            br
+            button.sub Registration

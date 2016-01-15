@@ -3,17 +3,21 @@ html(lang="ru")
     head
         meta(charset="UTF-8")
         title Planshark
-        script(src="/src/js/jquery.js")
-        script(src="/src/js/babel.js")
-        script(src="/src/js/react.min.js")
-        script(src="/src/js/react-dom.min.js")
-        script(src="/src/js/main.js" type="text/babel")
+        script(src="/src/js/libs/jquery.js")
+        script(src="/src/js/libs/jquery.toaster.js")
+        script(src="/src/js/libs/babel.js")
+        script(src="/src/js/libs/react.min.js")
+        script(src="/src/js/libs/react-dom.min.js")
         link(rel="stylesheet/less" href="/src/less/main.less")
-        script(src="/src/js/less.js")
+        script(src="/src/js/libs/less.js")
         //- other JS files
         block scripts
         //- add mixins
         include mixins
     body
+        header
+            section.wrapper
+                img.logo_img(src="/src/img/logo.png" alt="logo")
         section.content
-            block content
+            section.wrapper
+                block content
