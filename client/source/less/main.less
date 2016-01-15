@@ -51,6 +51,16 @@ body {
             }
         }
     }
+    button {
+        background: @main;
+        color: white;
+        border: none;
+        padding: 3px 5px;
+        transition-duration: 0.3s;
+        &:hover {
+            background: lighten(@main, 10%);
+        }
+    }
     .hidden {
         display: none;
     }

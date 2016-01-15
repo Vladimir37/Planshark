@@ -8,7 +8,7 @@ block content
         article.index_but_main
             article.index_but.login.active Login
             article.index_but.register Registration
-        article.form.index_form.login_form
+        article.form.index_form.login_form(data-type="post" data-addr="/api/account/registration")
             input(type="text" name="name" placeholder="Name" data-req="true")
             br
             input(type="password" name="pass" placeholder="Password" data-req="true")
@@ -17,7 +17,7 @@ block content
                 input(type="checkbox" name="remember")
             br
             button.sub Login
-        article.form.index_form.register_form.hidden
+        article.form.index_form.register_form.hidden(data-type="post" data-addr="/api/account/login")
             input(type="text" name="mail" placeholder="E-mail" data-req="true")
             br
             input(type="text" name="name" placeholder="Name" data-req="true")
