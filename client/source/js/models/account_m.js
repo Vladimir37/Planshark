@@ -34,15 +34,15 @@ var Login = React.createClass({
     getInitialState() {
         return null;
     },
-    submit() {
-        //
+    submit(elem) {
+        var ajax_data = getData(elem.target);
     },
     render() {
         return <article className="form index_form login_form" data-addr="/api/account/login">
                 <input type="text" name="name" placeholder="Name" data-req="true"/><br/>
                 <input type="password" name="pass" placeholder="Password" data-req="true"/><br/>
                 <label>Remember me<input type="checkbox" name="remember"/></label><br/>
-                <button className="sub">Login</button>
+                <button className="sub" onClick={this.submit}>Login</button>
             </article>;
     }
 });
@@ -51,8 +51,8 @@ var Registration = React.createClass({
     getInitialState() {
         return null;
     },
-    submit() {
-        //
+    submit(elem) {
+        var ajax_data = getData(elem.target);
     },
     render() {
         return <article className="form index_form register_form hidden" data-addr="/api/account/registration">
@@ -61,7 +61,7 @@ var Registration = React.createClass({
                 <input type="password" name="pass" placeholder="Password" data-req="true"/><br/>
                 <label>Personal<input type="radio" name="type" value="personal" defaultChecked/></label>
                 <label>Company<input type="radio" name="type" value="company"/></label><br/>
-                <button className="sub">Registration</button>
+                <button className="sub" onClick={this.submit}>Registration</button>
             </article>;
     }
 });
@@ -69,11 +69,8 @@ var Registration = React.createClass({
 //checking cookie and render start forms
 var StartAccount = React.createClass({
     getInitialState() {
-        //ToDo Checking
+        //ToDo Checking cookie status
         return null;
-    },
-    statusSwitching() {
-        //
     },
     render() {
         return <article className="index_form_inner">
