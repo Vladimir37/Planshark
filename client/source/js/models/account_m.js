@@ -5,14 +5,27 @@ var Buttons = React.createClass({
             reg: false
         };
     },
-    switching() {
-        this.state.log = !this.state.log;
-        this.state.reg = !this.state.reg;
+    switching(name) {
+        var self = this;
+        return () => {
+            if (!self.state[name]) {
+                self.setState({
+                    log: !self.state.log,
+                    reg: !self.state.reg
+                });
+                var visible_form = $('.index_form:visible');
+                var hidden_form = $('.index_form:hidden');
+                visible_form.hide();
+                hidden_form.fadeIn();
+            }
+        }
     },
     render() {
+        var log_classes = "index_but " + (this.state.log ? 'active' : '');
+        var reg_classes = "index_but " + (this.state.reg ? 'active' : '');
         return <article className="index_but_main">
-            <article className="index_but login active">Login</article>
-            <article className="index_but register">Registration</article>
+            <article className={log_classes} onClick={this.switching('log')}>Login</article>
+            <article className={reg_classes} onClick={this.switching('reg')}>Registration</article>
         </article>;
     }
 });
@@ -46,7 +59,7 @@ var Registration = React.createClass({
                 <input type="text" name="mail" placeholder="E-mail" data-req="true"/><br/>
                 <input type="text" name="name" placeholder="Name" data-req="true"/><br/>
                 <input type="password" name="pass" placeholder="Password" data-req="true"/><br/>
-                <label>Personal<input type="radio" name="type" value="personal" checked/></label>
+                <label>Personal<input type="radio" name="type" value="personal" defaultChecked/></label>
                 <label>Company<input type="radio" name="type" value="company"/></label><br/>
                 <button className="sub">Registration</button>
             </article>;
