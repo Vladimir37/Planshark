@@ -19,8 +19,6 @@ function login(req, res, next) {
             name: login
         }
     }).then(function(user) {
-        res.status(200);
-        console.log('DA');
         if(!user) {
             res.end('1');
         }
@@ -30,8 +28,8 @@ function login(req, res, next) {
                 var cookie_data = [user.room || false, user.u_group || false, user.id];
                 var cookie = crypt.encrypt(JSON.stringify(cookie_data));
                 var expiration;
-                remember ? expiration = 604800000 : expiration = false;
-                res.cookie('planshrak_status', cookie, {maxAge: expiration});
+                remember ? expiration = {maxAge: 604800000} : expiration = {};
+                res.cookie('planshark_status', cookie, expiration);
                 res.end('0');
             }
             else {

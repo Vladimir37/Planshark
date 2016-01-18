@@ -4,8 +4,8 @@ var db_config = require('../../config/db');
 
 var sequelize = new Sequelize(db_config.database, db_config.login, db_config.pass, {
     dialect: db_config.dialect,
-    port: db_config.port
-    //logging: false
+    port: db_config.port,
+    logging: false
 });
 
 

@@ -4,7 +4,7 @@ var crypt = require('./crypt');
 //checking user status
 function status(type) {
     return function(req, res, next) {
-        var cookie = req.cookies.planshrak_status;
+        var cookie = req.cookies.planshark_status;
         if (!cookie) {
             if(type == 'hard' || type == 'medium') {
                 errors.e403(req, res, next);

@@ -1,3 +1,7 @@
+//responses
+var registration_r = ['Success!', 'Name is busy', 'Mail is busy', 'Required fields are empty', 'Server error'];
+var login_r = ['Success!', 'Incorrect login or password', 'Server error'];
+
 var Buttons = React.createClass({
     getInitialState() {
         return {
@@ -37,12 +41,14 @@ var Login = React.createClass({
     submit(elem) {
         var ajax_data = getData(elem.target);
         submitting(ajax_data, '/api/account/login', 'POST', function(data) {
-            console.log('RESULT');
-            console.log(data);
+            var response_status = +data;
+            if(isNaN(response_status)) {
+                response_status = 2;
+            }
+            toast(login_r[response_status]);
         }, function(err) {
-            toast("Server error");
-            console.log('ERROR');
             console.log(err);
+            toast("Server error");
         });
     },
     render() {
@@ -62,15 +68,13 @@ var Registration = React.createClass({
     submit(elem) {
         var ajax_data = getData(elem.target);
         submitting(ajax_data, '/api/account/registration', 'POST', function(data) {
-            console.log('SUCCESS');
-            console.log(data);
+            var response_status = +data;
+            if(isNaN(response_status)) {
+                response_status = 4;
+            }
+            toast(registration_r[response_status]);
         }, function(err) {
             toast("Server error");
-            console.log('ERROR');
-            console.log(err);
-        }, function(data) {
-            console.log('RESULT');
-            console.log(data);
         });
     },
     render() {
