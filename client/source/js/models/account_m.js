@@ -36,9 +36,17 @@ var Login = React.createClass({
     },
     submit(elem) {
         var ajax_data = getData(elem.target);
+        submitting(ajax_data, '/api/account/login', 'POST', function(data) {
+            console.log('RESULT');
+            console.log(data);
+        }, function(err) {
+            toast("Server error");
+            console.log('ERROR');
+            console.log(err);
+        });
     },
     render() {
-        return <article className="form index_form login_form" data-addr="/api/account/login">
+        return <article className="form index_form login_form">
                 <input type="text" name="name" placeholder="Name" data-req="true"/><br/>
                 <input type="password" name="pass" placeholder="Password" data-req="true"/><br/>
                 <label>Remember me<input type="checkbox" name="remember"/></label><br/>
@@ -53,12 +61,20 @@ var Registration = React.createClass({
     },
     submit(elem) {
         var ajax_data = getData(elem.target);
+        submitting(ajax_data, '/api/account/registration', 'POST', function(data) {
+            console.log('RESULT');
+            console.log(data);
+        }, function(err) {
+            toast("Server error");
+            console.log('ERROR');
+            console.log(err);
+        });
     },
     render() {
         return <article className="form index_form register_form hidden" data-addr="/api/account/registration">
                 <input type="text" name="mail" placeholder="E-mail" data-req="true"/><br/>
                 <input type="text" name="name" placeholder="Name" data-req="true"/><br/>
-                <input type="password" name="pass" placeholder="Password" data-req="true"/><br/>
+                <input type="text" name="pass" placeholder="Password" data-req="true"/><br/>
                 <label>Personal<input type="radio" name="type" value="personal" defaultChecked/></label>
                 <label>Company<input type="radio" name="type" value="company"/></label><br/>
                 <button className="sub" onClick={this.submit}>Registration</button>

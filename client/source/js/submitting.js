@@ -22,12 +22,18 @@ function getData(target) {
 
 //submitting data to server
 function submitting(data, url, type, success, error, complete) {
-    $.ajax({
-        url,
-        type,
-        data,
-        error,
-        success,
-        complete
-    })
+    complete = complete || function(){};
+    if(data) {
+        $.ajax({
+            url,
+            type,
+            data,
+            error,
+            success,
+            complete
+        });
+    }
+    else {
+        toast("Required fields are empty!");
+    }
 };

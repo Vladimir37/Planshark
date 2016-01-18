@@ -19,6 +19,8 @@ function login(req, res, next) {
             name: login
         }
     }).then(function(user) {
+        res.status(200);
+        console.log('DA');
         if(!user) {
             res.end('1');
         }
@@ -43,49 +45,34 @@ function login(req, res, next) {
 };
 
 //check unoccupied name
-function free_name(type, func) {
+function free_name(req, type) {
     //type: name/mail
-    return function(req, res, next) {
+    return new Promise(function(resolve, reject) {
         var name = req.body[type];
         if (!name) {
-            if(func) {
-                return 3;
-            }
-            res.end('3');
+            reject(3);
         }
         else {
-            db[type + 's'].findOne({
+            db.users.findOne({
                 where: {
                     [type]: name
                 }
             }).then(function (user) {
                 if (user) {
-                    if(func) {
-                        return 1;
-                    }
-                    res.end('1');
+                    reject(1);
                 }
                 else {
-                    if(type == 'mail' && !re_mail(name)) {
-                        if(func) {
-                            return 4;
-                        }
-                        res.end('4');
+                    if (type == 'mail' && !re_mail.test(name)) {
+                        reject(4);
                     }
-                    if(func) {
-                        return 0;
-                    }
-                    res.end('0');
+                    resolve(0);
                 }
             }, function (err) {
-                console.log(err);
-                if(func) {
-                    return 2;
-                }
-                res.end('2');
+                //console.log(err);
+                reject(2);
             });
         }
-    }
+    });
 };
 
 //creating new user
@@ -94,21 +81,20 @@ function registration(req, res, next) {
     var mail = req.body.mail;
     var name = req.body.name;
     var raw_pass = req.body.pass;
-    var pass = crypt.encrypt(pass);
-    if((type != 'personal' || type != 'company') || !mail || !name || !raw_pass || !pass) {
+    var pass = crypt.encrypt(raw_pass);
+    if((type != 'personal' && type != 'company') || !mail || !name || !raw_pass || !pass) {
         res.end('3');
     }
     else {
-        new Promise(function(resolve, reject) {
-            var name_status = free_name('name', true)(req, res, next);
+        free_name(req, 'name').then(function(name_status) {
             if(name_status == 0) {
-                resolve(0);
+                return free_name(req, 'mail');
             }
             else {
-                reject('1');
+                throw '1';
             }
-        }).then(function() {
-            var mail_status = free_name('mail', true)(req, res, next);
+        }).then(function(mail_status) {
+            console.log(3);
             if(mail_status == 0) {
                 return db.users.create({
                     name,
@@ -128,6 +114,7 @@ function registration(req, res, next) {
             }
             else {
                 res.end('0');
+                return Promise.resolve();
             }
         }).then(function(new_rooms) {
             if(type == 'company') {
@@ -139,12 +126,15 @@ function registration(req, res, next) {
                     }
                 });
             }
+            else {
+                return Promise.resolve();
+            }
         }).then(function() {
             mail('registration', mail, 'Registration in Planshark', {name, pass});
             res.end('0');
         }).catch(function(err) {
-            console.log(err);
-            res.end('1');
+            console.log('ERROR!');
+            res.end(err);
         });
     }
 };
