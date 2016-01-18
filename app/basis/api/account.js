@@ -68,7 +68,6 @@ function free_name(req, type) {
                     resolve(0);
                 }
             }, function (err) {
-                //console.log(err);
                 reject(2);
             });
         }
@@ -94,7 +93,6 @@ function registration(req, res, next) {
                 throw '1';
             }
         }).then(function(mail_status) {
-            console.log(3);
             if(mail_status == 0) {
                 return db.users.create({
                     name,
@@ -133,8 +131,8 @@ function registration(req, res, next) {
             mail('registration', mail, 'Registration in Planshark', {name, pass});
             res.end('0');
         }).catch(function(err) {
-            console.log('ERROR!');
-            res.end(err);
+            var error_type = err.toString();
+            res.end(error_type);
         });
     }
 };

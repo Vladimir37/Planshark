@@ -62,12 +62,15 @@ var Registration = React.createClass({
     submit(elem) {
         var ajax_data = getData(elem.target);
         submitting(ajax_data, '/api/account/registration', 'POST', function(data) {
-            console.log('RESULT');
+            console.log('SUCCESS');
             console.log(data);
         }, function(err) {
             toast("Server error");
             console.log('ERROR');
             console.log(err);
+        }, function(data) {
+            console.log('RESULT');
+            console.log(data);
         });
     },
     render() {
