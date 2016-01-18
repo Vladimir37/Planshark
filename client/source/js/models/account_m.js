@@ -46,6 +46,12 @@ var Login = React.createClass({
                 response_status = 2;
             }
             toast(login_r[response_status]);
+            if(response_status == 0) {
+                document.location.pathname = '/tasks';
+            }
+            else {
+                $(elem.target).parent().find('[name="pass"]').val('');
+            }
         }, function(err) {
             console.log(err);
             toast("Server error");
@@ -86,6 +92,18 @@ var Registration = React.createClass({
                 <label>Company<input type="radio" name="type" value="company"/></label><br/>
                 <button className="sub" onClick={this.submit}>Registration</button>
             </article>;
+    }
+});
+
+//after registration
+var After = React.createClass({
+    getInitialState() {
+        return null;
+    },
+    render() {
+        return <article className="after_reg">
+            The letter with login and password was send to your mail. You now are able to log in to the Planshark.
+        </article>;
     }
 });
 

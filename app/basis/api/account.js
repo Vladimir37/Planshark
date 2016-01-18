@@ -188,10 +188,55 @@ function reminder(req, res, next) {
             var pass = crypt.decrypt(user.pass);
             mail('reminder', mail, 'Password in Planshark', {pass, name: user.name});
         }
-    })
+    });
+};
+
+function status(req, res, next) {
+    var cookie = JSON.parse(crypt.decrypt(req.cookies.planshark_status));
+    if(!cookie) {
+        res.end('false');
+    }
+    else {
+        var status_data = {};
+        status_data.id = cookie[2];
+        status_data.room = cookie[0];
+        status_data.group = cookie[1];
+        db.users.findById(status_data.id).then(function(user) {
+            status_data.name = user.name;
+            if(!status_data.room) {
+                res.end(JSON.stringify(status_data));
+                return JSON.stringify(status_data);
+            }
+            if(status_data.group == 0) {
+                status_data.t_manage = true;
+                status_data.u_manage = true;
+                status_data.creating = true;
+                status_data.editing = true;
+                status_data.reassignment = true;
+                status_data.deleting = true;
+                res.end(JSON.stringify(status_data));
+                return JSON.stringify(status_data);
+            }
+            else {
+                return db.users_groups.findById(status_data.group);
+            }
+        }).then(function(user_group) {
+            status_data.t_manage = Boolean(+user_group.t_group_manage);
+            status_data.u_manage = Boolean(+user_group.u_group_manage);
+            status_data.creating = Boolean(+user_group.creating);
+            status_data.editing = Boolean(+user_group.editing);
+            status_data.reassignment = Boolean(+user_group.reassignment);
+            status_data.deleting = Boolean(+user_group.deleting);
+            res.end(JSON.stringify(status_data));
+        }).catch(function(err) {
+            console.log(err);
+            res.end('false');
+        })
+    }
 };
 
 exports.login = login;
 exports.registration = registration;
 exports.change = change;
 exports.reminder = reminder;
+exports.status = status;

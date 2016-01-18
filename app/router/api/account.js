@@ -16,4 +16,7 @@ router.post('/change', account.change);
 //password reminder
 router.post('/reminder', account.reminder);
 
+//object with user status
+router.get('/status', account.status);
+
 module.exports = router;
