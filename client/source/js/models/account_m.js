@@ -40,6 +40,7 @@ var Login = React.createClass({
     },
     submit(elem) {
         var ajax_data = getData(elem.target);
+        var self = this;
         submitting(ajax_data, '/api/account/login', 'POST', function(data) {
             var response_status = +data;
             if(isNaN(response_status)) {
@@ -47,7 +48,7 @@ var Login = React.createClass({
             }
             toast(login_r[response_status]);
             if(response_status == 0) {
-                this.props.request();
+                self.props.request();
             }
             else {
                 $(elem.target).parent().find('[name="pass"]').val('');
@@ -73,6 +74,7 @@ var Registration = React.createClass({
     },
     submit(elem) {
         var ajax_data = getData(elem.target);
+        var self = this;
         submitting(ajax_data, '/api/account/registration', 'POST', function(data) {
             var response_status = +data;
             if(isNaN(response_status)) {
@@ -80,7 +82,7 @@ var Registration = React.createClass({
             }
             toast(registration_r[response_status]);
             if(response_status == 0) {
-                this.props.request();
+                self.props.request();
             }
         }, function(err) {
             toast("Server error");
@@ -124,16 +126,21 @@ var Panel = React.createClass({
         };
     },
     receptionData() {
-        submitting(null, '/api/account/status', 'POST', function(data) {
-            this.setState({
+        var self = this;
+        submitting(null, '/api/account/status', 'GET', function(data) {
+            if(typeof data == 'string') {
+                data = JSON.parse(data);
+            }
+            self.setState({
+                active: false,
                 name: data.name,
                 tasks: true,
-                t_groups: data.t_manage,
-                u_groups: data.u_manage,
+                t_groups: Boolean(data.t_manage || !self.state.room),
+                u_groups: Boolean(data.u_manage),
                 users: Boolean(data.group == 0 && data.room)
             });
         }, function(err) {
-            this.setState({
+            self.setState({
                 active: false,
                 fail: true
             });
@@ -141,6 +148,7 @@ var Panel = React.createClass({
     },
     render() {
         if(this.state.active && !this.state.fail) {
+            this.receptionData();
             return <article className="index_panel">
                 <p className="message">Please wait...</p>
             </article>;
@@ -182,6 +190,7 @@ var Panel = React.createClass({
 //checking cookie and render start forms
 var StartAccount = React.createClass({
     getInitialState() {
+        //todo checking for cookie
         return {
             logged: false,
             registration: false
@@ -202,7 +211,7 @@ var StartAccount = React.createClass({
             logged: false,
             registration: false
         });
-        submitting(null, '/api/account/exit');
+        submitting(null, '/api/account/exit', 'POST');
         return true;
     },
     render() {
@@ -214,12 +223,14 @@ var StartAccount = React.createClass({
                 <Registration request={this.registration} />
             </article>;
         }
+        //after registration
         else if(this.state.registration) {
             return <article className="index_form_inner">
                 <After />
                 <Login request={this.login} />
             </article>;
         }
+        //after login
         else {
             return <article className="index_form_inner">
                 <Panel exit={this.exit} />

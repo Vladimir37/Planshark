@@ -26,6 +26,7 @@ function submitting(data, url, type, success, error, complete) {
     success = success || emptyFunction;
     error = error || emptyFunction;
     complete = complete || emptyFunction;
+    data = data || {};
     if(data) {
         $.ajax({
             url,
