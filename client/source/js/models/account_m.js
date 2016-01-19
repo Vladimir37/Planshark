@@ -47,7 +47,7 @@ var Login = React.createClass({
             }
             toast(login_r[response_status]);
             if(response_status == 0) {
-                document.location.pathname = '/tasks';
+                this.props.request();
             }
             else {
                 $(elem.target).parent().find('[name="pass"]').val('');
@@ -79,6 +79,9 @@ var Registration = React.createClass({
                 response_status = 4;
             }
             toast(registration_r[response_status]);
+            if(response_status == 0) {
+                this.props.request();
+            }
         }, function(err) {
             toast("Server error");
         });
@@ -161,9 +164,9 @@ var Panel = React.createClass({
             var users = this.state.users ? <a href="/users">
                 <article className="index_panel_elem">Users</article>
             </a> : '';
-            var exit = <a href="/api/account/exit">
-                <article className="index_panel_elem">Exit</article>
-            </a>;
+            var exit = <article className="index_panel_elem" onClick={this.props.exit}>
+                Exit
+            </article>;
             return <article className="index_panel">
                 {name}
                 {tasks}
@@ -180,15 +183,48 @@ var Panel = React.createClass({
 var StartAccount = React.createClass({
     getInitialState() {
         return {
-            logged: false
+            logged: false,
+            registration: false
         };
     },
+    registration() {
+        this.setState({
+            registration: true
+        });
+    },
+    login() {
+        this.setState({
+            logged: true
+        });
+    },
+    exit() {
+        this.setState({
+            logged: false,
+            registration: false
+        });
+        submitting(null, '/api/account/exit');
+        return true;
+    },
     render() {
-        return <article className="index_form_inner">
-            <Buttons />
-            <Login />
-            <Registration />
-        </article>;
+        //first visit
+        if(!this.state.logged && !this.state.registration) {
+            return <article className="index_form_inner">
+                <Buttons />
+                <Login request={this.login} />
+                <Registration request={this.registration} />
+            </article>;
+        }
+        else if(this.state.registration) {
+            return <article className="index_form_inner">
+                <After />
+                <Login request={this.login} />
+            </article>;
+        }
+        else {
+            return <article className="index_form_inner">
+                <Panel exit={this.exit} />
+            </article>;
+        }
     }
 });
 

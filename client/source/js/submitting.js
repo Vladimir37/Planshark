@@ -22,7 +22,10 @@ function getData(target) {
 
 //submitting data to server
 function submitting(data, url, type, success, error, complete) {
-    complete = complete || function(){};
+    var emptyFunction = function(){};
+    success = success || emptyFunction;
+    error = error || emptyFunction;
+    complete = complete || emptyFunction;
     if(data) {
         $.ajax({
             url,
