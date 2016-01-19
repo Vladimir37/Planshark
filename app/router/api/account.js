@@ -19,4 +19,7 @@ router.post('/reminder', account.reminder);
 //object with user status
 router.get('/status', account.status);
 
+//exit from account
+router.post('/exit', account.exit);
+
 module.exports = router;

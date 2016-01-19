@@ -107,16 +107,86 @@ var After = React.createClass({
     }
 });
 
+//panel for authorized users
+var Panel = React.createClass({
+    getInitialState() {
+        return {
+            active: true,
+            fail: false,
+            name: false,
+            tasks: false,
+            t_groups: false,
+            u_groups: false,
+            users: false
+        };
+    },
+    receptionData() {
+        submitting(null, '/api/account/status', 'POST', function(data) {
+            this.setState({
+                name: data.name,
+                tasks: true,
+                t_groups: data.t_manage,
+                u_groups: data.u_manage,
+                users: Boolean(data.group == 0 && data.room)
+            });
+        }, function(err) {
+            this.setState({
+                active: false,
+                fail: true
+            });
+        });
+    },
+    render() {
+        if(this.state.active && !this.state.fail) {
+            return <article className="index_panel">
+                <p className="message">Please wait...</p>
+            </article>;
+        }
+        else if(!this.state.active && this.state.fail) {
+            return <article className="index_panel">
+                <p className="message">Server error! Try again later.</p>
+            </article>;
+        }
+        else {
+            var name = <article className="index_panel_name">{this.state.name}</article>;
+            var tasks = <a href="/tasks">
+                <article className="index_panel_elem">Tasks</article>
+            </a>;
+            var t_groups = this.state.t_groups ? <a href="/tasks_groups">
+                <article className="index_panel_elem">Tasks groups</article>
+            </a> : '';
+            var u_groups = this.state.u_groups ? <a href="/users_groups">
+                <article className="index_panel_elem">Users groups</article>
+            </a> : '';
+            var users = this.state.users ? <a href="/users">
+                <article className="index_panel_elem">Users</article>
+            </a> : '';
+            var exit = <a href="/api/account/exit">
+                <article className="index_panel_elem">Exit</article>
+            </a>;
+            return <article className="index_panel">
+                {name}
+                {tasks}
+                {t_groups}
+                {u_groups}
+                {users}
+                {exit}
+            </article>;
+        }
+    }
+});
+
 //checking cookie and render start forms
 var StartAccount = React.createClass({
     getInitialState() {
-        //ToDo Checking cookie status
-        return null;
+        return {
+            logged: false
+        };
     },
     render() {
         return <article className="index_form_inner">
             <Buttons />
-            <Login/>
+            <Login />
             <Registration />
         </article>;
     }

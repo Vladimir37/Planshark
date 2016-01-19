@@ -191,6 +191,7 @@ function reminder(req, res, next) {
     });
 };
 
+//data about user in JSON. False if not logged
 function status(req, res, next) {
     var cookie = JSON.parse(crypt.decrypt(req.cookies.planshark_status));
     if(!cookie) {
@@ -235,8 +236,15 @@ function status(req, res, next) {
     }
 };
 
+//exit from account
+function exit(req, res, next) {
+    res.clearCookie('planshark_status');
+    res.end('0');
+};
+
 exports.login = login;
 exports.registration = registration;
 exports.change = change;
 exports.reminder = reminder;
 exports.status = status;
+exports.exit = exit;
