@@ -1,6 +1,6 @@
 var db = require('../database');
 var crypt = require('../crypt');
-var mail = require('../mail');
+var mail_send = require('../mail');
 
 //RegExp for mail
 var re_mail = new RegExp('.+@.+\..+');
@@ -126,7 +126,7 @@ function registration(req, res, next) {
                 return Promise.resolve();
             }
         }).then(function() {
-            mail('registration', mail, 'Registration in Planshark', {name, pass});
+            mail_send('registration', mail, 'Registration in Planshark', {name, pass});
             res.end('0');
         }).catch(function(err) {
             var error_type = err.toString();

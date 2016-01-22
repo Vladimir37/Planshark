@@ -200,6 +200,7 @@ var StartAccount = React.createClass({
         this.setState({
             registration: true
         });
+        $('.login_form').show();
     },
     login() {
         this.setState({
