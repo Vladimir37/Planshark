@@ -126,24 +126,14 @@ var Panel = React.createClass({
         };
     },
     receptionData() {
-        var self = this;
-        submitting(null, '/api/account/status', 'GET', function(data) {
-            if(typeof data == 'string') {
-                data = JSON.parse(data);
-            }
-            self.setState({
-                active: false,
-                name: data.name,
-                tasks: true,
-                t_groups: Boolean(data.t_manage || !self.state.room),
-                u_groups: Boolean(data.u_manage),
-                users: Boolean(data.group == 0 && data.room)
-            });
-        }, function(err) {
-            self.setState({
-                active: false,
-                fail: true
-            });
+        var data = this.props.user_data;
+        this.setState({
+            active: false,
+            name: data.name,
+            tasks: true,
+            t_groups: Boolean(data.t_manage || !self.state.room),
+            u_groups: Boolean(data.u_manage),
+            users: Boolean(data.group == 0 && data.room)
         });
     },
     render() {
@@ -190,11 +180,36 @@ var Panel = React.createClass({
 //checking cookie and render start forms
 var StartAccount = React.createClass({
     getInitialState() {
-        //todo checking for cookie
         return {
             logged: false,
-            registration: false
+            registration: false,
+            data: false
         };
+    },
+    checking() {
+        var self = this;
+        submitting(null, '/api/account/status', 'GET', function(data) {
+            if(typeof data == 'string') {
+                data = JSON.parse(data);
+            }
+            if(data && !self.state.logged) {
+                self.setState({
+                    logged: true,
+                    data
+                });
+            }
+            else if(!data && self.state.logged) {
+                self.setState({
+                    logged: false,
+                    data: false
+                });
+            }
+        }, function(err) {
+            self.setState({
+                active: false,
+                fail: true
+            });
+        });
     },
     registration() {
         this.setState({
@@ -203,19 +218,16 @@ var StartAccount = React.createClass({
         $('.login_form').show();
     },
     login() {
-        this.setState({
-            logged: true
-        });
+        this.checking();
     },
     exit() {
-        this.setState({
-            logged: false,
-            registration: false
+        var self = this;
+        submitting(null, '/api/account/exit', 'POST', false, false, function() {
+            self.checking();
         });
-        submitting(null, '/api/account/exit', 'POST');
-        return true;
     },
     render() {
+        this.checking();
         //first visit
         if(!this.state.logged && !this.state.registration) {
             return <article className="index_form_inner">
@@ -225,7 +237,7 @@ var StartAccount = React.createClass({
             </article>;
         }
         //after registration
-        else if(this.state.registration) {
+        else if(!this.state.logged && this.state.registration) {
             return <article className="index_form_inner">
                 <After />
                 <Login request={this.login} />
@@ -234,7 +246,7 @@ var StartAccount = React.createClass({
         //after login
         else {
             return <article className="index_form_inner">
-                <Panel exit={this.exit} />
+                <Panel exit={this.exit} user_data={this.state.data} />
             </article>;
         }
     }
