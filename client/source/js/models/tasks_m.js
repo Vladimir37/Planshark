@@ -79,3 +79,7 @@ var Creating = React.createClass({
         </section>;
     }
 });
+
+$(document).ready(function() {
+    $('input#qw').datepicker();
+})
