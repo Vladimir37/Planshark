@@ -15,19 +15,42 @@ var Creating = React.createClass({
         //
     },
     render() {
-        var users = '';
+        //performers list
+        var users = [];
         if(this.state.room && this.state.users) {
             this.state.users.forEach(function(elem) {
                 users.push(<label>{elem[1]}<input type="radio" name="performer" value={elem[0]}/></label>);
             });
-            users.unshift(<label>Me<input type="radio" name="performer" value={false}/></label>)
+            users.unshift(<label>Me<input type="radio" name="performer" value={false} checked /></label>)
         }
-        var t_groups = '';
+        //tasks groups list
+        var t_groups = [];
         if(this.state.t_groups) {
             this.state.t_groups.map(function(elem) {
-                return <label>{elem[1]}<input type="radio" name="performer" value={elem[0]}/></label>;
+                t_groups.push(<label>{elem[1]}<input type="radio" name="t_group" value={elem[0]}/></label>);
             });
-            users.unshift(<label>Me<input type="radio" name="performer" value={false}/></label>)
+            t_groups.unshift(<label>No group<input type="radio" name="t_group" value={false} checked/></label>)
+        }
+        //users groups list
+        var u_groups = [];
+        if(this.state.room && this.state.u_groups) {
+            this.state.u_groups.forEach(function(elem) {
+                u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" value={elem[0]}/></label>);
+            });
+            u_groups.unshift(<label>No group<input type="radio" name="u_group" value={false} checked /></label>)
+        }
+        //personal or company items
+        var u_groups_item = '';
+        var performers_item = '';
+        if(this.state.room) {
+            performers_item = <article className="perform_select_main">
+                <h3>Performer</h3>
+                <article className="users_select">{users}</article>
+            </article>;
+            u_groups_item = <article className="u_group_select_main">
+                <h3>Users group</h3>
+                <article className="u_group_select">{u_groups}</article>
+            </article>;
         }
         return <section className="taskCreating">
             <article className="taskCreatingHead">Creating</article>
@@ -46,6 +69,12 @@ var Creating = React.createClass({
                         <label>High<input type="radio" name="priority" value="2"/></label>
                     </article>
                 </article>
+                {performers_item}
+                <article className="t_group_select_main">
+                <h3>Tasks group</h3>
+                    <article className="t_group_select">{t_groups}</article>
+                </article>
+                {u_groups_item}
             </article>
         </section>;
     }
