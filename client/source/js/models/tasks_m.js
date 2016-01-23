@@ -1,5 +1,5 @@
 //responses
-var actions_r = ['Success!', 'Required fields are empty', 'Incorrect date', 'Server error'];
+var actions_r = ['Success!', 'Server error' , 'Required fields are empty', 'Incorrect date'];
 var deleting_r = ['Success!', 'Server error'];
 
 var Creating = React.createClass({
@@ -11,8 +11,27 @@ var Creating = React.createClass({
             u_groups: false
         };
     },
-    creating() {
-        //
+    submit(elem) {
+        var ajax_data = getData(elem.target);
+        var exp_date = $(elem.target).find('input#time').val();
+        if(exp_date && new Date() > new Date(exp_date)) {
+            toast(actions_r[3]);
+        }
+        else {
+            submitting(ajax_data, '/api/tasks/create', 'POST', function(data) {
+                var response_status = +data;
+                if(isNaN(response_status)) {
+                    response_status = 1;
+                }
+                toast(registration_r[response_status]);
+                if(response_status == 0) {
+                    toast(actions_r[0]);
+                    $(elem.target).find('textarea, input[type="text"]').val('');
+                }
+            }, function(err) {
+                toast("Server error");
+            });
+        }
     },
     render() {
         //performers list
@@ -56,7 +75,7 @@ var Creating = React.createClass({
             <article className="taskCreatingHead">Creating</article>
             <article className="taskCreatingBody">
                 <input type="text" name="name" placeholder="Task name" data-req="true"/><br/>
-                <textarea name="description" placeholder="Task description"></textarea><br/>
+                <textarea name="description" placeholder="Task description" data-req="true"></textarea><br/>
                 <article className="priority">
                     <article className="priority_scale">
                         <article className="priority_scale_1"></article>
@@ -75,11 +94,44 @@ var Creating = React.createClass({
                     <article className="t_group_select">{t_groups}</article>
                 </article>
                 {u_groups_item}
+                <input type="text" name="expiration" placeholder="Expiration time" id="time"/><br/>
+                <button className="sub" onClick={this.submit}>Create</button>
             </article>
         </section>;
     }
 });
 
+var TasksPage = React.createClass({
+    getInitialState() {
+        return {
+            loaded: false,
+            failed: false,
+            data: false
+        }
+    },
+    loading() {
+        var self = this;
+        submitting(null, '/api/account/status', 'GET', function(data) {
+            if (typeof data == 'string') {
+                data = JSON.parse(data);
+            }
+            self.setState({
+                loaded: true,
+                data: data
+            })
+        }, function(err) {
+            self.setState({
+                failed: true
+            });
+        });
+    },
+    render() {
+        if(!this.state.loaded && !this.state.failed) {
+            //
+        }
+    }
+});
+
 $(document).ready(function() {
-    $('input#qw').datepicker();
-})
+    $('input#time').datepicker();
+});
