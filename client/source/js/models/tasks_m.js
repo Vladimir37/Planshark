@@ -5,6 +5,7 @@ var deleting_r = ['Success!', 'Server error'];
 var Creating = React.createClass({
     getInitialState() {
         return {
+            received: false,
             room: false,
             users: false,
             t_groups: false,
@@ -12,7 +13,15 @@ var Creating = React.createClass({
         };
     },
     receive() {
-        //
+        var all_data = this.props.data;
+        var status = this.props.status;
+        this.setState({
+            received: true,
+            room: status.room,
+            users: all_data.body.users,
+            t_groups: all_data.body.t_groups,
+            u_groups: all_data.body.u_groups
+        });
     },
     submit(elem) {
         var ajax_data = getData(elem.target);
@@ -43,7 +52,7 @@ var Creating = React.createClass({
             this.state.users.forEach(function(elem) {
                 users.push(<label>{elem[1]}<input type="radio" name="performer" value={elem[0]}/></label>);
             });
-            users.unshift(<label>Me<input type="radio" name="performer" value={false} checked /></label>)
+            users.unshift(<label>Me<input type="radio" name="performer" value={false} defaultChecked /></label>)
         }
         //tasks groups list
         var t_groups = [];
@@ -51,7 +60,7 @@ var Creating = React.createClass({
             this.state.t_groups.map(function(elem) {
                 t_groups.push(<label>{elem[1]}<input type="radio" name="t_group" value={elem[0]}/></label>);
             });
-            t_groups.unshift(<label>No group<input type="radio" name="t_group" value={false} checked/></label>)
+            t_groups.unshift(<label>No group<input type="radio" name="t_group" value={false} defaultChecked/></label>)
         }
         //users groups list
         var u_groups = [];
@@ -59,7 +68,7 @@ var Creating = React.createClass({
             this.state.u_groups.forEach(function(elem) {
                 u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" value={elem[0]}/></label>);
             });
-            u_groups.unshift(<label>No group<input type="radio" name="u_group" value={false} checked /></label>)
+            u_groups.unshift(<label>No group<input type="radio" name="u_group" value={false} defaultChecked /></label>)
         }
         //personal or company items
         var u_groups_item = '';
@@ -74,33 +83,41 @@ var Creating = React.createClass({
                 <article className="u_group_select">{u_groups}</article>
             </article>;
         }
-        return <section className="taskCreating">
-            <article className="taskCreatingHead">Creating</article>
-            <article className="taskCreatingBody">
-                <input type="text" name="name" placeholder="Task name" data-req="true"/><br/>
-                <textarea name="description" placeholder="Task description" data-req="true"></textarea><br/>
-                <article className="priority">
-                    <article className="priority_scale">
-                        <article className="priority_scale_1"></article>
-                        <article className="priority_scale_2"></article>
-                        <article className="priority_scale_3"></article>
+        //data not received
+        if(!this.state.received) {
+            this.receive();
+            //return <Waiting />;
+            return <article>Wait, wait</article>;
+        }
+        else {
+            return <section className="taskCreating">
+                <article className="taskCreatingHead">Creating</article>
+                <article className="taskCreatingBody">
+                    <input type="text" name="name" placeholder="Task name" data-req="true"/><br/>
+                    <textarea name="description" placeholder="Task description" data-req="true"></textarea><br/>
+                    <article className="priority">
+                        <article className="priority_scale">
+                            <article className="priority_scale_1"></article>
+                            <article className="priority_scale_2"></article>
+                            <article className="priority_scale_3"></article>
+                        </article>
+                        <article className="priority_control">
+                            <label>Low<input type="radio" name="priority" value="0" defaultChecked/></label>
+                            <label>Middle<input type="radio" name="priority" value="1"/></label>
+                            <label>High<input type="radio" name="priority" value="2"/></label>
+                        </article>
                     </article>
-                    <article className="priority_control">
-                        <label>Low<input type="radio" name="priority" value="0" defaultChecked/></label>
-                        <label>Middle<input type="radio" name="priority" value="1"/></label>
-                        <label>High<input type="radio" name="priority" value="2"/></label>
+                    {performers_item}
+                    <article className="t_group_select_main">
+                        <h3>Tasks group</h3>
+                        <article className="t_group_select">{t_groups}</article>
                     </article>
+                    {u_groups_item}
+                    <input type="text" name="expiration" placeholder="Expiration time" id="time"/><br/>
+                    <button className="sub" onClick={this.submit}>Create</button>
                 </article>
-                {performers_item}
-                <article className="t_group_select_main">
-                <h3>Tasks group</h3>
-                    <article className="t_group_select">{t_groups}</article>
-                </article>
-                {u_groups_item}
-                <input type="text" name="expiration" placeholder="Expiration time" id="time"/><br/>
-                <button className="sub" onClick={this.submit}>Create</button>
-            </article>
-        </section>;
+            </section>;
+        }
     }
 });
 
@@ -109,19 +126,30 @@ var TasksPage = React.createClass({
         return {
             loaded: false,
             failed: false,
+            status: false,
             data: false
         }
     },
     loading() {
         var self = this;
-        submitting(null, '/api/account/status', 'GET', function(data) {
-            if (typeof data == 'string') {
-                data = JSON.parse(data);
+        submitting(null, '/api/account/status', 'GET', function(status) {
+            if (typeof status == 'string') {
+                status = JSON.parse(status);
             }
-            self.setState({
-                loaded: true,
-                data: data
-            })
+            submitting(null, '/api/data_viewing/all', 'GET', function(data) {
+                if (typeof data == 'string') {
+                    data = JSON.parse(data);
+                }
+                self.setState({
+                    loaded: true,
+                    status,
+                    data
+                });
+            }, function(err) {
+                self.setState({
+                    failed: true
+                });
+            });
         }, function(err) {
             self.setState({
                 failed: true
@@ -131,19 +159,27 @@ var TasksPage = React.createClass({
     render() {
         if(!this.state.loaded && !this.state.failed) {
             this.loading();
-            return <Waiting />;
+            //return <Waiting />;
+            return <article>Waut wait</article>;
         }
         else if(!this.state.loaded && this.state.failed) {
             return <Error />;
         }
         else {
+            //page formation
             var page = [];
-            if(this.state.data.creating) {
-                page.push(<Creating />);
+            if(this.state.status.creating) {
+                page.push(<Creating status={this.state.status} data={this.state.data} />);
             }
+            //render
+            return <article className="tasks_page_inner">
+                {page}
+            </article>;
         }
     }
 });
+
+ReactDOM.render(<TasksPage />, document.getElementsByClassName('tasks_page')[0]);
 
 $(document).ready(function() {
     $('input#time').datepicker();

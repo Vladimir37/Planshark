@@ -20,6 +20,8 @@
         "sequelize": "*",
         "easy-encryption": "*",
         "nodemailer": "*",
-        "random-token": "*"
+        "random-token": "*",
+        "babel-loader": "6.2.1",
+        "webpack": "*"
     }
 }
