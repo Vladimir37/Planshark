@@ -11,6 +11,9 @@ var Creating = React.createClass({
             u_groups: false
         };
     },
+    receive() {
+        //
+    },
     submit(elem) {
         var ajax_data = getData(elem.target);
         var exp_date = $(elem.target).find('input#time').val();
@@ -127,7 +130,17 @@ var TasksPage = React.createClass({
     },
     render() {
         if(!this.state.loaded && !this.state.failed) {
-            //
+            this.loading();
+            return <Waiting />;
+        }
+        else if(!this.state.loaded && this.state.failed) {
+            return <Error />;
+        }
+        else {
+            var page = [];
+            if(this.state.data.creating) {
+                page.push(<Creating />);
+            }
         }
     }
 });

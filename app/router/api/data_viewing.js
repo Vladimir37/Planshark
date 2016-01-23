@@ -16,4 +16,7 @@ router.get('/t_groups', data_viewing.t_groups);
 //get users groups
 router.get('/u_groups', data_viewing.u_groups);
 
+//all data
+router.get('/all' , data_viewing.all);
+
 module.exports = router;

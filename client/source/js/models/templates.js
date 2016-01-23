@@ -50,3 +50,25 @@ var Menu = React.createClass({
         }
     }
 });
+
+var Waiting = React.createClass({
+    getInitialState() {
+        return null;
+    },
+    render() {
+        return <article className="waiting">
+            <p className="message">Please wait...</p>
+        </article>;
+    }
+});
+
+var Error = React.createClass({
+    getInitialState() {
+        return null;
+    },
+    render() {
+        return <article className="waiting">
+            <p className="message">Server error! Try again later.</p>
+        </article>;
+    }
+});

@@ -116,7 +116,7 @@ var After = React.createClass({
 var Panel = React.createClass({
     getInitialState() {
         return {
-            active: true,
+            loaded: true,
             fail: false,
             name: false,
             tasks: false,
@@ -128,7 +128,7 @@ var Panel = React.createClass({
     receptionData() {
         var data = this.props.user_data;
         this.setState({
-            active: false,
+            loaded: false,
             name: data.name,
             tasks: true,
             t_groups: Boolean(data.t_manage || !self.state.room),
@@ -137,16 +137,12 @@ var Panel = React.createClass({
         });
     },
     render() {
-        if(this.state.active && !this.state.fail) {
+        if(this.state.loaded && !this.state.fail) {
             this.receptionData();
-            return <article className="index_panel">
-                <p className="message">Please wait...</p>
-            </article>;
+            return <Waiting />;
         }
-        else if(!this.state.active && this.state.fail) {
-            return <article className="index_panel">
-                <p className="message">Server error! Try again later.</p>
-            </article>;
+        else if(!this.state.loaded && this.state.fail) {
+            return <Error />;
         }
         else {
             var name = <article className="index_panel_name">{this.state.name}</article>;
@@ -205,10 +201,7 @@ var StartAccount = React.createClass({
                 });
             }
         }, function(err) {
-            self.setState({
-                active: false,
-                fail: true
-            });
+            console.log(err);
         });
     },
     registration() {
