@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import $ from '../libs/jquery';
+import $ from 'jquery';
+import {submitting, getData} from '../submitting.js';
+import {Waiting, Error, Menu} from './templates.js';
+import toast from '../toaster.js';
 
 //responses
 var actions_r = ['Success!', 'Server error' , 'Required fields are empty', 'Incorrect date'];
@@ -183,7 +186,7 @@ var TasksPage = React.createClass({
 });
 
 $(document).ready(function() {
-    if (document.location.pathname == 'tasks') {
+    if (document.location.pathname == '/tasks') {
         ReactDOM.render(<TasksPage />, document.getElementsByClassName('tasks_page')[0]);
     }
     $('input#time').datepicker();

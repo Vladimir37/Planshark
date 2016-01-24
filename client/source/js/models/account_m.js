@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import $ from '../libs/jquery';
+import $ from 'jquery';
+import {submitting, getData} from '../submitting.js';
+import {Waiting, Error} from './templates.js';
+import toast from '../toaster.js';
 
 //responses
 var registration_r = ['Success!', 'Name is busy', 'Mail is busy', 'Required fields are empty', 'Server error'];

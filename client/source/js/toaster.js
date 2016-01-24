@@ -1,4 +1,4 @@
-import toastr from './libs/toastr.min.js';
+import toastr from './libs/toastr.js';
 
 toastr.options = {
     "closeButton": false,
@@ -18,6 +18,6 @@ toastr.options = {
     "hideMethod": "fadeOut"
 };
 
-function toast(text) {
+export default function toast(text) {
     toastr["success"](text);
 };

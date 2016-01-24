@@ -1,5 +1,5 @@
 //get data from form
-function getData(target) {
+export function getData(target) {
     var form_data = {};
     var form = $(target).parent();
     var text_inputs = form.find('input[type="text"], input[type="password"], textarea');
@@ -21,7 +21,7 @@ function getData(target) {
 };
 
 //submitting data to server
-function submitting(data, url, type, success, error, complete) {
+export function submitting(data, url, type, success, error, complete) {
     var emptyFunction = function(){};
     success = success || emptyFunction;
     error = error || emptyFunction;

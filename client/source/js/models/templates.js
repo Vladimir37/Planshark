@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-var Menu = React.createClass({
+export var Menu = React.createClass({
     getInitialState() {
         return {
             received: false,
@@ -54,7 +54,7 @@ var Menu = React.createClass({
     }
 });
 
-var Waiting = React.createClass({
+export var Waiting = React.createClass({
     getInitialState() {
         return null;
     },
@@ -65,7 +65,7 @@ var Waiting = React.createClass({
     }
 });
 
-var Error = React.createClass({
+export var Error = React.createClass({
     getInitialState() {
         return null;
     },
