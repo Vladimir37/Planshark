@@ -3,9 +3,13 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var status = require('./basis/status');
+var webpack = require('./basis/webpack');
 var errors = require('./router/errors');
 var index = require('./router/index');
 var api = require('./router/api');
+
+//start packaging
+webpack();
 
 var app = express();
 

@@ -3,25 +3,13 @@ html(lang="en")
     head
         meta(charset="UTF-8")
         title Planshark
-        script(src="/src/js/libs/jquery.js")
-        script(src="/src/js/libs/jquery.toaster.js")
-        script(src="/src/js/libs/jquery-ui.min.js")
-        script(src="/src/js/libs/babel.js")
-        script(src="/src/js/libs/react.js")
-        script(src="/src/js/libs/react-dom.js")
-        script(src="/src/js/libs/toastr.min.js")
-        script(src="/src/js/toaster.js")
+        script(src="/src/js/bundle/bundle.js")
         link(rel="stylesheet/less" href="/src/style/toastr.min.css")
         link(rel="stylesheet/less" href="/src/style/jquery-ui.min.css")
         link(rel="stylesheet/less" href="/src/style/jquery-ui.structure.min.css")
         link(rel="stylesheet/less" href="/src/style/jquery-ui.theme.min.css")
         link(rel="stylesheet/less" href="/src/style/main.less")
         script(src="/src/js/libs/less.js")
-        script(src="/src/js/submitting.js")
-        script(src="/src/js/models/templates.js" type="text/babel")
-        //- other JS files
-        block scripts
-        //- add mixins
         include mixins
     body
         header

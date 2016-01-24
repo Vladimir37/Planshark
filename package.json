@@ -21,7 +21,13 @@
         "easy-encryption": "*",
         "nodemailer": "*",
         "random-token": "*",
+        "react": "0.14.6",
+        "react-dom": "0.14.6",
         "babel-loader": "6.2.1",
+        "babel-core": "*",
+        "babel-preset-es2015": "*",
+        "babel-preset-react": "*",
+        "jquery": "2.2.0",
         "webpack": "*"
     }
 }

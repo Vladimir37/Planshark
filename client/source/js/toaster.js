@@ -1,3 +1,5 @@
+import toastr from './libs/toastr.min.js';
+
 toastr.options = {
     "closeButton": false,
     "debug": false,

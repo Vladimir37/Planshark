@@ -1,3 +1,7 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import $ from '../libs/jquery';
+
 //responses
 var actions_r = ['Success!', 'Server error' , 'Required fields are empty', 'Incorrect date'];
 var deleting_r = ['Success!', 'Server error'];
@@ -159,8 +163,7 @@ var TasksPage = React.createClass({
     render() {
         if(!this.state.loaded && !this.state.failed) {
             this.loading();
-            //return <Waiting />;
-            return <article>Waut wait</article>;
+            return <Waiting />;
         }
         else if(!this.state.loaded && this.state.failed) {
             return <Error />;
@@ -179,8 +182,9 @@ var TasksPage = React.createClass({
     }
 });
 
-ReactDOM.render(<TasksPage />, document.getElementsByClassName('tasks_page')[0]);
-
 $(document).ready(function() {
+    if (document.location.pathname == 'tasks') {
+        ReactDOM.render(<TasksPage />, document.getElementsByClassName('tasks_page')[0]);
+    }
     $('input#time').datepicker();
 });

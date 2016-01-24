@@ -1,3 +1,7 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import $ from '../libs/jquery';
+
 //responses
 var registration_r = ['Success!', 'Name is busy', 'Mail is busy', 'Required fields are empty', 'Server error'];
 var login_r = ['Success!', 'Incorrect login or password', 'Server error'];
@@ -245,4 +249,8 @@ var StartAccount = React.createClass({
     }
 });
 
-ReactDOM.render(<StartAccount />, document.getElementsByClassName('index_forms')[0]);
+$(document).ready(function() {
+    if(document.location.pathname == '/') {
+        ReactDOM.render(<StartAccount />, document.getElementsByClassName('index_forms')[0]);
+    }
+});
