@@ -81,7 +81,7 @@ body {
             }
             .taskCreating {
                 margin: 10px;
-                width: 300px;
+                width: 600px;
                 .taskCreatingHead {
                     padding: 5px;
                     font-size: 18px;
@@ -93,35 +93,46 @@ body {
                     border-top: none;
                     padding: 5px;
                     display: none;
-                    .priority {
-                        &_scale {
-                            display: inline-block;
-                            width: 45%;
-                            article {
-                                width: 40px;
-                                height: 15px;
-                                margin-bottom: 2px;
+                    .taskCreatingData {
+                        width: 230px;
+                        display: inline-block;
+                        margin-right: 10px;
+                        vertical-align: top;
+                        margin-top: 61px;
+                        .priority {
+                            &_scale {
+                                display: inline-block;
+                                width: 45%;
+                                article {
+                                    width: 40px;
+                                    height: 15px;
+                                    margin-bottom: 2px;
+                                }
+                                &_1 {
+                                    background: green;
+                                }
+                                &_2 {
+                                    background: #d3d300;
+                                }
+                                &_3 {
+                                    background: #b30000;
+                                }
                             }
-                            &_1 {
-                                background: green;
-                            }
-                            &_2 {
-                                background: #d3d300;
-                            }
-                            &_3 {
-                                background: #b30000;
+                            &_control {
+                                display: inline-block;
+                                width: 45%;
+                                input {
+                                    display: none;
+                                }
+                                label {
+                                    display: block;
+                                }
                             }
                         }
-                        &_control {
-                            display: inline-block;
-                            width: 45%;
-                            input {
-                                display: none;
-                            }
-                            label {
-                                display: block;
-                            }
-                        }
+                    }
+                    .select_main {
+                        display: inline-block;
+                        margin-right: 32px;
                     }
                 }
             }
@@ -160,15 +171,28 @@ body {
             text-align: center;
         }
     }
+    .select_box {
+        width: 200px;
+        height: 200px;
+        padding: 2px;
+        border: 2px solid @main;
+        overflow-y: scroll;
+        input {
+            display: none;
+        }
+        label {
+            display: block;
+        }
+    }
     input[type="text"], input[type="password"], textarea {
         border: 1px solid @main;
         border-radius: 0;
         padding: 4px;
-        transition-duration: 0.3s;
         margin-top: 3px;
         margin-bottom: 3px;
         font-size: 16px;
         resize: none;
+        transition-duration: 0.4s;
         &:focus {
             box-shadow: 0 -1px 0 @main inset;
         }

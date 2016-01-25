@@ -4,6 +4,7 @@ import $ from 'jquery';
 import {submitting, getData} from '../submitting.js';
 import {Waiting, Error, Menu} from './templates.js';
 import toast from '../toaster.js';
+import datepick from '../datepicker.js';
 
 //responses
 var actions_r = ['Success!', 'Server error' , 'Required fields are empty', 'Incorrect date'];
@@ -19,6 +20,9 @@ var Creating = React.createClass({
             u_groups: false
         };
     },
+    componentDidMount() {
+        setTimeout(datepick, 100);
+    },
     receive() {
         var all_data = this.props.data;
         var status = this.props.status;
@@ -33,29 +37,33 @@ var Creating = React.createClass({
     submit(elem) {
         var ajax_data = getData(elem.target);
         var exp_date = $(elem.target).find('input#time').val();
+        console.log(ajax_data);
         if(exp_date && new Date() > new Date(exp_date)) {
             toast(actions_r[3]);
         }
-        else {
-            submitting(ajax_data, '/api/tasks/create', 'POST', function(data) {
-                var response_status = +data;
-                if(isNaN(response_status)) {
-                    response_status = 1;
-                }
-                toast(registration_r[response_status]);
-                if(response_status == 0) {
-                    toast(actions_r[0]);
-                    $(elem.target).find('textarea, input[type="text"]').val('');
-                }
-            }, function(err) {
-                toast("Server error");
-            });
+        else if(!ajax_data) {
+            toast(actions_r[2]);
         }
+        //else {
+        //    submitting(ajax_data, '/api/tasks/create', 'POST', function(data) {
+        //        var response_status = +data;
+        //        if(isNaN(response_status)) {
+        //            response_status = 1;
+        //        }
+        //        toast(registration_r[response_status]);
+        //        if(response_status == 0) {
+        //            toast(actions_r[0]);
+        //            $(elem.target).find('textarea, input[type="text"]').val('');
+        //        }
+        //    }, function(err) {
+        //        toast("Server error");
+        //    });
+        //}
     },
     switching() {
         $('.taskCreatingBody').slideToggle();
     },
-    handleChange(elem) {
+    priorityChange(elem) {
         var target = elem.target;
         $('[name="priority"]').parent().removeClass('active_elem');
         $(target).parent().addClass('active_elem');
@@ -64,42 +72,49 @@ var Creating = React.createClass({
             $('.priority_scale_' + i).show();
         }
     },
+    selectBoxes(elem) {
+        var target = $(elem.target);
+        var elemParent = target.closest('.select_box');
+        elemParent.find('label').removeClass('active_elem');
+        target.parent().addClass('active_elem');
+    },
     render() {
+        var self = this;
         //performers list
         var users = [];
         if(this.state.room && this.state.users) {
             this.state.users.forEach(function(elem) {
-                users.push(<label>{elem[1]}<input type="radio" name="performer" value={elem[0]}/></label>);
+                users.push(<label>{elem[1]}<input type="radio" name="performer" onChange={self.selectBoxes} value={elem[0]}/></label>);
             });
-            users.unshift(<label>Me<input type="radio" name="performer" value={false} defaultChecked /></label>)
+            users.unshift(<label className="active_elem">Me<input type="radio" name="performer" value={false} onChange={self.selectBoxes} defaultChecked /></label>)
         }
         //tasks groups list
         var t_groups = [];
         if(this.state.t_groups) {
             this.state.t_groups.map(function(elem) {
-                t_groups.push(<label>{elem[1]}<input type="radio" name="t_group" value={elem[0]}/></label>);
+                t_groups.push(<label>{elem[1]}<input type="radio" name="t_group" onChange={self.selectBoxes} value={elem[0]}/></label>);
             });
-            t_groups.unshift(<label>No group<input type="radio" name="t_group" value={false} defaultChecked/></label>)
+            t_groups.unshift(<label className="active_elem">No group<input type="radio" name="t_group" onChange={self.selectBoxes} value={false} defaultChecked/></label>)
         }
         //users groups list
         var u_groups = [];
         if(this.state.room && this.state.u_groups) {
             this.state.u_groups.forEach(function(elem) {
-                u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" value={elem[0]}/></label>);
+                u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes} value={elem[0]}/></label>);
             });
-            u_groups.unshift(<label>No group<input type="radio" name="u_group" value={false} defaultChecked /></label>)
+            u_groups.unshift(<label className="active_elem">No group<input type="radio" name="u_group" onChange={self.selectBoxes} value={false} defaultChecked /></label>)
         }
         //personal or company items
         var u_groups_item = '';
         var performers_item = '';
         if(this.state.room) {
-            performers_item = <article className="perform_select_main">
+            performers_item = <article className="select_main">
                 <h3>Performer</h3>
-                <article className="users_select">{users}</article>
+                <article className="select_box">{users}</article>
             </article>;
-            u_groups_item = <article className="u_group_select_main">
+            u_groups_item = <article className="select_main">
                 <h3>Users group</h3>
-                <article className="u_group_select">{u_groups}</article>
+                <article className="select_box">{u_groups}</article>
             </article>;
         }
         //data not received
@@ -111,27 +126,30 @@ var Creating = React.createClass({
             return <section className="taskCreating">
                 <article className="taskCreatingHead" onClick={this.switching}>Creating</article>
                 <article className="taskCreatingBody">
-                    <input type="text" name="name" placeholder="Task name" data-req="true"/><br/>
-                    <textarea name="description" placeholder="Task description" data-req="true"></textarea><br/>
-                    <article className="priority">
-                        <article className="priority_scale">
-                            <article className="priority_scale_3 hidden" ></article>
-                            <article className="priority_scale_2 hidden" ></article>
-                            <article className="priority_scale_1"></article>
+                    <article className="taskCreatingData">
+                        <input type="text" name="name" placeholder="Task name" data-req="true"/><br/>
+                        <textarea name="description" placeholder="Task description" data-req="true"></textarea><br/>
+                        <article className="priority">
+                            <article className="priority_scale">
+                                <article className="priority_scale_3 hidden" ></article>
+                                <article className="priority_scale_2 hidden" ></article>
+                                <article className="priority_scale_1"></article>
+                            </article>
+                            <article className="priority_control">
+                                <label>High<input type="radio" name="priority" value="3" onChange={this.priorityChange}/></label>
+                                <label>Middle<input type="radio" name="priority" value="2" onChange={this.priorityChange}/></label>
+                                <label className="active_elem">Low<input type="radio" name="priority" value="1" onChange={this.priorityChange} defaultChecked/></label>
+                            </article>
                         </article>
-                        <article className="priority_control">
-                            <label>High<input type="radio" name="priority" value="3" onChange={this.handleChange}/></label>
-                            <label>Middle<input type="radio" name="priority" value="2" onChange={this.handleChange}/></label>
-                            <label className="active_elem">Low<input type="radio" name="priority" value="1" onChange={this.handleChange} defaultChecked/></label>
-                        </article>
+                        <br/>
+                        <input type="text" name="expiration" placeholder="Expiration time" className="time_field"/><br/>
                     </article>
                     {performers_item}
-                    <article className="t_group_select_main">
+                    <article className="select_main">
                         <h3>Tasks group</h3>
-                        <article className="t_group_select">{t_groups}</article>
+                        <article className="select_box">{t_groups}</article>
                     </article>
-                    {u_groups_item}
-                    <input type="text" name="expiration" placeholder="Expiration time" id="time"/><br/>
+                    {u_groups_item}<br/>
                     <button className="sub" onClick={this.submit}>Create</button>
                 </article>
             </section>;
@@ -201,7 +219,4 @@ $(document).ready(function() {
     if (document.location.pathname == '/tasks') {
         ReactDOM.render(<TasksPage />, document.getElementsByClassName('content_inner')[0]);
     }
-    $('.tasks_page_inner').ready(function() {
-        $('input#time').datepicker();
-    });
 });

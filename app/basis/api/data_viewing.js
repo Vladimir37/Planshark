@@ -147,10 +147,6 @@ function all(req, res, next) {
             users.forEach(function(item) {
                 result.push([item.id, item.name]);
             });
-            //if empty array
-            if(result == false) {
-                result = false;
-            }
             result_data.users = result;
             return db.tasks_groups.findAll({
                 where: {
@@ -162,10 +158,6 @@ function all(req, res, next) {
             groups.forEach(function(item) {
                 result.push([item.id, item.name]);
             });
-            //if empty array
-            if(result == false) {
-                result = false;
-            }
             result_data.t_groups = result;
             return db.users_groups.findAll({
                 where: {
@@ -177,10 +169,6 @@ function all(req, res, next) {
             groups.forEach(function(item) {
                 result.push([item.id, item.name]);
             });
-            //if empty array
-            if(result == false) {
-                result = false;
-            }
             result_data.u_groups = result;
             res.end(serializing(0, result_data));
         }).catch(function(err) {
