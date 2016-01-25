@@ -4,6 +4,7 @@ body {
     padding: 0;
     margin: 0;
     font-family: Helvetica;
+    font-size: 16px;
     .wrapper {
         margin: 0 auto;
         width: 960px;
@@ -78,10 +79,98 @@ body {
                     text-align: center;
                 }
             }
+            .taskCreating {
+                margin: 10px;
+                width: 300px;
+                .taskCreatingHead {
+                    padding: 5px;
+                    font-size: 18px;
+                    border: 2px solid @main;
+                    cursor: pointer;
+                }
+                .taskCreatingBody {
+                    border: 2px solid @main;
+                    border-top: none;
+                    padding: 5px;
+                    display: none;
+                    .priority {
+                        &_scale {
+                            display: inline-block;
+                            width: 45%;
+                            article {
+                                width: 40px;
+                                height: 15px;
+                                margin-bottom: 2px;
+                            }
+                            &_1 {
+                                background: green;
+                            }
+                            &_2 {
+                                background: #d3d300;
+                            }
+                            &_3 {
+                                background: #b30000;
+                            }
+                        }
+                        &_control {
+                            display: inline-block;
+                            width: 45%;
+                            input {
+                                display: none;
+                            }
+                            label {
+                                display: block;
+                            }
+                        }
+                    }
+                }
+            }
+            .menu_inner {
+                margin-top: -22px;
+                text-align: center;
+                nav {
+                    display: inline-block;
+                    margin-left: 5px;
+                    margin-right: 5px;
+                    padding: 2px 5px;
+                    font-size: 18px;
+                    background: @main;
+                    border: 2px solid @main;
+                    color: white;
+                    cursor: pointer;
+                    transition-duration: 0.4s;
+                    &.active_menu_elem {
+                        border: 2px solid @main;
+                        border-top: none;
+                        background: white;
+                        color: black;
+                        cursor: default;
+                    }
+                    &:not(.active_menu_elem):hover {
+                        border: 2px solid @main;
+                        border-top: none;
+                        background: white;
+                        color: black;
+                    }
+                }
+            }
         }
         .message {
             font-size: 19px;
             text-align: center;
+        }
+    }
+    input[type="text"], input[type="password"], textarea {
+        border: 1px solid @main;
+        border-radius: 0;
+        padding: 4px;
+        transition-duration: 0.3s;
+        margin-top: 3px;
+        margin-bottom: 3px;
+        font-size: 16px;
+        resize: none;
+        &:focus {
+            box-shadow: 0 -1px 0 @main inset;
         }
     }
     button {
@@ -98,6 +187,10 @@ body {
         display: none;
     }
     .active {
+        background: @main;
+        color: white;
+    }
+    .active_elem {
         background: @main;
         color: white;
     }

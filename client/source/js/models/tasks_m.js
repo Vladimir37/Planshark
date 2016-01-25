@@ -52,6 +52,18 @@ var Creating = React.createClass({
             });
         }
     },
+    switching() {
+        $('.taskCreatingBody').slideToggle();
+    },
+    handleChange(elem) {
+        var target = elem.target;
+        $('[name="priority"]').parent().removeClass('active_elem');
+        $(target).parent().addClass('active_elem');
+        $('.priority_scale article').hide();
+        for(var i = 1; i <= target.value; i++) {
+            $('.priority_scale_' + i).show();
+        }
+    },
     render() {
         //performers list
         var users = [];
@@ -93,25 +105,24 @@ var Creating = React.createClass({
         //data not received
         if(!this.state.received) {
             this.receive();
-            //return <Waiting />;
-            return <article>Wait, wait</article>;
+            return <Waiting />;
         }
         else {
             return <section className="taskCreating">
-                <article className="taskCreatingHead">Creating</article>
+                <article className="taskCreatingHead" onClick={this.switching}>Creating</article>
                 <article className="taskCreatingBody">
                     <input type="text" name="name" placeholder="Task name" data-req="true"/><br/>
                     <textarea name="description" placeholder="Task description" data-req="true"></textarea><br/>
                     <article className="priority">
                         <article className="priority_scale">
+                            <article className="priority_scale_3 hidden" ></article>
+                            <article className="priority_scale_2 hidden" ></article>
                             <article className="priority_scale_1"></article>
-                            <article className="priority_scale_2"></article>
-                            <article className="priority_scale_3"></article>
                         </article>
                         <article className="priority_control">
-                            <label>Low<input type="radio" name="priority" value="0" defaultChecked/></label>
-                            <label>Middle<input type="radio" name="priority" value="1"/></label>
-                            <label>High<input type="radio" name="priority" value="2"/></label>
+                            <label>High<input type="radio" name="priority" value="3" onChange={this.handleChange}/></label>
+                            <label>Middle<input type="radio" name="priority" value="2" onChange={this.handleChange}/></label>
+                            <label className="active_elem">Low<input type="radio" name="priority" value="1" onChange={this.handleChange} defaultChecked/></label>
                         </article>
                     </article>
                     {performers_item}
@@ -179,6 +190,7 @@ var TasksPage = React.createClass({
             }
             //render
             return <article className="tasks_page_inner">
+                <Menu active="tasks" data={this.state.status} />
                 {page}
             </article>;
         }
@@ -187,7 +199,9 @@ var TasksPage = React.createClass({
 
 $(document).ready(function() {
     if (document.location.pathname == '/tasks') {
-        ReactDOM.render(<TasksPage />, document.getElementsByClassName('tasks_page')[0]);
+        ReactDOM.render(<TasksPage />, document.getElementsByClassName('content_inner')[0]);
     }
-    $('input#time').datepicker();
+    $('.tasks_page_inner').ready(function() {
+        $('input#time').datepicker();
+    });
 });

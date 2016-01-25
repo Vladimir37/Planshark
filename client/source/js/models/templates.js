@@ -14,10 +14,18 @@ export var Menu = React.createClass({
         var data = this.props.data;
         if(data && !this.state.received) {
             this.setState({
+                received: true,
                 t_groups: Boolean(data.t_manage || !self.state.room),
                 u_groups: Boolean(data.u_manage),
                 users: Boolean(data.group == 0 && data.room)
             });
+        }
+    },
+    transition(addr) {
+        return function() {
+            if(document.location.pathname != addr) {
+                document.location.pathname = addr;
+            }
         }
     },
     exit() {
@@ -27,18 +35,20 @@ export var Menu = React.createClass({
     },
     render() {
         if(this.state.received) {
-            var tasks = <a href="/tasks">
-                <nav>Tasks</nav>
-            </a>;
-            var t_groups = this.state.t_group ? <a href="/tasks_groups">
-                <nav>Tasks groups</nav>
-            </a> : '';
-            var u_groups = this.state.u_group ? <a href="/users_groups">
-                <nav>Users groups</nav>
-            </a> : '';
-            var users = this.state.t_group ? <a href="/users">
-                <nav>Users</nav>
-            </a> : '';
+            //active definition
+            var active_name = this.props.active;
+            var tasks_c = active_name == 'tasks' ? 'active_menu_elem' : '';
+            var t_groups_c = active_name == 't_groups' ? 'active_menu_elem' : '';
+            var u_groups_c = active_name == 'u_groups' ? 'active_menu_elem' : '';
+            var users_c = active_name == 'users' ? 'active_menu_elem' : '';
+            //menu formation
+            var tasks = <nav onClick={this.transition('/tasks')} className={tasks_c}>Tasks</nav>;
+            var t_groups = this.state.t_groups ?
+                <nav onClick={this.transition('/tasks_groups')} className={t_groups_c}>Tasks groups</nav> : '';
+            var u_groups = this.state.u_groups ?
+                <nav onClick={this.transition('/users_groups')} className={u_groups_c}>Users groups</nav> : '';
+            var users = this.state.users ?
+                <nav onClick={this.transition('/users')} className={users_c}>Users</nav> : '';
             var exit_but = <nav onClick={this.exit}>Exit</nav>;
             return <article className="menu_inner">
                 {tasks}
@@ -49,6 +59,7 @@ export var Menu = React.createClass({
             </article>;
         }
         else {
+            this.dataHandling();
             return null;
         }
     }

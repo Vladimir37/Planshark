@@ -31029,11 +31029,19 @@
 	        var data = this.props.data;
 	        if (data && !this.state.received) {
 	            this.setState({
+	                received: true,
 	                t_groups: Boolean(data.t_manage || !self.state.room),
 	                u_groups: Boolean(data.u_manage),
 	                users: Boolean(data.group == 0 && data.room)
 	            });
 	        }
+	    },
+	    transition: function transition(addr) {
+	        return function () {
+	            if (document.location.pathname != addr) {
+	                document.location.pathname = addr;
+	            }
+	        };
 	    },
 	    exit: function exit() {
 	        submitting(null, '/api/account/exit', 'POST', false, false, function () {
@@ -31042,41 +31050,32 @@
 	    },
 	    render: function render() {
 	        if (this.state.received) {
+	            //active definition
+	            var active_name = this.props.active;
+	            var tasks_c = active_name == 'tasks' ? 'active_menu_elem' : '';
+	            var t_groups_c = active_name == 't_groups' ? 'active_menu_elem' : '';
+	            var u_groups_c = active_name == 'u_groups' ? 'active_menu_elem' : '';
+	            var users_c = active_name == 'users' ? 'active_menu_elem' : '';
+	            //menu formation
 	            var tasks = _react2.default.createElement(
-	                'a',
-	                { href: '/tasks' },
-	                _react2.default.createElement(
-	                    'nav',
-	                    null,
-	                    'Tasks'
-	                )
+	                'nav',
+	                { onClick: this.transition('/tasks'), className: tasks_c },
+	                'Tasks'
 	            );
-	            var t_groups = this.state.t_group ? _react2.default.createElement(
-	                'a',
-	                { href: '/tasks_groups' },
-	                _react2.default.createElement(
-	                    'nav',
-	                    null,
-	                    'Tasks groups'
-	                )
+	            var t_groups = this.state.t_groups ? _react2.default.createElement(
+	                'nav',
+	                { onClick: this.transition('/tasks_groups'), className: t_groups_c },
+	                'Tasks groups'
 	            ) : '';
-	            var u_groups = this.state.u_group ? _react2.default.createElement(
-	                'a',
-	                { href: '/users_groups' },
-	                _react2.default.createElement(
-	                    'nav',
-	                    null,
-	                    'Users groups'
-	                )
+	            var u_groups = this.state.u_groups ? _react2.default.createElement(
+	                'nav',
+	                { onClick: this.transition('/users_groups'), className: u_groups_c },
+	                'Users groups'
 	            ) : '';
-	            var users = this.state.t_group ? _react2.default.createElement(
-	                'a',
-	                { href: '/users' },
-	                _react2.default.createElement(
-	                    'nav',
-	                    null,
-	                    'Users'
-	                )
+	            var users = this.state.users ? _react2.default.createElement(
+	                'nav',
+	                { onClick: this.transition('/users'), className: users_c },
+	                'Users'
 	            ) : '';
 	            var exit_but = _react2.default.createElement(
 	                'nav',
@@ -31093,6 +31092,7 @@
 	                exit_but
 	            );
 	        } else {
+	            this.dataHandling();
 	            return null;
 	        }
 	    }
@@ -31209,6 +31209,20 @@
 	            });
 	        }
 	    },
+	    switching: function switching() {
+	        (0, _jquery2.default)('.taskCreatingBody').slideToggle();
+	    },
+	    handleChange: function handleChange(elem) {
+	        var target = elem.target;
+	        (0, _jquery2.default)('[name="priority"]').parent().removeClass('active_elem');
+	        (0, _jquery2.default)(target).parent().addClass('active_elem');
+	        (0, _jquery2.default)('.priority_scale article').hide();
+	        for (var i = 1; i <= target.value; i++) {
+	            console.log((0, _jquery2.default)('.priority_scale_' + i).length);
+	            console.log('.priority_scale_' + i);
+	            (0, _jquery2.default)('.priority_scale_' + i).show();
+	        }
+	    },
 	    render: function render() {
 	        //performers list
 	        var users = [];
@@ -31300,19 +31314,14 @@
 	        //data not received
 	        if (!this.state.received) {
 	            this.receive();
-	            //return <Waiting />;
-	            return _react2.default.createElement(
-	                'article',
-	                null,
-	                'Wait, wait'
-	            );
+	            return _react2.default.createElement(_templates.Waiting, null);
 	        } else {
 	            return _react2.default.createElement(
 	                'section',
 	                { className: 'taskCreating' },
 	                _react2.default.createElement(
 	                    'article',
-	                    { className: 'taskCreatingHead' },
+	                    { className: 'taskCreatingHead', onClick: this.switching },
 	                    'Creating'
 	                ),
 	                _react2.default.createElement(
@@ -31328,9 +31337,9 @@
 	                        _react2.default.createElement(
 	                            'article',
 	                            { className: 'priority_scale' },
-	                            _react2.default.createElement('article', { className: 'priority_scale_1' }),
-	                            _react2.default.createElement('article', { className: 'priority_scale_2' }),
-	                            _react2.default.createElement('article', { className: 'priority_scale_3' })
+	                            _react2.default.createElement('article', { className: 'priority_scale_3 hidden' }),
+	                            _react2.default.createElement('article', { className: 'priority_scale_2 hidden' }),
+	                            _react2.default.createElement('article', { className: 'priority_scale_1' })
 	                        ),
 	                        _react2.default.createElement(
 	                            'article',
@@ -31338,20 +31347,20 @@
 	                            _react2.default.createElement(
 	                                'label',
 	                                null,
-	                                'Low',
-	                                _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '0', defaultChecked: true })
+	                                'High',
+	                                _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '3', onChange: this.handleChange })
 	                            ),
 	                            _react2.default.createElement(
 	                                'label',
 	                                null,
 	                                'Middle',
-	                                _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '1' })
+	                                _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '2', onChange: this.handleChange })
 	                            ),
 	                            _react2.default.createElement(
 	                                'label',
-	                                null,
-	                                'High',
-	                                _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '2' })
+	                                { className: 'active_elem' },
+	                                'Low',
+	                                _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '1', onChange: this.handleChange, defaultChecked: true })
 	                            )
 	                        )
 	                    ),
@@ -31436,6 +31445,7 @@
 	            return _react2.default.createElement(
 	                'article',
 	                { className: 'tasks_page_inner' },
+	                _react2.default.createElement(_templates.Menu, { active: 'tasks', data: this.state.status }),
 	                page
 	            );
 	        }
@@ -31444,9 +31454,11 @@
 
 	(0, _jquery2.default)(document).ready(function () {
 	    if (document.location.pathname == '/tasks') {
-	        _reactDom2.default.render(_react2.default.createElement(TasksPage, null), document.getElementsByClassName('tasks_page')[0]);
+	        _reactDom2.default.render(_react2.default.createElement(TasksPage, null), document.getElementsByClassName('content_inner')[0]);
 	    }
-	    (0, _jquery2.default)('input#time').datepicker();
+	    (0, _jquery2.default)('.tasks_page_inner').ready(function () {
+	        (0, _jquery2.default)('input#time').datepicker();
+	    });
 	});
 
 /***/ }
