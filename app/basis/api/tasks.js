@@ -5,7 +5,7 @@ function creating(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //task data
     var performer = req.body.performer || author;
     var t_group = req.body.t_group || null;
@@ -33,7 +33,9 @@ function creating(req, res, next) {
     //company
     else {
         db.users_groups.findById(author_group).then(function(a_group) {
-            if(!a_group || !a_group.creating) {
+            console.log(!author_group);
+            console.log(author_group != 0);
+            if((!author_group && (author_group != 0)) || (author_group && !a_group.creating)) {
                 throw '1';
             }
             else {
@@ -52,6 +54,7 @@ function creating(req, res, next) {
         }).then(function() {
             res.end('0');
         }).catch(function(err) {
+            console.log(err);
             res.end('1');
         })
     }
@@ -62,7 +65,7 @@ function editing(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //task data
     var task_id = req.body.task_id;
     var t_group = req.body.t_group || null;
@@ -93,9 +96,10 @@ function editing(req, res, next) {
             res.end('1');
         });
     }
+    //company
     else {
         db.users_groups.findById(author_group).then(function(result) {
-            if(!result && author_group != 0) {
+            if((!author_group && (author_group != 0)) || (author_group && !a_group.editing)) {
                 throw '1';
             }
             else {
@@ -155,7 +159,7 @@ function reassignment(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //task data
     var task_id = req.body.task_id;
     var performer = req.body.performer;
@@ -198,7 +202,7 @@ function deleting(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //task data
     var task_id = req.body.task_id;
     //right to delete

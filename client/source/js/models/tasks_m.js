@@ -37,28 +37,27 @@ var Creating = React.createClass({
     submit(elem) {
         var ajax_data = getData(elem.target);
         var exp_date = $(elem.target).find('input#time').val();
-        console.log(ajax_data);
         if(exp_date && new Date() > new Date(exp_date)) {
             toast(actions_r[3]);
         }
         else if(!ajax_data) {
             toast(actions_r[2]);
         }
-        //else {
-        //    submitting(ajax_data, '/api/tasks/create', 'POST', function(data) {
-        //        var response_status = +data;
-        //        if(isNaN(response_status)) {
-        //            response_status = 1;
-        //        }
-        //        toast(registration_r[response_status]);
-        //        if(response_status == 0) {
-        //            toast(actions_r[0]);
-        //            $(elem.target).find('textarea, input[type="text"]').val('');
-        //        }
-        //    }, function(err) {
-        //        toast("Server error");
-        //    });
-        //}
+        else {
+            submitting(ajax_data, '/api/tasks/create', 'POST', function(data) {
+                console.log(data);
+                var response_status = +data;
+                if(isNaN(response_status)) {
+                    response_status = 1;
+                }
+                if(response_status == 0) {
+                    toast(actions_r[0]);
+                    $(elem.target).parent().find('textarea, input[type="text"]').val('');
+                }
+            }, function(err) {
+                toast("Server error");
+            });
+        }
     },
     switching() {
         $('.taskCreatingBody').slideToggle();
