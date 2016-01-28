@@ -13,7 +13,8 @@ function active_tasks(req, res, next) {
             where: {
                 user: author,
                 active: 1
-            }
+            },
+            include: [{model: db.tasks_groups}, {model: db.users_groups}]
         }).then(function(result) {
             res.end(serializing(0, result));
         }, function(err) {
@@ -53,7 +54,8 @@ function inactive_tasks(req, res, next) {
             where: {
                 user: author,
                 active: 0
-            }
+            },
+            include: [{model: db.tasks_groups}, {model: db.users_groups}, {model: db.users}]
         }).then(function(result) {
             res.end(serializing(0, result));
         }, function(err) {

@@ -127,6 +127,11 @@ tables.rooms = sequelize.define('rooms', {
     master: Sequelize.INTEGER
 });
 
+//connection tables
+tables.tasks.belongsTo(tables.tasks_groups, {foreignKey: 't_group'});
+tables.tasks.belongsTo(tables.users_groups, {foreignKey: 'u_group'});
+tables.tasks.belongsTo(tables.users, {foreignKey: 'performer'});
+
 //synchronization tables
 for(table in tables) {
     tables[table].sync().then(function() {

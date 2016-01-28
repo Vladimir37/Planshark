@@ -156,6 +156,35 @@ var Creating = React.createClass({
     }
 });
 
+var Task = React.createClass({
+    getInitialState() {
+        var data = this.props.data;
+        var status = this.props.status;
+        return {
+            name: data.name,
+            description: data.description,
+            t_group_num: data.t_group,
+            t_group_name: data.tasks_group.name,
+            u_group_num: data.u_group,
+            u_group_name: data.users_group.nam,
+            color: data.tasks_group.color,
+            performer_num: data.performer,
+            performer_name: data.user.name,
+            priority: data.priority,
+            created: data.createdAt,
+            expiration: data.expiration,
+            rights: {
+                editing: status.editing || false,
+                reassignment: status.reassignment || false,
+                deleting: status.deleting || false
+            }
+        }
+    },
+    render() {
+        //
+    }
+});
+
 var TasksPage = React.createClass({
     getInitialState() {
         return {
