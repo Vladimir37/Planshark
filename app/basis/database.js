@@ -130,8 +130,8 @@ tables.tasks = sequelize.define('tasks', {
 //connection tables
 tables.tasks.belongsTo(tables.tasks_groups, {foreignKey: 't_group'});
 tables.tasks.belongsTo(tables.users_groups, {foreignKey: 'u_group'});
-tables.tasks.belongsTo(tables.users, {foreignKey: 'performer', as: 'qw'});
-//tables.tasks.belongsTo(tables.users, {foreignKey: 'author'});
+var performer_data = tables.tasks.belongsTo(tables.users, {foreignKey: 'performer', as: 'performer_data'});
+var author_data = tables.tasks.belongsTo(tables.users, {foreignKey: 'author', as:'author_data'});
 
 //synchronization tables
 for(table in tables) {
@@ -140,6 +140,12 @@ for(table in tables) {
     }, function(err) {
         console.log('Database error: ' + err);
     });
+};
+
+//aliases
+tables.aliases = {
+    performer_data,
+    author_data
 };
 
 module.exports = tables;

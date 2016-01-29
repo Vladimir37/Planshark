@@ -14,7 +14,7 @@ function active_tasks(req, res, next) {
                 author,
                 active: 1
             },
-            include: [db.tasks_groups, db.users_groups, db.users, db.qws]
+            include: [db.tasks_groups, db.users_groups, db.aliases.author_data, db.aliases.performer_data]
         }).then(function(result) {
             res.end(serializing(0, result));
         }, function(err) {
@@ -32,7 +32,7 @@ function active_tasks(req, res, next) {
                     u_group: author_group,
                     performer: author
                 },
-                include: [db.tasks_groups, db.users_groups, db.users]
+                include: [db.tasks_groups, db.users_groups, db.aliases.author_data, db.aliases.performer_data]
             }
         }).then(function(result) {
             res.end(serializing(0, result));
@@ -56,7 +56,7 @@ function inactive_tasks(req, res, next) {
                 user: author,
                 active: 0
             },
-            include: [db.tasks_groups, db.users_groups, db.users]
+            include: [db.tasks_groups, db.users_groups, db.aliases.author_data, db.aliases.performer_data]
         }).then(function(result) {
             res.end(serializing(0, result));
         }, function(err) {
@@ -75,7 +75,7 @@ function inactive_tasks(req, res, next) {
                     performer: author
                 }
             },
-            include: [db.tasks_groups, db.users_groups, db.users]
+            include: [db.tasks_groups, db.users_groups, db.aliases.author_data, db.aliases.performer_data]
         }).then(function(result) {
             res.end(serializing(0, result));
         }, function(err) {
