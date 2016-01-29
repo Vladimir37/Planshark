@@ -10,6 +10,33 @@ import datepick from '../datepicker.js';
 var actions_r = ['Success!', 'Server error' , 'Required fields are empty', 'Incorrect date'];
 var deleting_r = ['Success!', 'Server error'];
 
+//Time left
+function time(date_one, date_two) {
+    date_one = new Date(date_one);
+    date_two = new Date(date_two);
+    var result = {
+        negative: false,
+        unit: null,
+        num: null
+    };
+    var ms =  date_one - date_two;
+    if(ms < 0) {
+        result.negative = true;
+        ms = date_two - date_one;
+    }
+    result.unit = 'Days ';
+    result.num = Math.floor((ms)/(86400000));
+    if(result.num == 0) {
+        result.unit = 'Hours ';
+        result.num = Math.floor((ms)/(3600000));
+    }
+    if(result.num == 0) {
+        result.unit = 'Minutes ';
+        result.num = Math.floor((ms)/(60000));
+    }
+    return result;
+};
+
 var Creating = React.createClass({
     getInitialState() {
         return {
@@ -45,7 +72,6 @@ var Creating = React.createClass({
         }
         else {
             submitting(ajax_data, '/api/tasks/create', 'POST', function(data) {
-                console.log(data);
                 var response_status = +data;
                 if(isNaN(response_status)) {
                     response_status = 1;
@@ -53,6 +79,9 @@ var Creating = React.createClass({
                 if(response_status == 0) {
                     toast(actions_r[0]);
                     $(elem.target).parent().find('textarea, input[type="text"]').val('');
+                }
+                else {
+                    toast(actions_r[response_status]);
                 }
             }, function(err) {
                 toast("Server error");
@@ -82,26 +111,34 @@ var Creating = React.createClass({
         //performers list
         var users = [];
         if(this.state.room && this.state.users) {
-            this.state.users.forEach(function(elem) {
-                users.push(<label>{elem[1]}<input type="radio" name="performer" onChange={self.selectBoxes} value={elem[0]}/></label>);
+            this.state.users.forEach(function (elem) {
+                users.push(<label>{elem[1]}<input type="radio" name="performer" onChange={self.selectBoxes}
+                                                  value={elem[0]}/></label>);
             });
-            users.unshift(<label className="active_elem">Me<input type="radio" name="performer" value={false} onChange={self.selectBoxes} defaultChecked /></label>)
+            users.unshift(<label className="active_elem">Me<input type="radio" name="performer" value=''
+                                                                  onChange={self.selectBoxes} defaultChecked/></label>)
         }
         //tasks groups list
         var t_groups = [];
         if(this.state.t_groups) {
-            this.state.t_groups.map(function(elem) {
-                t_groups.push(<label>{elem[1]}<input type="radio" name="t_group" onChange={self.selectBoxes} value={elem[0]}/></label>);
+            this.state.t_groups.map(function (elem) {
+                t_groups.push(<label>{elem[1]}<input type="radio" name="t_group" onChange={self.selectBoxes}
+                                                     value={elem[0]}/></label>);
             });
-            t_groups.unshift(<label className="active_elem">No group<input type="radio" name="t_group" onChange={self.selectBoxes} value={false} defaultChecked/></label>)
+            t_groups.unshift(<label className="active_elem">No group<input type="radio" name="t_group"
+                                                                           onChange={self.selectBoxes} value=''
+                                                                           defaultChecked/></label>)
         }
         //users groups list
         var u_groups = [];
         if(this.state.room && this.state.u_groups) {
-            this.state.u_groups.forEach(function(elem) {
-                u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes} value={elem[0]}/></label>);
+            this.state.u_groups.forEach(function (elem) {
+                u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes}
+                                                     value={elem[0]}/></label>);
             });
-            u_groups.unshift(<label className="active_elem">No group<input type="radio" name="u_group" onChange={self.selectBoxes} value={false} defaultChecked /></label>)
+            u_groups.unshift(<label className="active_elem">No group<input type="radio" name="u_group"
+                                                                           onChange={self.selectBoxes} value=''
+                                                                           defaultChecked/></label>)
         }
         //personal or company items
         var u_groups_item = '';
@@ -171,6 +208,8 @@ var Task = React.createClass({
             performer_num: data.performer,
             performer_name: data.user.name,
             priority: data.priority,
+            //TODO creator name
+            creating: data.user.name,
             created: data.createdAt,
             expiration: data.expiration,
             rights: {
@@ -181,7 +220,43 @@ var Task = React.createClass({
         }
     },
     render() {
-        //
+        // bottom buttons
+        var task_bottom = [];
+        var state = this.state;
+        var rights = this.state.rights;
+        for(key in rights) {
+            if(rights[key]) {
+                var but_name = key.charAt(0).toUpperCase() + key.slice(1);
+                task_bottom.push(<button onClick={this[key]}>{but_name}</button>);
+            }
+        }
+        //calculating days
+        var expiration_time = time(new Date(state.expiration), new Date());
+        var expiration_type = expiration_time.negative ? 'ago' : 'left';
+        var expiration_message = expiration_time.negative ? '(expired)' : '';
+        //render
+        return <article className="task">
+            <article className="task_top">
+                <article className="task_head">
+                    <span className="task_name">{state.name}</span><br/>
+                    <span className="task_group">{state.tasks_group.name}</span>
+                </article>
+                <article className="task_info">
+                    <span className="task_info_elem"><b>Author: </b>{state.creating}</span>
+                </article>
+                <article className="task_priority">
+                    <article className="task_priority_scale_3"></article>
+                    <article className="task_priority_scale_2"></article>
+                    <article className="task_priority_scale_1"></article>
+                </article>
+                <article className="task_time">
+                    <span className="task_expiration"><b>{expiration_time.unit + expiration_type}: </b>
+                        {expiration_time.num} <span className="expiration_message">{expiration_message}</span></span>
+                </article>
+            </article>
+            <article className="task_middle"></article>
+            <article className="task_bottom"></article>
+        </article>;
     }
 });
 
@@ -231,7 +306,7 @@ var TasksPage = React.createClass({
         else {
             //page formation
             var page = [];
-            if(this.state.status.creating) {
+            if(this.state.status.creating || !this.state.status.room) {
                 page.push(<Creating status={this.state.status} data={this.state.data} />);
             }
             //render

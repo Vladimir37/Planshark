@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {submitting} from '../submitting.js';
 
 export var Menu = React.createClass({
     getInitialState() {
@@ -12,6 +13,7 @@ export var Menu = React.createClass({
     },
     dataHandling() {
         var data = this.props.data;
+        var self = this;
         if(data && !this.state.received) {
             this.setState({
                 received: true,

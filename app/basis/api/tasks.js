@@ -33,8 +33,6 @@ function creating(req, res, next) {
     //company
     else {
         db.users_groups.findById(author_group).then(function(a_group) {
-            console.log(!author_group);
-            console.log(author_group != 0);
             if((!author_group && (author_group != 0)) || (author_group && !a_group.creating)) {
                 throw '1';
             }

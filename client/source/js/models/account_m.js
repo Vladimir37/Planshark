@@ -134,6 +134,7 @@ var Panel = React.createClass({
     },
     receptionData() {
         var data = this.props.user_data;
+        var self = this;
         this.setState({
             loaded: false,
             name: data.name,

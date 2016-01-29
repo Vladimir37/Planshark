@@ -11,10 +11,10 @@ function active_tasks(req, res, next) {
     if(!room) {
         db.tasks.findAll({
             where: {
-                user: author,
+                author,
                 active: 1
             },
-            include: [{model: db.tasks_groups}, {model: db.users_groups}]
+            include: [db.tasks_groups, db.users_groups, db.users, db.qws]
         }).then(function(result) {
             res.end(serializing(0, result));
         }, function(err) {
@@ -31,7 +31,8 @@ function active_tasks(req, res, next) {
                 $or: {
                     u_group: author_group,
                     performer: author
-                }
+                },
+                include: [db.tasks_groups, db.users_groups, db.users]
             }
         }).then(function(result) {
             res.end(serializing(0, result));
@@ -55,7 +56,7 @@ function inactive_tasks(req, res, next) {
                 user: author,
                 active: 0
             },
-            include: [{model: db.tasks_groups}, {model: db.users_groups}, {model: db.users}]
+            include: [db.tasks_groups, db.users_groups, db.users]
         }).then(function(result) {
             res.end(serializing(0, result));
         }, function(err) {
@@ -73,7 +74,8 @@ function inactive_tasks(req, res, next) {
                     u_group: author_group,
                     performer: author
                 }
-            }
+            },
+            include: [db.tasks_groups, db.users_groups, db.users]
         }).then(function(result) {
             res.end(serializing(0, result));
         }, function(err) {

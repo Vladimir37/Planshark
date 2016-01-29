@@ -58,6 +58,33 @@ tables.users_groups = sequelize.define('users_groups', {
     u_group_manage: Sequelize.INTEGER
 });
 
+tables.tasks_groups = sequelize.define('tasks_groups', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    room: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
+    user: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
+    name: Sequelize.TEXT,
+    color: Sequelize.TEXT
+});
+
+tables.rooms = sequelize.define('rooms', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    master: Sequelize.INTEGER
+});
+
 tables.tasks = sequelize.define('tasks', {
     id: {
         type: Sequelize.INTEGER,
@@ -100,37 +127,11 @@ tables.tasks = sequelize.define('tasks', {
     closedAt: Sequelize.DATE
 });
 
-tables.tasks_groups = sequelize.define('tasks_groups', {
-    id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    room: {
-        type: Sequelize.INTEGER,
-        allowNull: true
-    },
-    user: {
-        type: Sequelize.INTEGER,
-        allowNull: true
-    },
-    name: Sequelize.TEXT,
-    color: Sequelize.TEXT
-});
-
-tables.rooms = sequelize.define('rooms', {
-    id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    master: Sequelize.INTEGER
-});
-
 //connection tables
 tables.tasks.belongsTo(tables.tasks_groups, {foreignKey: 't_group'});
 tables.tasks.belongsTo(tables.users_groups, {foreignKey: 'u_group'});
-tables.tasks.belongsTo(tables.users, {foreignKey: 'performer'});
+tables.tasks.belongsTo(tables.users, {foreignKey: 'performer', as: 'qw'});
+//tables.tasks.belongsTo(tables.users, {foreignKey: 'author'});
 
 //synchronization tables
 for(table in tables) {

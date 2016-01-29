@@ -114,7 +114,8 @@ function all(req, res, next) {
             groups.forEach(function(item) {
                 result.push([item.id, item.name]);
             });
-            res.end(serializing(0, result));
+            result_data.t_groups = result;
+            res.end(serializing(0, result_data));
         }, function(err) {
             console.log(err);
             res.end(serializing(1));

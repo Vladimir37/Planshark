@@ -11239,6 +11239,7 @@
 	    },
 	    receptionData: function receptionData() {
 	        var data = this.props.user_data;
+	        var self = this;
 	        this.setState({
 	            loaded: false,
 	            name: data.name,
@@ -31013,6 +31014,8 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
+	var _submitting = __webpack_require__(5);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Menu = exports.Menu = _react2.default.createClass({
@@ -31027,6 +31030,7 @@
 	    },
 	    dataHandling: function dataHandling() {
 	        var data = this.props.data;
+	        var self = this;
 	        if (data && !this.state.received) {
 	            this.setState({
 	                received: true,
@@ -31044,7 +31048,7 @@
 	        };
 	    },
 	    exit: function exit() {
-	        submitting(null, '/api/account/exit', 'POST', false, false, function () {
+	        (0, _submitting.submitting)(null, '/api/account/exit', 'POST', false, false, function () {
 	            document.location.pathname = '/';
 	        });
 	    },
@@ -31170,6 +31174,33 @@
 	var actions_r = ['Success!', 'Server error', 'Required fields are empty', 'Incorrect date'];
 	var deleting_r = ['Success!', 'Server error'];
 
+	//Time left
+	function time(date_one, date_two) {
+	    date_one = new Date(date_one);
+	    date_two = new Date(date_two);
+	    var result = {
+	        negative: false,
+	        unit: null,
+	        num: null
+	    };
+	    var ms = date_one - date_two;
+	    if (ms < 0) {
+	        result.negative = true;
+	        ms = date_two - date_one;
+	    }
+	    result.unit = 'Days ';
+	    result.num = Math.floor(ms / 86400000);
+	    if (result.num == 0) {
+	        result.unit = 'Hours ';
+	        result.num = Math.floor(ms / 3600000);
+	    }
+	    if (result.num == 0) {
+	        result.unit = 'Minutes ';
+	        result.num = Math.floor(ms / 60000);
+	    }
+	    return result;
+	};
+
 	var Creating = _react2.default.createClass({
 	    displayName: 'Creating',
 	    getInitialState: function getInitialState() {
@@ -31204,7 +31235,6 @@
 	            (0, _toaster2.default)(actions_r[2]);
 	        } else {
 	            (0, _submitting.submitting)(ajax_data, '/api/tasks/create', 'POST', function (data) {
-	                console.log(data);
 	                var response_status = +data;
 	                if (isNaN(response_status)) {
 	                    response_status = 1;
@@ -31212,6 +31242,8 @@
 	                if (response_status == 0) {
 	                    (0, _toaster2.default)(actions_r[0]);
 	                    (0, _jquery2.default)(elem.target).parent().find('textarea, input[type="text"]').val('');
+	                } else {
+	                    (0, _toaster2.default)(actions_r[response_status]);
 	                }
 	            }, function (err) {
 	                (0, _toaster2.default)("Server error");
@@ -31246,14 +31278,16 @@
 	                    'label',
 	                    null,
 	                    elem[1],
-	                    _react2.default.createElement('input', { type: 'radio', name: 'performer', onChange: self.selectBoxes, value: elem[0] })
+	                    _react2.default.createElement('input', { type: 'radio', name: 'performer', onChange: self.selectBoxes,
+	                        value: elem[0] })
 	                ));
 	            });
 	            users.unshift(_react2.default.createElement(
 	                'label',
 	                { className: 'active_elem' },
 	                'Me',
-	                _react2.default.createElement('input', { type: 'radio', name: 'performer', value: false, onChange: self.selectBoxes, defaultChecked: true })
+	                _react2.default.createElement('input', { type: 'radio', name: 'performer', value: '',
+	                    onChange: self.selectBoxes, defaultChecked: true })
 	            ));
 	        }
 	        //tasks groups list
@@ -31264,14 +31298,17 @@
 	                    'label',
 	                    null,
 	                    elem[1],
-	                    _react2.default.createElement('input', { type: 'radio', name: 't_group', onChange: self.selectBoxes, value: elem[0] })
+	                    _react2.default.createElement('input', { type: 'radio', name: 't_group', onChange: self.selectBoxes,
+	                        value: elem[0] })
 	                ));
 	            });
 	            t_groups.unshift(_react2.default.createElement(
 	                'label',
 	                { className: 'active_elem' },
 	                'No group',
-	                _react2.default.createElement('input', { type: 'radio', name: 't_group', onChange: self.selectBoxes, value: false, defaultChecked: true })
+	                _react2.default.createElement('input', { type: 'radio', name: 't_group',
+	                    onChange: self.selectBoxes, value: '',
+	                    defaultChecked: true })
 	            ));
 	        }
 	        //users groups list
@@ -31282,14 +31319,17 @@
 	                    'label',
 	                    null,
 	                    elem[1],
-	                    _react2.default.createElement('input', { type: 'radio', name: 'u_group', onChange: self.selectBoxes, value: elem[0] })
+	                    _react2.default.createElement('input', { type: 'radio', name: 'u_group', onChange: self.selectBoxes,
+	                        value: elem[0] })
 	                ));
 	            });
 	            u_groups.unshift(_react2.default.createElement(
 	                'label',
 	                { className: 'active_elem' },
 	                'No group',
-	                _react2.default.createElement('input', { type: 'radio', name: 'u_group', onChange: self.selectBoxes, value: false, defaultChecked: true })
+	                _react2.default.createElement('input', { type: 'radio', name: 'u_group',
+	                    onChange: self.selectBoxes, value: '',
+	                    defaultChecked: true })
 	            ));
 	        }
 	        //personal or company items
@@ -31413,6 +31453,123 @@
 	    }
 	});
 
+	var Task = _react2.default.createClass({
+	    displayName: 'Task',
+	    getInitialState: function getInitialState() {
+	        var data = this.props.data;
+	        var status = this.props.status;
+	        return {
+	            name: data.name,
+	            description: data.description,
+	            t_group_num: data.t_group,
+	            t_group_name: data.tasks_group.name,
+	            u_group_num: data.u_group,
+	            u_group_name: data.users_group.nam,
+	            color: data.tasks_group.color,
+	            performer_num: data.performer,
+	            performer_name: data.user.name,
+	            priority: data.priority,
+	            //TODO creator name
+	            creating: data.user.name,
+	            created: data.createdAt,
+	            expiration: data.expiration,
+	            rights: {
+	                editing: status.editing || false,
+	                reassignment: status.reassignment || false,
+	                deleting: status.deleting || false
+	            }
+	        };
+	    },
+	    render: function render() {
+	        // bottom buttons
+	        var task_bottom = [];
+	        var state = this.state;
+	        var rights = this.state.rights;
+	        for (key in rights) {
+	            if (rights[key]) {
+	                var but_name = key.charAt(0).toUpperCase() + key.slice(1);
+	                task_bottom.push(_react2.default.createElement(
+	                    'button',
+	                    { onClick: this[key] },
+	                    but_name
+	                ));
+	            }
+	        }
+	        //calculating days
+	        var expiration_time = time(new Date(state.expiration), new Date());
+	        var expiration_type = expiration_time.negative ? 'ago' : 'left';
+	        var expiration_message = expiration_time.negative ? '(expired)' : '';
+	        //render
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'task' },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'task_top' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_head' },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'task_name' },
+	                        state.name
+	                    ),
+	                    _react2.default.createElement('br', null),
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'task_group' },
+	                        state.tasks_group.name
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_info' },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'task_info_elem' },
+	                        _react2.default.createElement(
+	                            'b',
+	                            null,
+	                            'Author: '
+	                        ),
+	                        state.creating
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_priority' },
+	                    _react2.default.createElement('article', { className: 'task_priority_scale_3' }),
+	                    _react2.default.createElement('article', { className: 'task_priority_scale_2' }),
+	                    _react2.default.createElement('article', { className: 'task_priority_scale_1' })
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_time' },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'task_expiration' },
+	                        _react2.default.createElement(
+	                            'b',
+	                            null,
+	                            expiration_time.unit + expiration_type,
+	                            ': '
+	                        ),
+	                        expiration_time.num,
+	                        ' ',
+	                        _react2.default.createElement(
+	                            'span',
+	                            { className: 'expiration_message' },
+	                            expiration_message
+	                        )
+	                    )
+	                )
+	            ),
+	            _react2.default.createElement('article', { className: 'task_middle' }),
+	            _react2.default.createElement('article', { className: 'task_bottom' })
+	        );
+	    }
+	});
+
 	var TasksPage = _react2.default.createClass({
 	    displayName: 'TasksPage',
 	    getInitialState: function getInitialState() {
@@ -31458,7 +31615,7 @@
 	        } else {
 	            //page formation
 	            var page = [];
-	            if (this.state.status.creating) {
+	            if (this.state.status.creating || !this.state.status.room) {
 	                page.push(_react2.default.createElement(Creating, { status: this.state.status, data: this.state.data }));
 	            }
 	            //render
