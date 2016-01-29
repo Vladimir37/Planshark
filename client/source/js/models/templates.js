@@ -88,3 +88,14 @@ export var Error = React.createClass({
         </article>;
     }
 });
+
+export var Empty = React.createClass({
+    getInitialState() {
+        return null;
+    },
+    render() {
+        return <article className="waiting">
+            <p className="message">List is empty.</p>
+        </article>;
+    }
+});

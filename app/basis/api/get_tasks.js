@@ -53,7 +53,7 @@ function inactive_tasks(req, res, next) {
     if(!room) {
         db.tasks.findAll({
             where: {
-                user: author,
+                author,
                 active: 0
             },
             include: [db.tasks_groups, db.users_groups, db.aliases.author_data, db.aliases.performer_data]

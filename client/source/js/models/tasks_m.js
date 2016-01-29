@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import {submitting, getData} from '../submitting.js';
-import {Waiting, Error, Menu} from './templates.js';
+import {Waiting, Error, Empty, Menu} from './templates.js';
 import toast from '../toaster.js';
 import datepick from '../datepicker.js';
 
@@ -203,13 +203,12 @@ var Task = React.createClass({
             t_group_num: data.t_group,
             t_group_name: data.tasks_group.name,
             u_group_num: data.u_group,
-            u_group_name: data.users_group.nam,
+            u_group_name: data.users_group.name,
             color: data.tasks_group.color,
             performer_num: data.performer,
-            performer_name: data.user.name,
+            performer_name: data.performer_data.name,
             priority: data.priority,
-            //TODO creator name
-            creating: data.user.name,
+            author: data.author_data.name,
             created: data.createdAt,
             expiration: data.expiration,
             rights: {
@@ -239,10 +238,10 @@ var Task = React.createClass({
             <article className="task_top">
                 <article className="task_head">
                     <span className="task_name">{state.name}</span><br/>
-                    <span className="task_group">{state.tasks_group.name}</span>
+                    <span className="task_group">{state.t_group_name}</span>
                 </article>
                 <article className="task_info">
-                    <span className="task_info_elem"><b>Author: </b>{state.creating}</span>
+                    <span className="task_info_elem"><b>Author: </b>{state.performer_name}</span>
                 </article>
                 <article className="task_priority">
                     <article className="task_priority_scale_3"></article>
@@ -253,10 +252,148 @@ var Task = React.createClass({
                     <span className="task_expiration"><b>{expiration_time.unit + expiration_type}: </b>
                         {expiration_time.num} <span className="expiration_message">{expiration_message}</span></span>
                 </article>
+                <article className="task_line"></article>
             </article>
-            <article className="task_middle"></article>
-            <article className="task_bottom"></article>
+            <article className="task_middle">
+                <article className="task_desc">
+                    <b>Description:</b>
+                    <article className="task_desc_text">{state.description}</article>
+                </article>
+                <article className="task_info">
+                    <span className="task_info_elem"><b>Creation date: </b>{state.created}</span>
+                    <span className="task_info_elem"><b>Expiration date: </b>{state.expiration}</span>
+                    <span className="task_info_elem"><b>Performer user: </b>{state.performer_name}</span>
+                    <span className="task_info_elem"><b>Performer group: </b>{state.u_group_name}</span>
+                </article>
+            </article>
+            <article className="task_bottom">{task_bottom}</article>
         </article>;
+    }
+});
+
+var TaskList = React.createClass({
+    getInitialState() {
+        return {
+            active: true,
+            inactive: false,
+            expired: false,
+            data: {
+                received: false,
+                error: false,
+                tasks: null
+            }
+        }
+    },
+    switching(name) {
+        var self = this;
+        return function() {
+            self.setState({
+                active: false,
+                inactive: false,
+                expired: false,
+                [name]: true
+            });
+        }
+    },
+    receive() {
+        var self = this;
+        var tasks_type;
+        if(this.state.inactive) {
+            tasks_type = 'inactive';
+        }
+        else {
+            tasks_type = 'active';
+        }
+        submitting(null, '/api/get_tasks/' + tasks_type, 'GET', function(data) {
+            if (typeof data == 'string') {
+                data = JSON.parse(data);
+            }
+            if(data.status == 1) {
+                self.setState({
+                    data: {
+                        error: true
+                    }
+                });
+            }
+            else {
+                //active and inactive
+                if(!self.state.expired) {
+                    self.setState({
+                        data: {
+                            received: true,
+                            tasks: data.body
+                        }
+                    });
+                }
+                //expired
+                else {
+                    var expired_tasks = [];
+                    data.body.forEach(function(task) {
+                        var today = new Date();
+                        if(!task.expiration) {
+                            expired_tasks.push(task);
+                        }
+                        else if(today > new Date(task.expiration)) {
+                            expired_tasks.push(task);
+                        }
+                    });
+                    self.setState({
+                        data: {
+                            received: true,
+                            tasks: expired_tasks
+                        }
+                    });
+                }
+            }
+        }, function(err) {
+            self.setState({
+                data: {
+                    error: true
+                }
+            });
+        });
+    },
+    render() {
+        //state
+        var state = this.state;
+        var data = this.state.data;
+        //classes determination
+        var active_c = this.state.active ? ' active_elem' : '';
+        var inactive_c = this.state.inactive ? ' active_elem' : '';
+        var expired_c = this.state.expired ? ' active_elem' : '';
+        //button panel
+        var tasks_buttons_panel = <article className="panel_tasks_buttons">
+            <button className={"panel_elem" + active_c} onClick={this.switching('active')}>Active</button>
+            <button className={"panel_elem" + inactive_c} onClick={this.switching('inactive')}>Inactive</button>
+            <button className={"panel_elem" + expired_c} onClick={this.switching('expired')}>Expired</button>
+        </article>;
+        //first load
+        if(!data.received && !data.error) {
+            this.receive();
+            return <article className="task_list">
+                {tasks_buttons_panel}
+                <Waiting />
+            </article>;
+        }
+        //error
+        else if(!data.received && data.error) {
+            return <article className="task_list">
+                {tasks_buttons_panel}
+                <Error />
+            </article>;
+        }
+        //render tasks
+        else {
+            var status = this.props.status;
+            var all_tasks = [];
+            this.state.data.tasks.forEach(function(task) {
+                all_tasks.push(<Task status={status} data={task} />)
+            });
+            return <article className="task_list">
+                {tasks_buttons_panel}
+                {all_tasks}
+            </article>;
+        }
     }
 });
 
@@ -305,9 +442,9 @@ var TasksPage = React.createClass({
         }
         else {
             //page formation
-            var page = [];
+            var page = [<TaskList status={this.state.status} />];
             if(this.state.status.creating || !this.state.status.room) {
-                page.push(<Creating status={this.state.status} data={this.state.data} />);
+                page.unshift(<Creating status={this.state.status} data={this.state.data} />);
             }
             //render
             return <article className="tasks_page_inner">
