@@ -81,6 +81,7 @@ body {
             }
             .taskCreating {
                 margin: 10px;
+                margin-left: 5px;
                 width: 600px;
                 .taskCreatingHead {
                     padding: 5px;
@@ -134,6 +135,66 @@ body {
                         display: inline-block;
                         margin-right: 32px;
                     }
+                }
+            }
+            .panel_tasks_buttons {
+                margin-left: 5px;
+                .active_elem {
+                    background: lighten(@main, 20%);
+                }
+            }
+            .task {
+                margin: 5px;
+                padding: 5px;
+                width: 750px;
+                min-height: 70px;
+                border: 2px solid @main;
+                box-shadow: 0 -2px 0 0 @main inset;
+                &_top {
+                    .task_head {
+                        display: inline-block;
+                        width: 35%;
+                        .task_name {
+                            font-size: 22px;
+                        }
+                        .task_group {
+                            font-size: 20px;
+                        }
+                    }
+                    .task_info {
+                        display: inline-block;
+                        width: 45%;
+                        vertical-align: top;
+                    }
+                    .task_priority {
+                        display: inline-block;
+                        width: 15%;
+                        text-align: right;
+                        article {
+                            width: 60px;
+                            height: 15px;
+                            margin: 2px;
+                            border: 1px solid @main;
+                        }
+                    }
+                    .task_expand {
+                        display: inline-block;
+                        width: 20px;
+                        height: 25px;
+                        padding: 2px;
+                        border: 1px solid @main;
+                        background-image: url("/src/img/expand.png");
+                        background-size: 25px;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        cursor: pointer;
+                    }
+                }
+                &_middle {
+                    display: none;
+                }
+                &_bottom {
+                    display: none;
                 }
             }
             .menu_inner {

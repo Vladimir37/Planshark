@@ -197,18 +197,22 @@ var Task = React.createClass({
     getInitialState() {
         var data = this.props.data;
         var status = this.props.status;
+        data.users_group = data.users_group || {};
+        data.tasks_group = data.tasks_group || {};
+        data.performer_data = data.performer_data || {};
+        data.author_data = data.author_data || {};
         return {
             name: data.name,
             description: data.description,
             t_group_num: data.t_group,
-            t_group_name: data.tasks_group.name,
+            t_group_name: data.tasks_group.name || null,
             u_group_num: data.u_group,
-            u_group_name: data.users_group.name,
+            u_group_name: data.users_group.name || null,
             color: data.tasks_group.color,
             performer_num: data.performer,
-            performer_name: data.performer_data.name,
+            performer_name: data.performer_data.name || null,
             priority: data.priority,
-            author: data.author_data.name,
+            author: data.author_data.name || null,
             created: data.createdAt,
             expiration: data.expiration,
             rights: {
@@ -223,16 +227,21 @@ var Task = React.createClass({
         var task_bottom = [];
         var state = this.state;
         var rights = this.state.rights;
-        for(key in rights) {
+        for(let key in rights) {
             if(rights[key]) {
                 var but_name = key.charAt(0).toUpperCase() + key.slice(1);
                 task_bottom.push(<button onClick={this[key]}>{but_name}</button>);
             }
         }
         //calculating days
-        var expiration_time = time(new Date(state.expiration), new Date());
-        var expiration_type = expiration_time.negative ? 'ago' : 'left';
-        var expiration_message = expiration_time.negative ? '(expired)' : '';
+        var expiration_result = '';
+        if(state.expiration) {
+            var expiration_time = time(new Date(state.expiration), new Date());
+            var expiration_type = expiration_time.negative ? 'ago' : 'left';
+            var expiration_message = expiration_time.negative ? '(expired)' : '';
+            expiration_result = <span className="task_expiration"><b>{expiration_time.unit + expiration_type}: </b>
+                {expiration_time.num} <span className="expiration_message">{expiration_message}</span></span>;
+        }
         //render
         return <article className="task">
             <article className="task_top">
@@ -241,18 +250,17 @@ var Task = React.createClass({
                     <span className="task_group">{state.t_group_name}</span>
                 </article>
                 <article className="task_info">
-                    <span className="task_info_elem"><b>Author: </b>{state.performer_name}</span>
+                    <span className="task_info_elem"><b>Performer: </b>{state.performer_name}</span>
                 </article>
                 <article className="task_priority">
                     <article className="task_priority_scale_3"></article>
                     <article className="task_priority_scale_2"></article>
                     <article className="task_priority_scale_1"></article>
                 </article>
+                <article className="task_expand"></article>
                 <article className="task_time">
-                    <span className="task_expiration"><b>{expiration_time.unit + expiration_type}: </b>
-                        {expiration_time.num} <span className="expiration_message">{expiration_message}</span></span>
+                    {expiration_result}
                 </article>
-                <article className="task_line"></article>
             </article>
             <article className="task_middle">
                 <article className="task_desc">
@@ -264,6 +272,7 @@ var Task = React.createClass({
                     <span className="task_info_elem"><b>Expiration date: </b>{state.expiration}</span>
                     <span className="task_info_elem"><b>Performer user: </b>{state.performer_name}</span>
                     <span className="task_info_elem"><b>Performer group: </b>{state.u_group_name}</span>
+                    <span className="task_info_elem"><b>Author: </b>{state.author}</span>
                 </article>
             </article>
             <article className="task_bottom">{task_bottom}</article>

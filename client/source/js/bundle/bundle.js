@@ -31478,18 +31478,22 @@
 	    getInitialState: function getInitialState() {
 	        var data = this.props.data;
 	        var status = this.props.status;
+	        data.users_group = data.users_group || {};
+	        data.tasks_group = data.tasks_group || {};
+	        data.performer_data = data.performer_data || {};
+	        data.author_data = data.author_data || {};
 	        return {
 	            name: data.name,
 	            description: data.description,
 	            t_group_num: data.t_group,
-	            t_group_name: data.tasks_group.name,
+	            t_group_name: data.tasks_group.name || null,
 	            u_group_num: data.u_group,
-	            u_group_name: data.users_group.name,
+	            u_group_name: data.users_group.name || null,
 	            color: data.tasks_group.color,
 	            performer_num: data.performer,
-	            performer_name: data.performer_data.name,
+	            performer_name: data.performer_data.name || null,
 	            priority: data.priority,
-	            author: data.author_data.name,
+	            author: data.author_data.name || null,
 	            created: data.createdAt,
 	            expiration: data.expiration,
 	            rights: {
@@ -31504,7 +31508,7 @@
 	        var task_bottom = [];
 	        var state = this.state;
 	        var rights = this.state.rights;
-	        for (key in rights) {
+	        for (var key in rights) {
 	            if (rights[key]) {
 	                var but_name = key.charAt(0).toUpperCase() + key.slice(1);
 	                task_bottom.push(_react2.default.createElement(
@@ -31515,9 +31519,29 @@
 	            }
 	        }
 	        //calculating days
-	        var expiration_time = time(new Date(state.expiration), new Date());
-	        var expiration_type = expiration_time.negative ? 'ago' : 'left';
-	        var expiration_message = expiration_time.negative ? '(expired)' : '';
+	        var expiration_result = '';
+	        if (state.expiration) {
+	            var expiration_time = time(new Date(state.expiration), new Date());
+	            var expiration_type = expiration_time.negative ? 'ago' : 'left';
+	            var expiration_message = expiration_time.negative ? '(expired)' : '';
+	            expiration_result = _react2.default.createElement(
+	                'span',
+	                { className: 'task_expiration' },
+	                _react2.default.createElement(
+	                    'b',
+	                    null,
+	                    expiration_time.unit + expiration_type,
+	                    ': '
+	                ),
+	                expiration_time.num,
+	                ' ',
+	                _react2.default.createElement(
+	                    'span',
+	                    { className: 'expiration_message' },
+	                    expiration_message
+	                )
+	            );
+	        }
 	        //render
 	        return _react2.default.createElement(
 	            'article',
@@ -31549,7 +31573,7 @@
 	                        _react2.default.createElement(
 	                            'b',
 	                            null,
-	                            'Author: '
+	                            'Performer: '
 	                        ),
 	                        state.performer_name
 	                    )
@@ -31561,26 +31585,11 @@
 	                    _react2.default.createElement('article', { className: 'task_priority_scale_2' }),
 	                    _react2.default.createElement('article', { className: 'task_priority_scale_1' })
 	                ),
+	                _react2.default.createElement('article', { className: 'task_expand' }),
 	                _react2.default.createElement(
 	                    'article',
 	                    { className: 'task_time' },
-	                    _react2.default.createElement(
-	                        'span',
-	                        { className: 'task_expiration' },
-	                        _react2.default.createElement(
-	                            'b',
-	                            null,
-	                            expiration_time.unit + expiration_type,
-	                            ': '
-	                        ),
-	                        expiration_time.num,
-	                        ' ',
-	                        _react2.default.createElement(
-	                            'span',
-	                            { className: 'expiration_message' },
-	                            expiration_message
-	                        )
-	                    )
+	                    expiration_result
 	                ),
 	                _react2.default.createElement('article', { className: 'task_line' })
 	            ),
@@ -31643,6 +31652,16 @@
 	                            'Performer group: '
 	                        ),
 	                        state.u_group_name
+	                    ),
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'task_info_elem' },
+	                        _react2.default.createElement(
+	                            'b',
+	                            null,
+	                            'Author: '
+	                        ),
+	                        state.author
 	                    )
 	                )
 	            ),
@@ -31680,6 +31699,7 @@
 	        };
 	    },
 	    receive: function receive() {
+	        var self = this;
 	        var tasks_type;
 	        if (this.state.inactive) {
 	            tasks_type = 'inactive';
@@ -31690,6 +31710,47 @@
 	            if (typeof data == 'string') {
 	                data = JSON.parse(data);
 	            }
+	            if (data.status == 1) {
+	                self.setState({
+	                    data: {
+	                        error: true
+	                    }
+	                });
+	            } else {
+	                //active and inactive
+	                if (!self.state.expired) {
+	                    self.setState({
+	                        data: {
+	                            received: true,
+	                            tasks: data.body
+	                        }
+	                    });
+	                }
+	                //expired
+	                else {
+	                        var expired_tasks = [];
+	                        data.body.forEach(function (task) {
+	                            var today = new Date();
+	                            if (!task.expiration) {
+	                                expired_tasks.push(task);
+	                            } else if (today > new Date(task.expiration)) {
+	                                expired_tasks.push(task);
+	                            }
+	                        });
+	                        self.setState({
+	                            data: {
+	                                received: true,
+	                                tasks: expired_tasks
+	                            }
+	                        });
+	                    }
+	            }
+	        }, function (err) {
+	            self.setState({
+	                data: {
+	                    error: true
+	                }
+	            });
 	        });
 	    },
 	    render: function render() {
@@ -31720,24 +31781,39 @@
 	                'Expired'
 	            )
 	        );
+	        //first load
 	        if (!data.received && !data.error) {
-	            //todo request
+	            this.receive();
 	            return _react2.default.createElement(
 	                'article',
 	                { className: 'task_list' },
 	                tasks_buttons_panel,
 	                _react2.default.createElement(_templates.Waiting, null)
 	            );
-	        } else if (!data.received && data.error) {
-	            return _react2.default.createElement(
-	                'article',
-	                { className: 'task_list' },
-	                tasks_buttons_panel,
-	                _react2.default.createElement(_templates.Error, null)
-	            );
-	        } else {
-	            //
 	        }
+	        //error
+	        else if (!data.received && data.error) {
+	                return _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_list' },
+	                    tasks_buttons_panel,
+	                    _react2.default.createElement(_templates.Error, null)
+	                );
+	            }
+	            //render tasks
+	            else {
+	                    var status = this.props.status;
+	                    var all_tasks = [];
+	                    this.state.data.tasks.forEach(function (task) {
+	                        all_tasks.push(_react2.default.createElement(Task, { status: status, data: task }));
+	                    });
+	                    return _react2.default.createElement(
+	                        'article',
+	                        { className: 'task_list' },
+	                        tasks_buttons_panel,
+	                        all_tasks
+	                    );
+	                }
 	    }
 	});
 
@@ -31785,9 +31861,9 @@
 	            return _react2.default.createElement(_templates.Error, null);
 	        } else {
 	            //page formation
-	            var page = [];
+	            var page = [_react2.default.createElement(TaskList, { status: this.state.status })];
 	            if (this.state.status.creating || !this.state.status.room) {
-	                page.push(_react2.default.createElement(Creating, { status: this.state.status, data: this.state.data }));
+	                page.unshift(_react2.default.createElement(Creating, { status: this.state.status, data: this.state.data }));
 	            }
 	            //render
 	            return _react2.default.createElement(
