@@ -31494,7 +31494,7 @@
 	            performer_name: data.performer_data.name || null,
 	            priority: data.priority,
 	            author: data.author_data.name || null,
-	            created: data.createdAt,
+	            created: new Date(data.createdAt).toString().slice(0, -15),
 	            expiration: data.expiration,
 	            rights: {
 	                editing: status.editing || false,
@@ -31502,6 +31502,10 @@
 	                deleting: status.deleting || false
 	            }
 	        };
+	    },
+	    expand: function expand(elem) {
+	        var target = (0, _jquery2.default)(elem.target).closest('.task');
+	        target.find('.task_additional').slideToggle();
 	    },
 	    render: function render() {
 	        // bottom buttons
@@ -31520,6 +31524,7 @@
 	        }
 	        //calculating days
 	        var expiration_result = '';
+	        var expiration_date = 'none';
 	        if (state.expiration) {
 	            var expiration_time = time(new Date(state.expiration), new Date());
 	            var expiration_type = expiration_time.negative ? 'ago' : 'left';
@@ -31541,6 +31546,7 @@
 	                    expiration_message
 	                )
 	            );
+	            expiration_date = new Date(state.expiration).toString().slice(0, -15);
 	        }
 	        //render
 	        return _react2.default.createElement(
@@ -31585,90 +31591,94 @@
 	                    _react2.default.createElement('article', { className: 'task_priority_scale_2' }),
 	                    _react2.default.createElement('article', { className: 'task_priority_scale_1' })
 	                ),
-	                _react2.default.createElement('article', { className: 'task_expand' }),
+	                _react2.default.createElement('article', { className: 'task_expand', onClick: this.expand }),
 	                _react2.default.createElement(
 	                    'article',
 	                    { className: 'task_time' },
 	                    expiration_result
-	                ),
-	                _react2.default.createElement('article', { className: 'task_line' })
-	            ),
-	            _react2.default.createElement(
-	                'article',
-	                { className: 'task_middle' },
-	                _react2.default.createElement(
-	                    'article',
-	                    { className: 'task_desc' },
-	                    _react2.default.createElement(
-	                        'b',
-	                        null,
-	                        'Description:'
-	                    ),
-	                    _react2.default.createElement(
-	                        'article',
-	                        { className: 'task_desc_text' },
-	                        state.description
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    'article',
-	                    { className: 'task_info' },
-	                    _react2.default.createElement(
-	                        'span',
-	                        { className: 'task_info_elem' },
-	                        _react2.default.createElement(
-	                            'b',
-	                            null,
-	                            'Creation date: '
-	                        ),
-	                        state.created
-	                    ),
-	                    _react2.default.createElement(
-	                        'span',
-	                        { className: 'task_info_elem' },
-	                        _react2.default.createElement(
-	                            'b',
-	                            null,
-	                            'Expiration date: '
-	                        ),
-	                        state.expiration
-	                    ),
-	                    _react2.default.createElement(
-	                        'span',
-	                        { className: 'task_info_elem' },
-	                        _react2.default.createElement(
-	                            'b',
-	                            null,
-	                            'Performer user: '
-	                        ),
-	                        state.performer_name
-	                    ),
-	                    _react2.default.createElement(
-	                        'span',
-	                        { className: 'task_info_elem' },
-	                        _react2.default.createElement(
-	                            'b',
-	                            null,
-	                            'Performer group: '
-	                        ),
-	                        state.u_group_name
-	                    ),
-	                    _react2.default.createElement(
-	                        'span',
-	                        { className: 'task_info_elem' },
-	                        _react2.default.createElement(
-	                            'b',
-	                            null,
-	                            'Author: '
-	                        ),
-	                        state.author
-	                    )
 	                )
 	            ),
 	            _react2.default.createElement(
 	                'article',
-	                { className: 'task_bottom' },
-	                task_bottom
+	                { className: 'task_additional' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_middle' },
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'task_desc' },
+	                        _react2.default.createElement(
+	                            'b',
+	                            null,
+	                            'Description:'
+	                        ),
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: 'task_desc_text' },
+	                            state.description
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'task_info' },
+	                        _react2.default.createElement(
+	                            'span',
+	                            { className: 'task_info_elem' },
+	                            _react2.default.createElement(
+	                                'b',
+	                                null,
+	                                'Creation date: '
+	                            ),
+	                            state.created
+	                        ),
+	                        _react2.default.createElement(
+	                            'span',
+	                            { className: 'task_info_elem' },
+	                            _react2.default.createElement(
+	                                'b',
+	                                null,
+	                                'Expiration date: '
+	                            ),
+	                            expiration_date
+	                        ),
+	                        _react2.default.createElement(
+	                            'span',
+	                            { className: 'task_info_elem' },
+	                            _react2.default.createElement(
+	                                'b',
+	                                null,
+	                                'Performer user: '
+	                            ),
+	                            state.performer_name
+	                        ),
+	                        _react2.default.createElement(
+	                            'span',
+	                            { className: 'task_info_elem' },
+	                            _react2.default.createElement(
+	                                'b',
+	                                null,
+	                                'Performer group: '
+	                            ),
+	                            state.u_group_name
+	                        ),
+	                        _react2.default.createElement(
+	                            'span',
+	                            { className: 'task_info_elem' },
+	                            _react2.default.createElement(
+	                                'b',
+	                                null,
+	                                'Author: '
+	                            ),
+	                            state.author
+	                        )
+	                    ),
+	                    _react2.default.createElement('div', { className: 'clearfix' })
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_bottom' },
+	                    task_bottom
+	                )
 	            )
 	        );
 	    }
@@ -31690,13 +31700,21 @@
 	    },
 	    switching: function switching(name) {
 	        var self = this;
-	        return function () {
-	            self.setState(_defineProperty({
-	                active: false,
-	                inactive: false,
-	                expired: false
-	            }, name, true));
-	        };
+	        if (!this.state[name]) {
+	            return function () {
+	                var _self$setState;
+
+	                self.setState((_self$setState = {
+	                    active: false,
+	                    inactive: false,
+	                    expired: false
+	                }, _defineProperty(_self$setState, name, true), _defineProperty(_self$setState, 'data', {
+	                    received: false,
+	                    error: false,
+	                    tasks: null
+	                }), _self$setState));
+	            };
+	        }
 	    },
 	    receive: function receive() {
 	        var self = this;
@@ -31731,9 +31749,7 @@
 	                        var expired_tasks = [];
 	                        data.body.forEach(function (task) {
 	                            var today = new Date();
-	                            if (!task.expiration) {
-	                                expired_tasks.push(task);
-	                            } else if (today > new Date(task.expiration)) {
+	                            if (task.expiration && today > new Date(task.expiration)) {
 	                                expired_tasks.push(task);
 	                            }
 	                        });

@@ -213,7 +213,7 @@ var Task = React.createClass({
             performer_name: data.performer_data.name || null,
             priority: data.priority,
             author: data.author_data.name || null,
-            created: data.createdAt,
+            created: new Date(data.createdAt).toString().slice(0, -15),
             expiration: data.expiration,
             rights: {
                 editing: status.editing || false,
@@ -221,6 +221,10 @@ var Task = React.createClass({
                 deleting: status.deleting || false
             }
         }
+    },
+    expand(elem) {
+        var target = $(elem.target).closest('.task');
+        target.find('.task_additional').slideToggle();
     },
     render() {
         // bottom buttons
@@ -235,12 +239,14 @@ var Task = React.createClass({
         }
         //calculating days
         var expiration_result = '';
+        var expiration_date = 'none';
         if(state.expiration) {
             var expiration_time = time(new Date(state.expiration), new Date());
             var expiration_type = expiration_time.negative ? 'ago' : 'left';
             var expiration_message = expiration_time.negative ? '(expired)' : '';
             expiration_result = <span className="task_expiration"><b>{expiration_time.unit + expiration_type}: </b>
                 {expiration_time.num} <span className="expiration_message">{expiration_message}</span></span>;
+            expiration_date = new Date(state.expiration).toString().slice(0, -15);
         }
         //render
         return <article className="task">
@@ -257,25 +263,28 @@ var Task = React.createClass({
                     <article className="task_priority_scale_2"></article>
                     <article className="task_priority_scale_1"></article>
                 </article>
-                <article className="task_expand"></article>
+                <article className="task_expand" onClick={this.expand}></article>
                 <article className="task_time">
                     {expiration_result}
                 </article>
             </article>
-            <article className="task_middle">
-                <article className="task_desc">
-                    <b>Description:</b>
-                    <article className="task_desc_text">{state.description}</article>
+            <article className="task_additional">
+                <article className="task_middle">
+                    <article className="task_desc">
+                        <b>Description:</b>
+                        <article className="task_desc_text">{state.description}</article>
+                    </article>
+                    <article className="task_info">
+                        <span className="task_info_elem"><b>Creation date: </b>{state.created}</span>
+                        <span className="task_info_elem"><b>Expiration date: </b>{expiration_date}</span>
+                        <span className="task_info_elem"><b>Performer user: </b>{state.performer_name}</span>
+                        <span className="task_info_elem"><b>Performer group: </b>{state.u_group_name}</span>
+                        <span className="task_info_elem"><b>Author: </b>{state.author}</span>
+                    </article>
+                    <div className="clearfix"></div>
                 </article>
-                <article className="task_info">
-                    <span className="task_info_elem"><b>Creation date: </b>{state.created}</span>
-                    <span className="task_info_elem"><b>Expiration date: </b>{state.expiration}</span>
-                    <span className="task_info_elem"><b>Performer user: </b>{state.performer_name}</span>
-                    <span className="task_info_elem"><b>Performer group: </b>{state.u_group_name}</span>
-                    <span className="task_info_elem"><b>Author: </b>{state.author}</span>
-                </article>
+                <article className="task_bottom">{task_bottom}</article>
             </article>
-            <article className="task_bottom">{task_bottom}</article>
         </article>;
     }
 });
@@ -295,13 +304,20 @@ var TaskList = React.createClass({
     },
     switching(name) {
         var self = this;
-        return function() {
-            self.setState({
-                active: false,
-                inactive: false,
-                expired: false,
-                [name]: true
-            });
+        if(!this.state[name]) {
+            return function () {
+                self.setState({
+                    active: false,
+                    inactive: false,
+                    expired: false,
+                    [name]: true,
+                    data: {
+                        received: false,
+                        error: false,
+                        tasks: null
+                    }
+                });
+            }
         }
     },
     receive() {
@@ -339,10 +355,7 @@ var TaskList = React.createClass({
                     var expired_tasks = [];
                     data.body.forEach(function(task) {
                         var today = new Date();
-                        if(!task.expiration) {
-                            expired_tasks.push(task);
-                        }
-                        else if(today > new Date(task.expiration)) {
+                        if(task.expiration && today > new Date(task.expiration)) {
                             expired_tasks.push(task);
                         }
                     });

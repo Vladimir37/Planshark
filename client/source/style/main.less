@@ -150,10 +150,12 @@ body {
                 min-height: 70px;
                 border: 2px solid @main;
                 box-shadow: 0 -2px 0 0 @main inset;
+                position: relative;
                 &_top {
                     .task_head {
                         display: inline-block;
                         width: 35%;
+                        vertical-align: top;
                         .task_name {
                             font-size: 22px;
                         }
@@ -188,13 +190,43 @@ body {
                         background-position: center;
                         background-repeat: no-repeat;
                         cursor: pointer;
+                        position: absolute;
+                        top: 5px;
+                        right: 5px;
+                    }
+                    .task_time {
+                        margin-top: 5px;
+                        .expiration_message {
+                            color: red;
+                        }
                     }
                 }
-                &_middle {
+                &_additional {
                     display: none;
-                }
-                &_bottom {
-                    display: none;
+                    .task_middle {
+                        .task_desc {
+                            vertical-align: top;
+                            display: inline-block;
+                            width: 360px;
+                            .task_desc_text {
+                                padding: 2px;
+                                width: 350px;
+                                min-height: 30px;
+                                border: 1px solid @main;
+                            }
+                        }
+                        .task_info {
+                            display: inline-block;
+                            width: 350px;
+                            float: right;
+                            &_elem {
+                                display: block;
+                            }
+                        }
+                    }
+                    .task_bottom {
+                        //
+                    }
                 }
             }
             .menu_inner {
@@ -278,5 +310,11 @@ body {
     .active_elem {
         background: @main;
         color: white;
+    }
+}
+.clearfix {
+    clear: both;
+    &:before {
+        content: ' ';
     }
 }
