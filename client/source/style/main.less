@@ -137,10 +137,22 @@ body {
                     }
                 }
             }
-            .panel_tasks_buttons {
+            .panel_tasks_type {
                 margin-left: 5px;
                 .active_elem {
                     background: lighten(@main, 20%);
+                }
+            }
+            .panel_tasks_sort {
+                .sorting_point {
+                    display: inline-block;
+                    margin-left: 5px;
+                    margin-top: 5px;
+                    vertical-align: top;
+                    button {
+                        display: block;
+                        width: 140px;
+                    }
                 }
             }
             .task {
@@ -172,11 +184,24 @@ body {
                         display: inline-block;
                         width: 15%;
                         text-align: right;
+                        vertical-align: bottom;
                         article {
                             width: 60px;
                             height: 15px;
                             margin: 2px;
                             border: 1px solid @main;
+                        }
+                        .color_l {
+                            background: green;
+                        }
+                        .color_m {
+                            background: #d3d300;
+                        }
+                        .color_h {
+                            background: #b30000;
+                        }
+                        .hide_block {
+                            visibility: hidden;
                         }
                     }
                     .task_expand {

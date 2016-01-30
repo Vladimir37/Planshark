@@ -248,6 +248,31 @@ var Task = React.createClass({
                 {expiration_time.num} <span className="expiration_message">{expiration_message}</span></span>;
             expiration_date = new Date(state.expiration).toString().slice(0, -15);
         }
+        //priority blocks
+        var priority_color;
+        switch(+state.priority) {
+            case 1:
+                priority_color = 'color_l';
+                break;
+            case 2:
+                priority_color = 'color_m';
+                break;
+            case 3:
+                priority_color = 'color_h';
+                break;
+            default:
+                priority_color = 'color_l';
+                break;
+        }
+        var priority_blocks = [];
+        for(var i = 0; i < 3; i++) {
+            if(i < state.priority) {
+                priority_blocks.push(<article className={"task_priority_scale " + priority_color}></article>);
+            }
+            else {
+                priority_blocks.unshift(<article className={"task_priority_scale hide_block"}></article>);
+            }
+        }
         //render
         return <article className="task">
             <article className="task_top">
@@ -259,9 +284,7 @@ var Task = React.createClass({
                     <span className="task_info_elem"><b>Performer: </b>{state.performer_name}</span>
                 </article>
                 <article className="task_priority">
-                    <article className="task_priority_scale_3"></article>
-                    <article className="task_priority_scale_2"></article>
-                    <article className="task_priority_scale_1"></article>
+                    {priority_blocks}
                 </article>
                 <article className="task_expand" onClick={this.expand}></article>
                 <article className="task_time">
@@ -375,6 +398,56 @@ var TaskList = React.createClass({
             });
         });
     },
+    sort(direction, type) {
+        var self = this;
+        return function() {
+            var all_tasks = self.state.data.tasks;
+            function sorting(a, b) {
+                var result;
+                var today = new Date();
+                switch(type) {
+                    case 'date':
+                        result = new Date(a.createdAt) - new Date(b.createdAt);
+                        return result;
+                        break;
+                    case 'priority':
+                        result = a.priority - b.priority;
+                        return result;
+                        break;
+                    case 'time':
+                        if(!a.expiration && !b.expiration) {
+                            return 0;
+                        }
+                        else if(!a.expiration) {
+                            return -1;
+                        }
+                        else if(!b.expiration) {
+                            return 1;
+                        }
+                        else {
+                            var time_one = new Date(a.expiration) - today;
+                            var time_two = new Date(b.expiration) - today;
+                            result = time_one - time_two;
+                            return result;
+                        }
+                        break;
+                    default:
+                        return 0;
+                }
+            }
+            all_tasks.sort(sorting);
+            if(direction) {
+                all_tasks.reverse();
+            }
+            self.setState({
+                data: {
+                    received: true,
+                    error: false,
+                    tasks: all_tasks
+                }
+            });
+        }
+    },
     render() {
         //state
         var state = this.state;
@@ -383,24 +456,41 @@ var TaskList = React.createClass({
         var active_c = this.state.active ? ' active_elem' : '';
         var inactive_c = this.state.inactive ? ' active_elem' : '';
         var expired_c = this.state.expired ? ' active_elem' : '';
-        //button panel
-        var tasks_buttons_panel = <article className="panel_tasks_buttons">
+        //button panel (type)
+        var tasks_buttons_type = <article className="panel_tasks_type">
             <button className={"panel_elem" + active_c} onClick={this.switching('active')}>Active</button>
             <button className={"panel_elem" + inactive_c} onClick={this.switching('inactive')}>Inactive</button>
             <button className={"panel_elem" + expired_c} onClick={this.switching('expired')}>Expired</button>
+        </article>;
+        //button panel (sort)
+        var tasks_buttons_sort = <article className="panel_tasks_sort">
+            <article className="sorting_point">
+                <button className="panel_elem" onClick={this.sort(false, 'date')}>Increase date</button>
+                <button className="panel_elem" onClick={this.sort(true, 'date')}>Decrease date</button>
+            </article>
+            <article className="sorting_point">
+                <button className="panel_elem" onClick={this.sort(false, 'priority')}>Increase priority</button>
+                <button className="panel_elem" onClick={this.sort(true, 'priority')}>Decrease priority</button>
+            </article>
+            <article className="sorting_point">
+                <button className="panel_elem" onClick={this.sort(false, 'time')}>Increase time</button>
+                <button className="panel_elem" onClick={this.sort(true, 'time')}>Decrease time</button>
+            </article>
         </article>;
         //first load
         if(!data.received && !data.error) {
             this.receive();
             return <article className="task_list">
-                {tasks_buttons_panel}
+                {tasks_buttons_type}
+                {tasks_buttons_sort}
                 <Waiting />
             </article>;
         }
         //error
         else if(!data.received && data.error) {
             return <article className="task_list">
-                {tasks_buttons_panel}
+                {tasks_buttons_type}
+                {tasks_buttons_sort}
                 <Error />
             </article>;
         }
@@ -412,7 +502,8 @@ var TaskList = React.createClass({
                 all_tasks.push(<Task status={status} data={task} />)
             });
             return <article className="task_list">
-                {tasks_buttons_panel}
+                {tasks_buttons_type}
+                {tasks_buttons_sort}
                 {all_tasks}
             </article>;
         }
@@ -463,6 +554,7 @@ var TasksPage = React.createClass({
             return <Error />;
         }
         else {
+            console.log('ZANOVO');
             //page formation
             var page = [<TaskList status={this.state.status} />];
             if(this.state.status.creating || !this.state.status.room) {

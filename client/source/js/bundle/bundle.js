@@ -31548,6 +31548,30 @@
 	            );
 	            expiration_date = new Date(state.expiration).toString().slice(0, -15);
 	        }
+	        //priority blocks
+	        var priority_color;
+	        switch (+state.priority) {
+	            case 1:
+	                priority_color = 'color_l';
+	                break;
+	            case 2:
+	                priority_color = 'color_m';
+	                break;
+	            case 3:
+	                priority_color = 'color_h';
+	                break;
+	            default:
+	                priority_color = 'color_l';
+	                break;
+	        }
+	        var priority_blocks = [];
+	        for (var i = 0; i < 3; i++) {
+	            if (i < state.priority) {
+	                priority_blocks.push(_react2.default.createElement('article', { className: "task_priority_scale " + priority_color }));
+	            } else {
+	                priority_blocks.unshift(_react2.default.createElement('article', { className: "task_priority_scale hide_block" }));
+	            }
+	        }
 	        //render
 	        return _react2.default.createElement(
 	            'article',
@@ -31587,9 +31611,7 @@
 	                _react2.default.createElement(
 	                    'article',
 	                    { className: 'task_priority' },
-	                    _react2.default.createElement('article', { className: 'task_priority_scale_3' }),
-	                    _react2.default.createElement('article', { className: 'task_priority_scale_2' }),
-	                    _react2.default.createElement('article', { className: 'task_priority_scale_1' })
+	                    priority_blocks
 	                ),
 	                _react2.default.createElement('article', { className: 'task_expand', onClick: this.expand }),
 	                _react2.default.createElement(
@@ -31769,6 +31791,53 @@
 	            });
 	        });
 	    },
+	    sort: function sort(direction, type) {
+	        var self = this;
+	        return function () {
+	            var all_tasks = self.state.data.tasks;
+	            function sorting(a, b) {
+	                var result;
+	                var today = new Date();
+	                switch (type) {
+	                    case 'date':
+	                        result = new Date(a.createdAt) - new Date(b.createdAt);
+	                        return result;
+	                        break;
+	                    case 'priority':
+	                        result = a.priority - b.priority;
+	                        return result;
+	                        break;
+	                    case 'time':
+	                        if (!a.expiration && !b.expiration) {
+	                            return 0;
+	                        } else if (!a.expiration) {
+	                            return -1;
+	                        } else if (!b.expiration) {
+	                            return 1;
+	                        } else {
+	                            var time_one = new Date(a.expiration) - today;
+	                            var time_two = new Date(b.expiration) - today;
+	                            result = time_one - time_two;
+	                            return result;
+	                        }
+	                        break;
+	                    default:
+	                        return 0;
+	                }
+	            }
+	            all_tasks.sort(sorting);
+	            if (direction) {
+	                all_tasks.reverse();
+	            }
+	            self.setState({
+	                data: {
+	                    received: true,
+	                    error: false,
+	                    tasks: all_tasks
+	                }
+	            });
+	        };
+	    },
 	    render: function render() {
 	        //state
 	        var state = this.state;
@@ -31777,10 +31846,10 @@
 	        var active_c = this.state.active ? ' active_elem' : '';
 	        var inactive_c = this.state.inactive ? ' active_elem' : '';
 	        var expired_c = this.state.expired ? ' active_elem' : '';
-	        //button panel
-	        var tasks_buttons_panel = _react2.default.createElement(
+	        //button panel (type)
+	        var tasks_buttons_type = _react2.default.createElement(
 	            'article',
-	            { className: 'panel_tasks_buttons' },
+	            { className: 'panel_tasks_type' },
 	            _react2.default.createElement(
 	                'button',
 	                { className: "panel_elem" + active_c, onClick: this.switching('active') },
@@ -31797,13 +31866,61 @@
 	                'Expired'
 	            )
 	        );
+	        //button panel (sort)
+	        var tasks_buttons_sort = _react2.default.createElement(
+	            'article',
+	            { className: 'panel_tasks_sort' },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'sorting_point' },
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'panel_elem', onClick: this.sort(false, 'date') },
+	                    'Increase date'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'panel_elem', onClick: this.sort(true, 'date') },
+	                    'Decrease date'
+	                )
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'sorting_point' },
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'panel_elem', onClick: this.sort(false, 'priority') },
+	                    'Increase priority'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'panel_elem', onClick: this.sort(true, 'priority') },
+	                    'Decrease priority'
+	                )
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'sorting_point' },
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'panel_elem', onClick: this.sort(false, 'time') },
+	                    'Increase time'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'panel_elem', onClick: this.sort(true, 'time') },
+	                    'Decrease time'
+	                )
+	            )
+	        );
 	        //first load
 	        if (!data.received && !data.error) {
 	            this.receive();
 	            return _react2.default.createElement(
 	                'article',
 	                { className: 'task_list' },
-	                tasks_buttons_panel,
+	                tasks_buttons_type,
+	                tasks_buttons_sort,
 	                _react2.default.createElement(_templates.Waiting, null)
 	            );
 	        }
@@ -31812,7 +31929,8 @@
 	                return _react2.default.createElement(
 	                    'article',
 	                    { className: 'task_list' },
-	                    tasks_buttons_panel,
+	                    tasks_buttons_type,
+	                    tasks_buttons_sort,
 	                    _react2.default.createElement(_templates.Error, null)
 	                );
 	            }
@@ -31823,10 +31941,12 @@
 	                    this.state.data.tasks.forEach(function (task) {
 	                        all_tasks.push(_react2.default.createElement(Task, { status: status, data: task }));
 	                    });
+	                    console.log(all_tasks);
 	                    return _react2.default.createElement(
 	                        'article',
 	                        { className: 'task_list' },
-	                        tasks_buttons_panel,
+	                        tasks_buttons_type,
+	                        tasks_buttons_sort,
 	                        all_tasks
 	                    );
 	                }
@@ -31876,6 +31996,7 @@
 	        } else if (!this.state.loaded && this.state.failed) {
 	            return _react2.default.createElement(_templates.Error, null);
 	        } else {
+	            console.log('ZANOVO');
 	            //page formation
 	            var page = [_react2.default.createElement(TaskList, { status: this.state.status })];
 	            if (this.state.status.creating || !this.state.status.room) {
