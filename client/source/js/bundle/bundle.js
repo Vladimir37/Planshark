@@ -31503,6 +31503,9 @@
 	            }
 	        };
 	    },
+	    shouldComponentUpdate: function shouldComponentUpdate() {
+	        return true;
+	    },
 	    expand: function expand(elem) {
 	        var target = (0, _jquery2.default)(elem.target).closest('.task');
 	        target.find('.task_additional').slideToggle();
@@ -31720,6 +31723,9 @@
 	            }
 	        };
 	    },
+	    shouldComponentUpdate: function shouldComponentUpdate() {
+	        return true;
+	    },
 	    switching: function switching(name) {
 	        var self = this;
 	        if (!this.state[name]) {
@@ -31795,6 +31801,13 @@
 	        var self = this;
 	        return function () {
 	            var all_tasks = self.state.data.tasks;
+	            self.setState({
+	                data: {
+	                    received: true,
+	                    error: false,
+	                    tasks: []
+	                }
+	            });
 	            function sorting(a, b) {
 	                var result;
 	                var today = new Date();
@@ -31938,8 +31951,8 @@
 	            else {
 	                    var status = this.props.status;
 	                    var all_tasks = [];
-	                    this.state.data.tasks.forEach(function (task) {
-	                        all_tasks.push(_react2.default.createElement(Task, { status: status, data: task }));
+	                    data.tasks.forEach(function (task) {
+	                        all_tasks.push(_react2.default.createElement(Task, { status: status, data: task, key: task.id }));
 	                    });
 	                    console.log(all_tasks);
 	                    return _react2.default.createElement(
@@ -31996,7 +32009,6 @@
 	        } else if (!this.state.loaded && this.state.failed) {
 	            return _react2.default.createElement(_templates.Error, null);
 	        } else {
-	            console.log('ZANOVO');
 	            //page formation
 	            var page = [_react2.default.createElement(TaskList, { status: this.state.status })];
 	            if (this.state.status.creating || !this.state.status.room) {

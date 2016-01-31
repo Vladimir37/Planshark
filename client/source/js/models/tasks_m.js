@@ -222,6 +222,9 @@ var Task = React.createClass({
             }
         }
     },
+    shouldComponentUpdate() {
+        return true;
+    },
     expand(elem) {
         var target = $(elem.target).closest('.task');
         target.find('.task_additional').slideToggle();
@@ -325,6 +328,9 @@ var TaskList = React.createClass({
             }
         }
     },
+    shouldComponentUpdate() {
+        return true;
+    },
     switching(name) {
         var self = this;
         if(!this.state[name]) {
@@ -402,6 +408,13 @@ var TaskList = React.createClass({
         var self = this;
         return function() {
             var all_tasks = self.state.data.tasks;
+            self.setState({
+                data: {
+                    received: true,
+                    error: false,
+                    tasks: []
+                }
+            });
             function sorting(a, b) {
                 var result;
                 var today = new Date();
@@ -498,9 +511,10 @@ var TaskList = React.createClass({
         else {
             var status = this.props.status;
             var all_tasks = [];
-            this.state.data.tasks.forEach(function(task) {
-                all_tasks.push(<Task status={status} data={task} />)
+            data.tasks.forEach(function(task) {
+                all_tasks.push(<Task status={status} data={task} key={task.id} />);
             });
+            console.log(all_tasks);
             return <article className="task_list">
                 {tasks_buttons_type}
                 {tasks_buttons_sort}
@@ -554,7 +568,6 @@ var TasksPage = React.createClass({
             return <Error />;
         }
         else {
-            console.log('ZANOVO');
             //page formation
             var page = [<TaskList status={this.state.status} />];
             if(this.state.status.creating || !this.state.status.room) {
