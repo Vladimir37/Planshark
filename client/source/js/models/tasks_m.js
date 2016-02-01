@@ -202,6 +202,7 @@ var Task = React.createClass({
         data.performer_data = data.performer_data || {};
         data.author_data = data.author_data || {};
         return {
+            id: data.id,
             name: data.name,
             description: data.description,
             t_group_num: data.t_group,
@@ -228,6 +229,7 @@ var Task = React.createClass({
     },
     editing(elem) {
         var target = $(elem.target).closest('.task');
+        target.find('.task_action:not(.task_edit)').hide();
         target.find('.task_edit').slideToggle();
     },
     reassignment() {
@@ -236,16 +238,64 @@ var Task = React.createClass({
     deleting() {
         //
     },
+    solve(elem) {
+        var target = $(elem.target).closest('.task');
+        target.find('.task_action:not(.task_solve)').hide();
+        target.find('.task_solve').slideToggle();
+    },
+    submit(type) {
+        var self = this;
+        return function(elem) {
+            var target = elem.target;
+            switch(type) {
+                case 'edit':
+                    var ajax_data = getData(target);
+                    ajax_data.task_id = self.state.id;
+                    submitting(ajax_data, '/api/tasks/edit', 'POST', function(data) {
+                        var response_status = +data;
+                        if(isNaN(response_status)) {
+                            response_status = 1;
+                        }
+                        toast(actions_r[response_status]);
+                    }, function(err) {
+                        toast(actions_r[1]);
+                    });
+                    break;
+                case 'solve':
+                    var ajax_data = getData(target);
+                    ajax_data.task_id = self.state.id;
+                    submitting(ajax_data, '/api/tasks/close', 'POST', function(data) {
+                        var response_status = +data;
+                        if(isNaN(response_status)) {
+                            response_status = 1;
+                        }
+                        toast(actions_r[response_status]);
+                    }, function(err) {
+                        toast(actions_r[1]);
+                    });
+                    break;
+                default:
+                    console.log('Incorrect action');
+            };
+        }
+    },
     selectBoxes(elem) {
         var target = $(elem.target);
         var elemParent = target.closest('.select_box');
         elemParent.find('label').removeClass('active_elem');
         target.parent().addClass('active_elem');
     },
+    priorityChange(elem) {
+        var target = elem.target;
+        $('[name="priority"]').parent().removeClass('active_elem');
+        $(target).parent().addClass('active_elem');
+        return true;
+    },
     render() {
         var self = this;
         // bottom buttons
         var task_bottom = [];
+        task_bottom.push(<button className="solve_but" onClick={this.solve}>Solve</button>);
         var state = this.state;
         var rights = this.state.rights;
         for(let key in rights) {
@@ -291,8 +341,11 @@ var Task = React.createClass({
             }
         }
         //date for edit
-        var full_date = new Date(state.expiration);
-        var string_date = full_date.getMonth() + 1 + '/' + full_date.getDate() + '/' + full_date.getFullYear();
+        var string_date = '';
+        if(state.expiration) {
+            var full_date = new Date(state.expiration);
+            string_date = full_date.getMonth() + 1 + '/' + full_date.getDate() + '/' + full_date.getFullYear();
+        }
         //props data and status
         var status = this.props.status;
         var group_data = this.props.group_data;
@@ -300,6 +353,25 @@ var Task = React.createClass({
         var users_list = group_data.body.users;
         var t_groups_list = group_data.body.t_groups;
         var u_groups_list = group_data.body.u_groups;
+        //default priority
+        var pt_default = '';
+        var pt_class_1 = '', pt_class_2 = '', pt_class_3 = '';
+        switch(+state.priority) {
+            case 1:
+                pt_default = '1';
+                pt_class_1 = 'active_elem';
+                break;
+            case 2:
+                pt_default = '2';
+                pt_class_2 = 'active_elem';
+                break;
+            case 3:
+                pt_default = '3';
+                pt_class_3 = 'active_elem';
+                break;
+            default:
+                console.log('Incorrect priority');
+        };
         //performers list
         var users = [];
         if(room && users_list) {
@@ -379,11 +451,21 @@ var Task = React.createClass({
                     <div className="clearfix"></div>
                 </article>
                 <article className="task_bottom">{task_bottom}</article>
+                <article className="task_action task_solve hidden">
+                    <article className="column_sizeless">
+                        <textarea name="answer" placeholder="Answer"></textarea>
+                        <button onClick={this.submit('solve')}>Solve</button>
+                    </article>
+                </article>
                 <article className="task_action task_edit hidden">
                     <article className="column column_text">
                         <input type="text" name="name" placeholder="name" defaultValue={state.name} data-req="true" /><br/>
                         <textarea name="description" placeholder="Task description" defaultValue={state.description} data-req="true"></textarea><br/>
                         <input type="text" name="expiration" placeholder="Expiration time" className="time_field" defaultValue={string_date} /><br/>
+                        <input type="radio" name="priority" value={pt_default} defaultChecked />
+                        <label className={pt_class_3}><input type="radio" name="priority" value="3" onChange={this.priorityChange} />High</label>
+                        <label className={pt_class_2}><input type="radio" name="priority" value="2" onChange={this.priorityChange} />Middle</label>
+                        <label className={pt_class_1}><input type="radio" name="priority" value="1" onChange={this.priorityChange} />Low</label>
                         {performers_item}
                     </article>
                     <article className="column">
@@ -393,6 +475,7 @@ var Task = React.createClass({
                         </article>
                         {u_groups_item}
                     </article>
+                    <button onClick={this.submit('edit')}>Edit</button>
                 </article>
                 <article className="task_action task_reassign hidden"></article>
                 <article className="task_action task_delete hidden"></article>

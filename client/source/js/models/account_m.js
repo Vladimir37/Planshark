@@ -92,7 +92,7 @@ var Registration = React.createClass({
                 self.props.request();
             }
         }, function(err) {
-            toast("Server error");
+            toast(registration_r[4]);
         });
     },
     render() {

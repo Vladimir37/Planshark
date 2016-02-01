@@ -250,7 +250,20 @@ body {
                         }
                     }
                     .task_bottom {
-                        //
+                        .solve_but {
+                            margin-right: 10px;
+                        }
+                    }
+                    .task_action {
+                        input[type="radio"] {
+                            display: none;
+                        }
+                        label {
+                            padding: 0 5px;
+                        }
+                        button {
+                            display: block;
+                        }
                     }
                 }
             }
@@ -345,6 +358,12 @@ body {
     }
     .column_text {
         padding-top: 61px;
+    }
+    .column_sizeless {
+        display: inline-block;
+        box-sizing: border-box;
+        width: 32%;
+        vertical-align: top;
     }
 }
 .clearfix {

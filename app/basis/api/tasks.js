@@ -77,6 +77,7 @@ function editing(req, res, next) {
     //personal
     if(!room) {
         db.tasks.update({
+            u_group,
             t_group,
             priority,
             name: task_name,
@@ -132,6 +133,7 @@ function editing(req, res, next) {
         }).then(function() {
             return db.tasks.update({
                 t_group,
+                u_group,
                 priority,
                 name: task_name,
                 description: task_description,
