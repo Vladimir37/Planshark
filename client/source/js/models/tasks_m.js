@@ -216,20 +216,34 @@ var Task = React.createClass({
             created: new Date(data.createdAt).toString().slice(0, -15),
             expiration: data.expiration,
             rights: {
-                editing: status.editing || false,
+                editing: status.editing || !status.room || false,
                 reassignment: status.reassignment || false,
-                deleting: status.deleting || false
+                deleting: status.deleting || !status.room || false
             }
         }
-    },
-    shouldComponentUpdate() {
-        return true;
     },
     expand(elem) {
         var target = $(elem.target).closest('.task');
         target.find('.task_additional').slideToggle();
     },
+    editing(elem) {
+        var target = $(elem.target).closest('.task');
+        target.find('.task_edit').slideToggle();
+    },
+    reassignment() {
+        //
+    },
+    deleting() {
+        //
+    },
+    selectBoxes(elem) {
+        var target = $(elem.target);
+        var elemParent = target.closest('.select_box');
+        elemParent.find('label').removeClass('active_elem');
+        target.parent().addClass('active_elem');
+    },
     render() {
+        var self = this;
         // bottom buttons
         var task_bottom = [];
         var state = this.state;
@@ -276,6 +290,61 @@ var Task = React.createClass({
                 priority_blocks.unshift(<article className={"task_priority_scale hide_block"}></article>);
             }
         }
+        //date for edit
+        var full_date = new Date(state.expiration);
+        var string_date = full_date.getMonth() + 1 + '/' + full_date.getDate() + '/' + full_date.getFullYear();
+        //props data and status
+        var status = this.props.status;
+        var group_data = this.props.group_data;
+        var room = status.room;
+        var users_list = group_data.body.users;
+        var t_groups_list = group_data.body.t_groups;
+        var u_groups_list = group_data.body.u_groups;
+        //performers list
+        var users = [];
+        if(room && users_list) {
+            group_data.users.forEach(function (elem) {
+                users.push(<label>{elem[1]}<input type="radio" name="performer" onChange={self.selectBoxes}
+                                                  value={elem[0]}/></label>);
+            });
+            users.unshift(<label className="active_elem">Me<input type="radio" name="performer" value=''
+                                                                  onChange={self.selectBoxes} defaultChecked/></label>)
+        }
+        //tasks groups list
+        var t_groups = [];
+        if(t_groups_list) {
+            t_groups_list.map(function (elem) {
+                t_groups.push(<label>{elem[1]}<input type="radio" name="t_group" onChange={self.selectBoxes}
+                                                     value={elem[0]}/></label>);
+            });
+            t_groups.unshift(<label className="active_elem">No group<input type="radio" name="t_group"
+                                                                           onChange={self.selectBoxes} value=''
+                                                                           defaultChecked/></label>)
+        }
+        //users groups list
+        var u_groups = [];
+        if(status.room && u_groups_list) {
+            u_groups_list.forEach(function (elem) {
+                u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes}
+                                                     value={elem[0]}/></label>);
+            });
+            u_groups.unshift(<label className="active_elem">No group<input type="radio" name="u_group"
+                                                                           onChange={self.selectBoxes} value=''
+                                                                           defaultChecked/></label>)
+        }
+        //personal or company items
+        var u_groups_item = '';
+        var performers_item = '';
+        if(status.room) {
+            performers_item = <article className="select_main">
+                <h3>Performer</h3>
+                <article className="select_box">{users}</article>
+            </article>;
+            u_groups_item = <article className="select_main">
+                <h3>Users group</h3>
+                <article className="select_box">{u_groups}</article>
+            </article>;
+        }
         //render
         return <article className="task">
             <article className="task_top">
@@ -310,6 +379,23 @@ var Task = React.createClass({
                     <div className="clearfix"></div>
                 </article>
                 <article className="task_bottom">{task_bottom}</article>
+                <article className="task_action task_edit hidden">
+                    <article className="column column_text">
+                        <input type="text" name="name" placeholder="name" defaultValue={state.name} data-req="true" /><br/>
+                        <textarea name="description" placeholder="Task description" defaultValue={state.description} data-req="true"></textarea><br/>
+                        <input type="text" name="expiration" placeholder="Expiration time" className="time_field" defaultValue={string_date} /><br/>
+                        {performers_item}
+                    </article>
+                    <article className="column">
+                        <article className="select_main">
+                            <h3>Tasks group</h3>
+                            <article className="select_box">{t_groups}</article>
+                        </article>
+                        {u_groups_item}
+                    </article>
+                </article>
+                <article className="task_action task_reassign hidden"></article>
+                <article className="task_action task_delete hidden"></article>
             </article>
         </article>;
     }
@@ -327,9 +413,6 @@ var TaskList = React.createClass({
                 tasks: null
             }
         }
-    },
-    shouldComponentUpdate() {
-        return true;
     },
     switching(name) {
         var self = this;
@@ -511,10 +594,12 @@ var TaskList = React.createClass({
         else {
             var status = this.props.status;
             var all_tasks = [];
-            data.tasks.forEach(function(task) {
-                all_tasks.push(<Task status={status} data={task} key={task.id} />);
+            var list_tasks = data.tasks;
+            var group_data = this.props.group_data;
+            list_tasks.reverse();
+            list_tasks.forEach(function(task) {
+                all_tasks.push(<Task status={status} data={task} key={task.id} group_data={group_data} />);
             });
-            console.log(all_tasks);
             return <article className="task_list">
                 {tasks_buttons_type}
                 {tasks_buttons_sort}
@@ -569,7 +654,7 @@ var TasksPage = React.createClass({
         }
         else {
             //page formation
-            var page = [<TaskList status={this.state.status} />];
+            var page = [<TaskList status={this.state.status} group_data={this.state.data} key='TasksList' />];
             if(this.state.status.creating || !this.state.status.room) {
                 page.unshift(<Creating status={this.state.status} data={this.state.data} />);
             }

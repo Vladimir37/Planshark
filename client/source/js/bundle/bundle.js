@@ -31497,20 +31497,34 @@
 	            created: new Date(data.createdAt).toString().slice(0, -15),
 	            expiration: data.expiration,
 	            rights: {
-	                editing: status.editing || false,
+	                editing: status.editing || !status.room || false,
 	                reassignment: status.reassignment || false,
-	                deleting: status.deleting || false
+	                deleting: status.deleting || !status.room || false
 	            }
 	        };
-	    },
-	    shouldComponentUpdate: function shouldComponentUpdate() {
-	        return true;
 	    },
 	    expand: function expand(elem) {
 	        var target = (0, _jquery2.default)(elem.target).closest('.task');
 	        target.find('.task_additional').slideToggle();
 	    },
+	    editing: function editing(elem) {
+	        var target = (0, _jquery2.default)(elem.target).closest('.task');
+	        target.find('.task_edit').slideToggle();
+	    },
+	    reassignment: function reassignment() {
+	        //
+	    },
+	    deleting: function deleting() {
+	        //
+	    },
+	    selectBoxes: function selectBoxes(elem) {
+	        var target = (0, _jquery2.default)(elem.target);
+	        var elemParent = target.closest('.select_box');
+	        elemParent.find('label').removeClass('active_elem');
+	        target.parent().addClass('active_elem');
+	    },
 	    render: function render() {
+	        var self = this;
 	        // bottom buttons
 	        var task_bottom = [];
 	        var state = this.state;
@@ -31574,6 +31588,111 @@
 	            } else {
 	                priority_blocks.unshift(_react2.default.createElement('article', { className: "task_priority_scale hide_block" }));
 	            }
+	        }
+	        //date for edit
+	        var full_date = new Date(state.expiration);
+	        var string_date = full_date.getMonth() + 1 + '/' + full_date.getDate() + '/' + full_date.getFullYear();
+	        //props data and status
+	        var status = this.props.status;
+	        var group_data = this.props.group_data;
+	        var room = status.room;
+	        var users_list = group_data.body.users;
+	        var t_groups_list = group_data.body.t_groups;
+	        var u_groups_list = group_data.body.u_groups;
+	        //performers list
+	        var users = [];
+	        if (room && users_list) {
+	            group_data.users.forEach(function (elem) {
+	                users.push(_react2.default.createElement(
+	                    'label',
+	                    null,
+	                    elem[1],
+	                    _react2.default.createElement('input', { type: 'radio', name: 'performer', onChange: self.selectBoxes,
+	                        value: elem[0] })
+	                ));
+	            });
+	            users.unshift(_react2.default.createElement(
+	                'label',
+	                { className: 'active_elem' },
+	                'Me',
+	                _react2.default.createElement('input', { type: 'radio', name: 'performer', value: '',
+	                    onChange: self.selectBoxes, defaultChecked: true })
+	            ));
+	        }
+	        //tasks groups list
+	        var t_groups = [];
+	        if (t_groups_list) {
+	            t_groups_list.map(function (elem) {
+	                t_groups.push(_react2.default.createElement(
+	                    'label',
+	                    null,
+	                    elem[1],
+	                    _react2.default.createElement('input', { type: 'radio', name: 't_group', onChange: self.selectBoxes,
+	                        value: elem[0] })
+	                ));
+	            });
+	            t_groups.unshift(_react2.default.createElement(
+	                'label',
+	                { className: 'active_elem' },
+	                'No group',
+	                _react2.default.createElement('input', { type: 'radio', name: 't_group',
+	                    onChange: self.selectBoxes, value: '',
+	                    defaultChecked: true })
+	            ));
+	        }
+	        //users groups list
+	        var u_groups = [];
+	        if (status.room && u_groups_list) {
+	            u_groups_list.forEach(function (elem) {
+	                u_groups.push(_react2.default.createElement(
+	                    'label',
+	                    null,
+	                    elem[1],
+	                    _react2.default.createElement('input', { type: 'radio', name: 'u_group', onChange: self.selectBoxes,
+	                        value: elem[0] })
+	                ));
+	            });
+	            u_groups.unshift(_react2.default.createElement(
+	                'label',
+	                { className: 'active_elem' },
+	                'No group',
+	                _react2.default.createElement('input', { type: 'radio', name: 'u_group',
+	                    onChange: self.selectBoxes, value: '',
+	                    defaultChecked: true })
+	            ));
+	        }
+	        //personal or company items
+	        var u_groups_item = '';
+	        var performers_item = '';
+	        if (status.room) {
+	            performers_item = _react2.default.createElement(
+	                'article',
+	                { className: 'select_main' },
+	                _react2.default.createElement(
+	                    'h3',
+	                    null,
+	                    'Performer'
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'select_box' },
+	                    users
+	                )
+	            );
+	            u_groups_item = _react2.default.createElement(
+	                'article',
+	                { className: 'select_main' },
+	                _react2.default.createElement(
+	                    'h3',
+	                    null,
+	                    'Users group'
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'select_box' },
+	                    u_groups
+	                )
+	            );
 	        }
 	        //render
 	        return _react2.default.createElement(
@@ -31703,7 +31822,43 @@
 	                    'article',
 	                    { className: 'task_bottom' },
 	                    task_bottom
-	                )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_action task_edit hidden' },
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'column column_text' },
+	                        _react2.default.createElement('input', { type: 'text', name: 'name', placeholder: 'name', defaultValue: state.name, 'data-req': 'true' }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('textarea', { name: 'description', placeholder: 'Task description', defaultValue: state.description, 'data-req': 'true' }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'text', name: 'expiration', placeholder: 'Expiration time', className: 'time_field', defaultValue: string_date }),
+	                        _react2.default.createElement('br', null),
+	                        performers_item
+	                    ),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'column' },
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: 'select_main' },
+	                            _react2.default.createElement(
+	                                'h3',
+	                                null,
+	                                'Tasks group'
+	                            ),
+	                            _react2.default.createElement(
+	                                'article',
+	                                { className: 'select_box' },
+	                                t_groups
+	                            )
+	                        ),
+	                        u_groups_item
+	                    )
+	                ),
+	                _react2.default.createElement('article', { className: 'task_action task_reassign hidden' }),
+	                _react2.default.createElement('article', { className: 'task_action task_delete hidden' })
 	            )
 	        );
 	    }
@@ -31722,9 +31877,6 @@
 	                tasks: null
 	            }
 	        };
-	    },
-	    shouldComponentUpdate: function shouldComponentUpdate() {
-	        return true;
 	    },
 	    switching: function switching(name) {
 	        var self = this;
@@ -31951,10 +32103,12 @@
 	            else {
 	                    var status = this.props.status;
 	                    var all_tasks = [];
-	                    data.tasks.forEach(function (task) {
-	                        all_tasks.push(_react2.default.createElement(Task, { status: status, data: task, key: task.id }));
+	                    var list_tasks = data.tasks;
+	                    var group_data = this.props.group_data;
+	                    list_tasks.reverse();
+	                    list_tasks.forEach(function (task) {
+	                        all_tasks.push(_react2.default.createElement(Task, { status: status, data: task, key: task.id, group_data: group_data }));
 	                    });
-	                    console.log(all_tasks);
 	                    return _react2.default.createElement(
 	                        'article',
 	                        { className: 'task_list' },
@@ -32010,7 +32164,7 @@
 	            return _react2.default.createElement(_templates.Error, null);
 	        } else {
 	            //page formation
-	            var page = [_react2.default.createElement(TaskList, { status: this.state.status })];
+	            var page = [_react2.default.createElement(TaskList, { status: this.state.status, group_data: this.state.data, key: 'TasksList' })];
 	            if (this.state.status.creating || !this.state.status.room) {
 	                page.unshift(_react2.default.createElement(Creating, { status: this.state.status, data: this.state.data }));
 	            }

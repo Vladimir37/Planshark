@@ -40,6 +40,7 @@ function start() {
             console.log(err);
         }
         else {
+            console.log('JS-bundle created.');
             //console.log(stats.toJson());
         }
     });
