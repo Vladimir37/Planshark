@@ -215,6 +215,7 @@ function status(req, res, next) {
                 status_data.editing = true;
                 status_data.reassignment = true;
                 status_data.deleting = true;
+                status_data.viewing = true;
                 res.end(JSON.stringify(status_data));
                 return JSON.stringify(status_data);
             }
@@ -228,6 +229,7 @@ function status(req, res, next) {
             status_data.editing = Boolean(+user_group.editing);
             status_data.reassignment = Boolean(+user_group.reassignment);
             status_data.deleting = Boolean(+user_group.deleting);
+            status_data.viewing = Boolean(+user_group.all_view);
             res.end(JSON.stringify(status_data));
         }).catch(function(err) {
             console.log(err);

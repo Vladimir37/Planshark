@@ -55,7 +55,8 @@ tables.users_groups = sequelize.define('users_groups', {
     reassignment: Sequelize.INTEGER,
     deleting: Sequelize.INTEGER,
     t_group_manage: Sequelize.INTEGER,
-    u_group_manage: Sequelize.INTEGER
+    u_group_manage: Sequelize.INTEGER,
+    all_view: Sequelize.INTEGER
 });
 
 tables.tasks_groups = sequelize.define('tasks_groups', {

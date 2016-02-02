@@ -535,6 +535,8 @@ var TaskList = React.createClass({
             active: true,
             inactive: false,
             expired: false,
+            all_active: false,
+            all_inactive: false,
             data: {
                 received: false,
                 error: false,
@@ -542,7 +544,7 @@ var TaskList = React.createClass({
             }
         }
     },
-    switching(name) {
+    switching(name, all) {
         var self = this;
         if(!this.state[name]) {
             return function () {
@@ -550,6 +552,7 @@ var TaskList = React.createClass({
                     active: false,
                     inactive: false,
                     expired: false,
+                    all: Boolean(all),
                     [name]: true,
                     data: {
                         received: false,
@@ -569,7 +572,11 @@ var TaskList = React.createClass({
         else {
             tasks_type = 'active';
         }
-        submitting(null, '/api/get_tasks/' + tasks_type, 'GET', function(data) {
+        var all_tasks_type = '';
+        if(this.state.all) {
+            all_tasks_type = '_all';
+        }
+        submitting(null, '/api/get_tasks/' + tasks_type + all_tasks_type, 'GET', function(data) {
             if (typeof data == 'string') {
                 data = JSON.parse(data);
             }
@@ -674,13 +681,25 @@ var TaskList = React.createClass({
     },
     render() {
         //state
-        var state = this.state;
         var data = this.state.data;
+        var status = this.props.status;
         //classes determination
-        var active_c = this.state.active ? ' active_elem' : '';
-        var inactive_c = this.state.inactive ? ' active_elem' : '';
-        var expired_c = this.state.expired ? ' active_elem' : '';
+        var active_c = this.state.active && !this.state.all ? ' active_elem' : '';
+        var inactive_c = this.state.inactive && !this.state.all ? ' active_elem' : '';
+        var expired_c = this.state.expired && !this.state.all ? ' active_elem' : '';
+        var all_active_c = this.state.active && this.state.all ? ' active_elem' : '';
+        var all_inactive_c = this.state.active && this.state.all ? ' active_elem' : '';
+        var all_expired_c = this.state.active && this.state.all ? ' active_elem' : '';
         //button panel (type)
+        var room_master_buttons = [];
+        if(status.room && (!status.group || status.viewing)) {
+            room_master_buttons.push(<button className={"panel_elem" + all_active_c} onClick={this.switching('active', true)}>
+                All active</button>);
+            room_master_buttons.push(<button className={"panel_elem" + all_inactive_c} onClick={this.switching('inactive', true)}>
+                All inactive</button>);
+            room_master_buttons.push(<button className={"panel_elem" + all_expired_c} onClick={this.switching('expired', true)}>
+                All expired</button>);
+        }
         var tasks_buttons_type = <article className="panel_tasks_type">
             <button className={"panel_elem" + active_c} onClick={this.switching('active')}>Active</button>
             <button className={"panel_elem" + inactive_c} onClick={this.switching('inactive')}>Inactive</button>
@@ -720,7 +739,6 @@ var TaskList = React.createClass({
         }
         //render tasks
         else {
-            var status = this.props.status;
             var all_tasks = [];
             var list_tasks = data.tasks;
             var group_data = this.props.group_data;
