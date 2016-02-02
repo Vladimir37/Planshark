@@ -163,6 +163,7 @@ function reassignment(req, res, next) {
     //task data
     var task_id = req.body.task_id;
     var performer = req.body.performer;
+    var u_group = req.body.u_group;
     //right to reassign
     var assign_right = false;
     author_group == 0 ? assign_right = true : assign_right = false;
@@ -182,6 +183,7 @@ function reassignment(req, res, next) {
     }).then(function() {
         return db.tasks.update({
             performer,
+            u_group,
             editor: author
         }, {
             where: {

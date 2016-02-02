@@ -6,7 +6,7 @@ function active_tasks(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = res.user_status.group || 0;
     //personal
     if(!room) {
         db.tasks.findAll({
@@ -31,9 +31,9 @@ function active_tasks(req, res, next) {
                 $or: {
                     u_group: author_group,
                     performer: author
-                },
-                include: [db.tasks_groups, db.users_groups, db.aliases.author_data, db.aliases.performer_data]
-            }
+                }
+            },
+            include: [db.tasks_groups, db.users_groups, db.aliases.author_data, db.aliases.performer_data]
         }).then(function(result) {
             res.end(serializing(0, result));
         }, function(err) {

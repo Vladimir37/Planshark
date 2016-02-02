@@ -31513,11 +31513,15 @@
 	        target.find('.task_action:not(.task_edit)').hide();
 	        target.find('.task_edit').slideToggle();
 	    },
-	    reassignment: function reassignment() {
-	        //
+	    reassignment: function reassignment(elem) {
+	        var target = (0, _jquery2.default)(elem.target).closest('.task');
+	        target.find('.task_action:not(.task_reassign)').hide();
+	        target.find('.task_reassign').slideToggle();
 	    },
-	    deleting: function deleting() {
-	        //
+	    deleting: function deleting(elem) {
+	        var target = (0, _jquery2.default)(elem.target).closest('.task');
+	        target.find('.task_action:not(.task_delete)').hide();
+	        target.find('.task_delete').slideToggle();
 	    },
 	    solve: function solve(elem) {
 	        var target = (0, _jquery2.default)(elem.target).closest('.task');
@@ -31528,9 +31532,10 @@
 	        var self = this;
 	        return function (elem) {
 	            var target = elem.target;
+	            var ajax_data = {};
 	            switch (type) {
 	                case 'edit':
-	                    var ajax_data = (0, _submitting.getData)(target);
+	                    ajax_data = (0, _submitting.getData)(target);
 	                    ajax_data.task_id = self.state.id;
 	                    (0, _submitting.submitting)(ajax_data, '/api/tasks/edit', 'POST', function (data) {
 	                        var response_status = +data;
@@ -31543,9 +31548,34 @@
 	                    });
 	                    break;
 	                case 'solve':
-	                    var ajax_data = (0, _submitting.getData)(target);
+	                    ajax_data = (0, _submitting.getData)(target);
 	                    ajax_data.task_id = self.state.id;
 	                    (0, _submitting.submitting)(ajax_data, '/api/tasks/close', 'POST', function (data) {
+	                        var response_status = +data;
+	                        if (isNaN(response_status)) {
+	                            response_status = 1;
+	                        }
+	                        (0, _toaster2.default)(actions_r[response_status]);
+	                    }, function (err) {
+	                        (0, _toaster2.default)(actions_r[1]);
+	                    });
+	                    break;
+	                case 'delete':
+	                    ajax_data.task_id = self.state.id;
+	                    (0, _submitting.submitting)(ajax_data, '/api/tasks/delete', 'POST', function (data) {
+	                        var response_status = +data;
+	                        if (isNaN(response_status)) {
+	                            response_status = 1;
+	                        }
+	                        (0, _toaster2.default)(actions_r[response_status]);
+	                    }, function (err) {
+	                        (0, _toaster2.default)(actions_r[1]);
+	                    });
+	                    break;
+	                case 'reassign':
+	                    ajax_data = (0, _submitting.getData)(target);
+	                    ajax_data.task_id = self.state.id;
+	                    (0, _submitting.submitting)(ajax_data, '/api/tasks/reassign', 'POST', function (data) {
 	                        var response_status = +data;
 	                        if (isNaN(response_status)) {
 	                            response_status = 1;
@@ -31680,63 +31710,70 @@
 	        //performers list
 	        var users = [];
 	        if (room && users_list) {
-	            group_data.users.forEach(function (elem) {
+	            users.push(_react2.default.createElement('input', { type: 'radio', name: 'performer', value: state.performer_num }));
+	            users_list.forEach(function (elem) {
+	                var local_class = elem[0] == state.performer_num ? 'active_elem' : '';
 	                users.push(_react2.default.createElement(
 	                    'label',
-	                    null,
+	                    { className: local_class },
 	                    elem[1],
 	                    _react2.default.createElement('input', { type: 'radio', name: 'performer', onChange: self.selectBoxes,
 	                        value: elem[0] })
 	                ));
 	            });
+	            var no_select = !state.performer_num ? 'active_elem' : '';
 	            users.unshift(_react2.default.createElement(
 	                'label',
-	                { className: 'active_elem' },
+	                { className: no_select },
 	                'Me',
 	                _react2.default.createElement('input', { type: 'radio', name: 'performer', value: '',
-	                    onChange: self.selectBoxes, defaultChecked: true })
+	                    onChange: self.selectBoxes })
 	            ));
 	        }
 	        //tasks groups list
 	        var t_groups = [];
 	        if (t_groups_list) {
-	            t_groups_list.map(function (elem) {
+	            t_groups.push(_react2.default.createElement('input', { type: 'radio', name: 't_group', value: state.t_group_num, defaultChecked: true }));
+	            t_groups_list.forEach(function (elem) {
+	                var local_class = elem[0] == state.t_group_num ? 'active_elem' : '';
 	                t_groups.push(_react2.default.createElement(
 	                    'label',
-	                    null,
+	                    { className: local_class },
 	                    elem[1],
 	                    _react2.default.createElement('input', { type: 'radio', name: 't_group', onChange: self.selectBoxes,
 	                        value: elem[0] })
 	                ));
 	            });
+	            var no_select = !state.t_group_num ? 'active_elem' : '';
 	            t_groups.unshift(_react2.default.createElement(
 	                'label',
-	                { className: 'active_elem' },
+	                { className: no_select },
 	                'No group',
 	                _react2.default.createElement('input', { type: 'radio', name: 't_group',
-	                    onChange: self.selectBoxes, value: '',
-	                    defaultChecked: true })
+	                    onChange: self.selectBoxes, value: '' })
 	            ));
 	        }
 	        //users groups list
 	        var u_groups = [];
 	        if (status.room && u_groups_list) {
+	            u_groups.push(_react2.default.createElement('input', { type: 'radio', name: 'u_group', value: state.u_group_num, defaultChecked: true }));
 	            u_groups_list.forEach(function (elem) {
+	                var local_class = elem[0] == state.u_group_num ? 'active_elem' : '';
 	                u_groups.push(_react2.default.createElement(
 	                    'label',
-	                    null,
+	                    { className: local_class },
 	                    elem[1],
 	                    _react2.default.createElement('input', { type: 'radio', name: 'u_group', onChange: self.selectBoxes,
 	                        value: elem[0] })
 	                ));
 	            });
+	            var no_select = !state.u_group_num ? 'active_elem' : '';
 	            u_groups.unshift(_react2.default.createElement(
 	                'label',
-	                { className: 'active_elem' },
+	                { className: no_select },
 	                'No group',
 	                _react2.default.createElement('input', { type: 'radio', name: 'u_group',
-	                    onChange: self.selectBoxes, value: '',
-	                    defaultChecked: true })
+	                    onChange: self.selectBoxes, value: '' })
 	            ));
 	        }
 	        //personal or company items
@@ -31945,8 +31982,7 @@
 	                            { className: pt_class_1 },
 	                            _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '1', onChange: this.priorityChange }),
 	                            'Low'
-	                        ),
-	                        performers_item
+	                        )
 	                    ),
 	                    _react2.default.createElement(
 	                        'article',
@@ -31964,8 +32000,7 @@
 	                                { className: 'select_box' },
 	                                t_groups
 	                            )
-	                        ),
-	                        u_groups_item
+	                        )
 	                    ),
 	                    _react2.default.createElement(
 	                        'button',
@@ -31973,8 +32008,37 @@
 	                        'Edit'
 	                    )
 	                ),
-	                _react2.default.createElement('article', { className: 'task_action task_reassign hidden' }),
-	                _react2.default.createElement('article', { className: 'task_action task_delete hidden' })
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_action task_reassign hidden' },
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'column' },
+	                        performers_item
+	                    ),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'column' },
+	                        u_groups_item
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.submit('reassign') },
+	                        'Reassign'
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_action task_delete hidden' },
+	                    'Are you sure you want to delete "',
+	                    state.name,
+	                    '" task?',
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.submit('delete') },
+	                        'Delete task'
+	                    )
+	                )
 	            )
 	        );
 	    }

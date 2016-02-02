@@ -232,11 +232,15 @@ var Task = React.createClass({
         target.find('.task_action:not(.task_edit)').hide();
         target.find('.task_edit').slideToggle();
     },
-    reassignment() {
-        //
+    reassignment(elem) {
+        var target = $(elem.target).closest('.task');
+        target.find('.task_action:not(.task_reassign)').hide();
+        target.find('.task_reassign').slideToggle();
     },
-    deleting() {
-        //
+    deleting(elem) {
+        var target = $(elem.target).closest('.task');
+        target.find('.task_action:not(.task_delete)').hide();
+        target.find('.task_delete').slideToggle();
     },
     solve(elem) {
         var target = $(elem.target).closest('.task');
@@ -247,9 +251,10 @@ var Task = React.createClass({
         var self = this;
         return function(elem) {
             var target = elem.target;
+            var ajax_data = {};
             switch(type) {
                 case 'edit':
-                    var ajax_data = getData(target);
+                    ajax_data = getData(target);
                     ajax_data.task_id = self.state.id;
                     submitting(ajax_data, '/api/tasks/edit', 'POST', function(data) {
                         var response_status = +data;
@@ -262,9 +267,34 @@ var Task = React.createClass({
                     });
                     break;
                 case 'solve':
-                    var ajax_data = getData(target);
+                    ajax_data = getData(target);
                     ajax_data.task_id = self.state.id;
                     submitting(ajax_data, '/api/tasks/close', 'POST', function(data) {
+                        var response_status = +data;
+                        if(isNaN(response_status)) {
+                            response_status = 1;
+                        }
+                        toast(actions_r[response_status]);
+                    }, function(err) {
+                        toast(actions_r[1]);
+                    });
+                    break;
+                case 'delete':
+                    ajax_data.task_id = self.state.id;
+                    submitting(ajax_data, '/api/tasks/delete', 'POST', function(data) {
+                        var response_status = +data;
+                        if(isNaN(response_status)) {
+                            response_status = 1;
+                        }
+                        toast(actions_r[response_status]);
+                    }, function(err) {
+                        toast(actions_r[1]);
+                    });
+                    break;
+                case 'reassign':
+                    ajax_data = getData(target);
+                    ajax_data.task_id = self.state.id;
+                    submitting(ajax_data, '/api/tasks/reassign', 'POST', function(data) {
                         var response_status = +data;
                         if(isNaN(response_status)) {
                             response_status = 1;
@@ -375,34 +405,41 @@ var Task = React.createClass({
         //performers list
         var users = [];
         if(room && users_list) {
-            group_data.users.forEach(function (elem) {
-                users.push(<label>{elem[1]}<input type="radio" name="performer" onChange={self.selectBoxes}
+            users.push(<input type="radio" name="performer" value={state.performer_num}/>);
+            users_list.forEach(function (elem) {
+                var local_class = elem[0] == state.performer_num ? 'active_elem' : '';
+                users.push(<label className={local_class}>{elem[1]}<input type="radio" name="performer" onChange={self.selectBoxes}
                                                   value={elem[0]}/></label>);
             });
-            users.unshift(<label className="active_elem">Me<input type="radio" name="performer" value=''
-                                                                  onChange={self.selectBoxes} defaultChecked/></label>)
+            var no_select = !state.performer_num ? 'active_elem' : '';
+            users.unshift(<label className={no_select}>Me<input type="radio" name="performer" value=''
+                                                                  onChange={self.selectBoxes} /></label>)
         }
         //tasks groups list
         var t_groups = [];
         if(t_groups_list) {
-            t_groups_list.map(function (elem) {
-                t_groups.push(<label>{elem[1]}<input type="radio" name="t_group" onChange={self.selectBoxes}
+            t_groups.push(<input type="radio" name="t_group" value={state.t_group_num} defaultChecked />);
+            t_groups_list.forEach(function (elem) {
+                var local_class = elem[0] == state.t_group_num ? 'active_elem' : '';
+                t_groups.push(<label className={local_class}>{elem[1]}<input type="radio" name="t_group" onChange={self.selectBoxes}
                                                      value={elem[0]}/></label>);
             });
-            t_groups.unshift(<label className="active_elem">No group<input type="radio" name="t_group"
-                                                                           onChange={self.selectBoxes} value=''
-                                                                           defaultChecked/></label>)
+            var no_select = !state.t_group_num ? 'active_elem' : '';
+            t_groups.unshift(<label className={no_select}>No group<input type="radio" name="t_group"
+                                                                           onChange={self.selectBoxes} value=''/></label>)
         }
         //users groups list
         var u_groups = [];
         if(status.room && u_groups_list) {
+            u_groups.push(<input type="radio" name="u_group" value={state.u_group_num} defaultChecked />);
             u_groups_list.forEach(function (elem) {
-                u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes}
+                var local_class = elem[0] == state.u_group_num ? 'active_elem' : '';
+                u_groups.push(<label className={local_class}>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes}
                                                      value={elem[0]}/></label>);
             });
-            u_groups.unshift(<label className="active_elem">No group<input type="radio" name="u_group"
-                                                                           onChange={self.selectBoxes} value=''
-                                                                           defaultChecked/></label>)
+            var no_select = !state.u_group_num ? 'active_elem' : '';
+            u_groups.unshift(<label className={no_select}>No group<input type="radio" name="u_group"
+                                                                           onChange={self.selectBoxes} value=''/></label>)
         }
         //personal or company items
         var u_groups_item = '';
@@ -466,19 +503,24 @@ var Task = React.createClass({
                         <label className={pt_class_3}><input type="radio" name="priority" value="3" onChange={this.priorityChange} />High</label>
                         <label className={pt_class_2}><input type="radio" name="priority" value="2" onChange={this.priorityChange} />Middle</label>
                         <label className={pt_class_1}><input type="radio" name="priority" value="1" onChange={this.priorityChange} />Low</label>
-                        {performers_item}
                     </article>
                     <article className="column">
                         <article className="select_main">
                             <h3>Tasks group</h3>
                             <article className="select_box">{t_groups}</article>
                         </article>
-                        {u_groups_item}
                     </article>
                     <button onClick={this.submit('edit')}>Edit</button>
                 </article>
-                <article className="task_action task_reassign hidden"></article>
-                <article className="task_action task_delete hidden"></article>
+                <article className="task_action task_reassign hidden">
+                    <article className="column">{performers_item}</article>
+                    <article className="column">{u_groups_item}</article>
+                    <button onClick={this.submit('reassign')}>Reassign</button>
+                </article>
+                <article className="task_action task_delete hidden">
+                    Are you sure you want to delete "{state.name}" task?
+                    <button onClick={this.submit('delete')}>Delete task</button>
+                </article>
             </article>
         </article>;
     }
