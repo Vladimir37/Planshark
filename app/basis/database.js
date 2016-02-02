@@ -103,11 +103,13 @@ tables.tasks = sequelize.define('tasks', {
     performer: {
         type: Sequelize.INTEGER,
         onDelete: 'SET NULL',
+        onUpdate: 'SET NULL',
         allowNull: true
     },
     t_group: {
         type: Sequelize.INTEGER,
         onDelete: 'SET NULL',
+        onUpdate: 'SET NULL',
         defaultValue: 0
     },
     u_group: {

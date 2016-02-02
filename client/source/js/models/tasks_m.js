@@ -411,9 +411,10 @@ var Task = React.createClass({
                 users.push(<label className={local_class}>{elem[1]}<input type="radio" name="performer" onChange={self.selectBoxes}
                                                   value={elem[0]}/></label>);
             });
-            var no_select = !state.performer_num ? 'active_elem' : '';
-            users.unshift(<label className={no_select}>Me<input type="radio" name="performer" value=''
-                                                                  onChange={self.selectBoxes} /></label>)
+            if(!state.performer_num) {
+                users.unshift(<label className='active_elem'>Me<input type="radio" name="performer" value=''
+                                                                    onChange={self.selectBoxes}/></label>)
+            }
         }
         //tasks groups list
         var t_groups = [];
@@ -437,9 +438,11 @@ var Task = React.createClass({
                 u_groups.push(<label className={local_class}>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes}
                                                      value={elem[0]}/></label>);
             });
-            var no_select = !state.u_group_num ? 'active_elem' : '';
-            u_groups.unshift(<label className={no_select}>No group<input type="radio" name="u_group"
-                                                                           onChange={self.selectBoxes} value=''/></label>)
+            if(!state.u_group_num) {
+                u_groups.unshift(<label className='active_elem'>No group<input type="radio" name="u_group"
+                                                                             onChange={self.selectBoxes}
+                                                                             value=''/></label>)
+            }
         }
         //personal or company items
         var u_groups_item = '';

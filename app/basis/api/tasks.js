@@ -77,7 +77,6 @@ function editing(req, res, next) {
     //personal
     if(!room) {
         db.tasks.update({
-            u_group,
             t_group,
             priority,
             name: task_name,
