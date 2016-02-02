@@ -31034,7 +31034,7 @@
 	        if (data && !this.state.received) {
 	            this.setState({
 	                received: true,
-	                t_groups: Boolean(data.t_manage || !self.state.room),
+	                t_groups: Boolean(data.t_manage || !data.room),
 	                u_groups: Boolean(data.u_manage),
 	                users: Boolean(data.group == 0 && data.room)
 	            });
@@ -32054,6 +32054,8 @@
 	            active: true,
 	            inactive: false,
 	            expired: false,
+	            all_active: false,
+	            all_inactive: false,
 	            data: {
 	                received: false,
 	                error: false,
@@ -32061,16 +32063,17 @@
 	            }
 	        };
 	    },
-	    switching: function switching(name) {
+	    switching: function switching(name, all) {
 	        var self = this;
-	        if (!this.state[name]) {
+	        if (!this.state[name] || this.state.all != all) {
 	            return function () {
 	                var _self$setState;
 
 	                self.setState((_self$setState = {
 	                    active: false,
 	                    inactive: false,
-	                    expired: false
+	                    expired: false,
+	                    all: Boolean(all)
 	                }, _defineProperty(_self$setState, name, true), _defineProperty(_self$setState, 'data', {
 	                    received: false,
 	                    error: false,
@@ -32087,7 +32090,11 @@
 	        } else {
 	            tasks_type = 'active';
 	        }
-	        (0, _submitting.submitting)(null, '/api/get_tasks/' + tasks_type, 'GET', function (data) {
+	        var all_tasks_type = '';
+	        if (this.state.all) {
+	            all_tasks_type = '_all';
+	        }
+	        (0, _submitting.submitting)(null, '/api/get_tasks/' + tasks_type + all_tasks_type, 'GET', function (data) {
 	            if (typeof data == 'string') {
 	                data = JSON.parse(data);
 	            }
@@ -32188,13 +32195,34 @@
 	    },
 	    render: function render() {
 	        //state
-	        var state = this.state;
 	        var data = this.state.data;
+	        var status = this.props.status;
 	        //classes determination
-	        var active_c = this.state.active ? ' active_elem' : '';
-	        var inactive_c = this.state.inactive ? ' active_elem' : '';
-	        var expired_c = this.state.expired ? ' active_elem' : '';
+	        var active_c = this.state.active && !this.state.all ? ' active_elem' : '';
+	        var inactive_c = this.state.inactive && !this.state.all ? ' active_elem' : '';
+	        var expired_c = this.state.expired && !this.state.all ? ' active_elem' : '';
+	        var all_active_c = this.state.active && this.state.all ? ' active_elem' : '';
+	        var all_inactive_c = this.state.inactive && this.state.all ? ' active_elem' : '';
+	        var all_expired_c = this.state.expired && this.state.all ? ' active_elem' : '';
 	        //button panel (type)
+	        var room_master_buttons = [];
+	        if (status.room && (!status.group || status.viewing)) {
+	            room_master_buttons.push(_react2.default.createElement(
+	                'button',
+	                { className: "panel_elem" + all_active_c, onClick: this.switching('active', true) },
+	                'All active'
+	            ));
+	            room_master_buttons.push(_react2.default.createElement(
+	                'button',
+	                { className: "panel_elem" + all_inactive_c, onClick: this.switching('inactive', true) },
+	                'All inactive'
+	            ));
+	            room_master_buttons.push(_react2.default.createElement(
+	                'button',
+	                { className: "panel_elem" + all_expired_c, onClick: this.switching('expired', true) },
+	                'All expired'
+	            ));
+	        }
 	        var tasks_buttons_type = _react2.default.createElement(
 	            'article',
 	            { className: 'panel_tasks_type' },
@@ -32210,9 +32238,10 @@
 	            ),
 	            _react2.default.createElement(
 	                'button',
-	                { className: "panel_elem" + expired_c, onClick: this.switching('expired') },
+	                { className: "panel_elem panel_elem_last" + expired_c, onClick: this.switching('expired') },
 	                'Expired'
-	            )
+	            ),
+	            room_master_buttons
 	        );
 	        //button panel (sort)
 	        var tasks_buttons_sort = _react2.default.createElement(
@@ -32284,7 +32313,6 @@
 	            }
 	            //render tasks
 	            else {
-	                    var status = this.props.status;
 	                    var all_tasks = [];
 	                    var list_tasks = data.tasks;
 	                    var group_data = this.props.group_data;

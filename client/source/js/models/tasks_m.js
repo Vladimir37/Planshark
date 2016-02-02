@@ -546,7 +546,7 @@ var TaskList = React.createClass({
     },
     switching(name, all) {
         var self = this;
-        if(!this.state[name]) {
+        if(!this.state[name] || this.state.all != all) {
             return function () {
                 self.setState({
                     active: false,
@@ -688,8 +688,8 @@ var TaskList = React.createClass({
         var inactive_c = this.state.inactive && !this.state.all ? ' active_elem' : '';
         var expired_c = this.state.expired && !this.state.all ? ' active_elem' : '';
         var all_active_c = this.state.active && this.state.all ? ' active_elem' : '';
-        var all_inactive_c = this.state.active && this.state.all ? ' active_elem' : '';
-        var all_expired_c = this.state.active && this.state.all ? ' active_elem' : '';
+        var all_inactive_c = this.state.inactive && this.state.all ? ' active_elem' : '';
+        var all_expired_c = this.state.expired && this.state.all ? ' active_elem' : '';
         //button panel (type)
         var room_master_buttons = [];
         if(status.room && (!status.group || status.viewing)) {
@@ -703,7 +703,8 @@ var TaskList = React.createClass({
         var tasks_buttons_type = <article className="panel_tasks_type">
             <button className={"panel_elem" + active_c} onClick={this.switching('active')}>Active</button>
             <button className={"panel_elem" + inactive_c} onClick={this.switching('inactive')}>Inactive</button>
-            <button className={"panel_elem" + expired_c} onClick={this.switching('expired')}>Expired</button>
+            <button className={"panel_elem panel_elem_last" + expired_c} onClick={this.switching('expired')}>Expired</button>
+            {room_master_buttons}
         </article>;
         //button panel (sort)
         var tasks_buttons_sort = <article className="panel_tasks_sort">

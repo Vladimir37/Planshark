@@ -17,7 +17,7 @@ export var Menu = React.createClass({
         if(data && !this.state.received) {
             this.setState({
                 received: true,
-                t_groups: Boolean(data.t_manage || !self.state.room),
+                t_groups: Boolean(data.t_manage || !data.room),
                 u_groups: Boolean(data.u_manage),
                 users: Boolean(data.group == 0 && data.room)
             });
