@@ -300,8 +300,51 @@ function closing(req, res, next) {
     }
 };
 
+function restoring(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    //task data
+    var task_id = req.body.task_id;
+    //personal
+    if(!room) {
+        db.tasks.update({
+            active: 1,
+            closedAt: null
+        }, {
+            where: {
+                id: task_id,
+                author
+            }
+        }).then(function() {
+            res.end('0');
+        }, function(err) {
+            console.log(err);
+            res.end('1');
+        });
+    }
+    //company
+    else {
+        db.tasks.update({
+            active: 1,
+            closedAt: null
+        }, {
+            where: {
+                id: task_id,
+                room
+            }
+        }).then(function () {
+            res.end('0');
+        }, function (err) {
+            console.log(err);
+            res.end('1');
+        });
+    }
+};
+
 exports.create = creating;
 exports.edit = editing;
 exports.reassign = reassignment;
 exports.deleting = deleting;
 exports.close = closing;
+exports.restore = restoring;

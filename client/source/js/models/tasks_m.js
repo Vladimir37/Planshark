@@ -217,6 +217,7 @@ var Task = React.createClass({
             id: data.id,
             name: data.name,
             description: data.description,
+            active: data.active,
             t_group_num: data.t_group,
             t_group_name: data.tasks_group.name || null,
             u_group_num: data.u_group,
@@ -258,6 +259,9 @@ var Task = React.createClass({
         var target = $(elem.target).closest('.task');
         target.find('.task_action:not(.task_solve)').hide();
         target.find('.task_solve').slideToggle();
+    },
+    restore(elem) {
+        //
     },
     submit(type) {
         var self = this;
@@ -337,7 +341,12 @@ var Task = React.createClass({
         var self = this;
         // bottom buttons
         var task_bottom = [];
-        task_bottom.push(<button className="solve_but" onClick={this.solve}>Solve</button>);
+        if(self.state.active) {
+            task_bottom.push(<button className="solve_but" onClick={this.solve}>Solve</button>);
+        }
+        else {
+            task_bottom.push(<button className="solve_but" onClick={this.restore}>Restore</button>);
+        }
         var state = this.state;
         var rights = this.state.rights;
         for(let key in rights) {
@@ -509,6 +518,10 @@ var Task = React.createClass({
                         <textarea name="answer" placeholder="Answer"></textarea>
                         <button onClick={this.submit('solve')}>Solve</button>
                     </article>
+                </article>
+                <article className="task_action task_restore hidden">
+                    Do you want to restore "{state.name}" task?
+                    <button onClick={this.submit('restore')}>Delete task</button>
                 </article>
                 <article className="task_action task_edit hidden">
                     <article className="column column_text">

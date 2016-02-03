@@ -23,4 +23,7 @@ router.post('/delete', tasks.deleting);
 //answer to task
 router.post('/close', tasks.close);
 
+//restoring task
+router.post('/restore', tasks.restore);
+
 module.exports = router;

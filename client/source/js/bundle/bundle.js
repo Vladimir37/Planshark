@@ -31506,6 +31506,7 @@
 	            id: data.id,
 	            name: data.name,
 	            description: data.description,
+	            active: data.active,
 	            t_group_num: data.t_group,
 	            t_group_name: data.tasks_group.name || null,
 	            u_group_num: data.u_group,
@@ -31626,11 +31627,13 @@
 	        var self = this;
 	        // bottom buttons
 	        var task_bottom = [];
-	        task_bottom.push(_react2.default.createElement(
-	            'button',
-	            { className: 'solve_but', onClick: this.solve },
-	            'Solve'
-	        ));
+	        if (self.state.active) {
+	            task_bottom.push(_react2.default.createElement(
+	                'button',
+	                { className: 'solve_but', onClick: this.solve },
+	                'Solve'
+	            ));
+	        }
 	        var state = this.state;
 	        var rights = this.state.rights;
 	        for (var key in rights) {
