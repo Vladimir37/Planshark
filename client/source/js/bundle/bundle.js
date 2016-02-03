@@ -31549,66 +31549,27 @@
 	        target.find('.task_action:not(.task_solve)').hide();
 	        target.find('.task_solve').slideToggle();
 	    },
+	    restore: function restore(elem) {
+	        var target = (0, _jquery2.default)(elem.target).closest('.task');
+	        target.find('.task_action:not(.task_restore)').hide();
+	        target.find('.task_restore').slideToggle();
+	    },
 	    submit: function submit(type) {
 	        var self = this;
 	        return function (elem) {
 	            var target = elem.target;
 	            var ajax_data = {};
-	            switch (type) {
-	                case 'edit':
-	                    ajax_data = (0, _submitting.getData)(target);
-	                    ajax_data.task_id = self.state.id;
-	                    (0, _submitting.submitting)(ajax_data, '/api/tasks/edit', 'POST', function (data) {
-	                        var response_status = +data;
-	                        if (isNaN(response_status)) {
-	                            response_status = 1;
-	                        }
-	                        (0, _toaster2.default)(actions_r[response_status]);
-	                    }, function (err) {
-	                        (0, _toaster2.default)(actions_r[1]);
-	                    });
-	                    break;
-	                case 'solve':
-	                    ajax_data = (0, _submitting.getData)(target);
-	                    ajax_data.task_id = self.state.id;
-	                    (0, _submitting.submitting)(ajax_data, '/api/tasks/close', 'POST', function (data) {
-	                        var response_status = +data;
-	                        if (isNaN(response_status)) {
-	                            response_status = 1;
-	                        }
-	                        (0, _toaster2.default)(actions_r[response_status]);
-	                    }, function (err) {
-	                        (0, _toaster2.default)(actions_r[1]);
-	                    });
-	                    break;
-	                case 'delete':
-	                    ajax_data.task_id = self.state.id;
-	                    (0, _submitting.submitting)(ajax_data, '/api/tasks/delete', 'POST', function (data) {
-	                        var response_status = +data;
-	                        if (isNaN(response_status)) {
-	                            response_status = 1;
-	                        }
-	                        (0, _toaster2.default)(actions_r[response_status]);
-	                    }, function (err) {
-	                        (0, _toaster2.default)(actions_r[1]);
-	                    });
-	                    break;
-	                case 'reassign':
-	                    ajax_data = (0, _submitting.getData)(target);
-	                    ajax_data.task_id = self.state.id;
-	                    (0, _submitting.submitting)(ajax_data, '/api/tasks/reassign', 'POST', function (data) {
-	                        var response_status = +data;
-	                        if (isNaN(response_status)) {
-	                            response_status = 1;
-	                        }
-	                        (0, _toaster2.default)(actions_r[response_status]);
-	                    }, function (err) {
-	                        (0, _toaster2.default)(actions_r[1]);
-	                    });
-	                    break;
-	                default:
-	                    console.log('Incorrect action');
-	            };
+	            ajax_data = (0, _submitting.getData)(target);
+	            ajax_data.task_id = self.state.id;
+	            (0, _submitting.submitting)(ajax_data, '/api/tasks/' + type, 'POST', function (data) {
+	                var response_status = +data;
+	                if (isNaN(response_status)) {
+	                    response_status = 1;
+	                }
+	                (0, _toaster2.default)(actions_r[response_status]);
+	            }, function (err) {
+	                (0, _toaster2.default)(actions_r[1]);
+	            });
 	        };
 	    },
 	    selectBoxes: function selectBoxes(elem) {
@@ -31625,6 +31586,8 @@
 	    },
 	    render: function render() {
 	        var self = this;
+	        var state = this.state;
+	        var rights = this.state.rights;
 	        // bottom buttons
 	        var task_bottom = [];
 	        if (self.state.active) {
@@ -31633,18 +31596,22 @@
 	                { className: 'solve_but', onClick: this.solve },
 	                'Solve'
 	            ));
-	        }
-	        var state = this.state;
-	        var rights = this.state.rights;
-	        for (var key in rights) {
-	            if (rights[key]) {
-	                var but_name = key.charAt(0).toUpperCase() + key.slice(1);
-	                task_bottom.push(_react2.default.createElement(
-	                    'button',
-	                    { onClick: this[key] },
-	                    but_name
-	                ));
+	            for (var key in rights) {
+	                if (rights[key]) {
+	                    var but_name = key.charAt(0).toUpperCase() + key.slice(1);
+	                    task_bottom.push(_react2.default.createElement(
+	                        'button',
+	                        { onClick: this[key] },
+	                        but_name
+	                    ));
+	                }
 	            }
+	        } else {
+	            task_bottom.push(_react2.default.createElement(
+	                'button',
+	                { className: 'solve_but', onClick: this.restore },
+	                'Restore'
+	            ));
 	        }
 	        //calculating days
 	        var expiration_result = '';
@@ -31980,9 +31947,21 @@
 	                        _react2.default.createElement('textarea', { name: 'answer', placeholder: 'Answer' }),
 	                        _react2.default.createElement(
 	                            'button',
-	                            { onClick: this.submit('solve') },
+	                            { onClick: this.submit('close') },
 	                            'Solve'
 	                        )
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_action task_restore hidden' },
+	                    'Do you want to restore "',
+	                    state.name,
+	                    '" task?',
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.submit('restore') },
+	                        'Restore task'
 	                    )
 	                ),
 	                _react2.default.createElement(

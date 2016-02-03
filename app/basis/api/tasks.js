@@ -267,6 +267,7 @@ function closing(req, res, next) {
         db.tasks.update({
             active: 0,
             answer,
+            editor: author,
             closedAt: new Date()
         }, {
             where: {
@@ -285,6 +286,7 @@ function closing(req, res, next) {
         db.tasks.update({
             active: 0,
             answer,
+            editor: author,
             closedAt: new Date()
         }, {
             where: {

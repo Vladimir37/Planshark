@@ -217,6 +217,7 @@ var Task = React.createClass({
             id: data.id,
             name: data.name,
             description: data.description,
+            answer: data.answer || null,
             active: data.active,
             t_group_num: data.t_group,
             t_group_name: data.tasks_group.name || null,
@@ -225,9 +226,11 @@ var Task = React.createClass({
             color: data.tasks_group.color,
             performer_num: data.performer,
             performer_name: data.performer_data.name || null,
+            editor_name: data.editor_data.name || null,
             priority: data.priority,
             author: data.author_data.name || null,
             created: new Date(data.createdAt).toString().slice(0, -15),
+            closed: new Date(data.closedAt),
             expiration: data.expiration,
             rights: {
                 editing: status.editing || !status.room || false,
@@ -261,68 +264,26 @@ var Task = React.createClass({
         target.find('.task_solve').slideToggle();
     },
     restore(elem) {
-        //
+        var target = $(elem.target).closest('.task');
+        target.find('.task_action:not(.task_restore)').hide();
+        target.find('.task_restore').slideToggle();
     },
     submit(type) {
         var self = this;
         return function(elem) {
             var target = elem.target;
             var ajax_data = {};
-            switch(type) {
-                case 'edit':
-                    ajax_data = getData(target);
-                    ajax_data.task_id = self.state.id;
-                    submitting(ajax_data, '/api/tasks/edit', 'POST', function(data) {
-                        var response_status = +data;
-                        if(isNaN(response_status)) {
-                            response_status = 1;
-                        }
-                        toast(actions_r[response_status]);
-                    }, function(err) {
-                        toast(actions_r[1]);
-                    });
-                    break;
-                case 'solve':
-                    ajax_data = getData(target);
-                    ajax_data.task_id = self.state.id;
-                    submitting(ajax_data, '/api/tasks/close', 'POST', function(data) {
-                        var response_status = +data;
-                        if(isNaN(response_status)) {
-                            response_status = 1;
-                        }
-                        toast(actions_r[response_status]);
-                    }, function(err) {
-                        toast(actions_r[1]);
-                    });
-                    break;
-                case 'delete':
-                    ajax_data.task_id = self.state.id;
-                    submitting(ajax_data, '/api/tasks/delete', 'POST', function(data) {
-                        var response_status = +data;
-                        if(isNaN(response_status)) {
-                            response_status = 1;
-                        }
-                        toast(actions_r[response_status]);
-                    }, function(err) {
-                        toast(actions_r[1]);
-                    });
-                    break;
-                case 'reassign':
-                    ajax_data = getData(target);
-                    ajax_data.task_id = self.state.id;
-                    submitting(ajax_data, '/api/tasks/reassign', 'POST', function(data) {
-                        var response_status = +data;
-                        if(isNaN(response_status)) {
-                            response_status = 1;
-                        }
-                        toast(actions_r[response_status]);
-                    }, function(err) {
-                        toast(actions_r[1]);
-                    });
-                    break;
-                default:
-                    console.log('Incorrect action');
-            };
+            ajax_data = getData(target);
+            ajax_data.task_id = self.state.id;
+            submitting(ajax_data, '/api/tasks/' + type, 'POST', function(data) {
+                var response_status = +data;
+                if(isNaN(response_status)) {
+                    response_status = 1;
+                }
+                toast(actions_r[response_status]);
+            }, function(err) {
+                toast(actions_r[1]);
+            });
         }
     },
     selectBoxes(elem) {
@@ -339,21 +300,21 @@ var Task = React.createClass({
     },
     render() {
         var self = this;
+        var state = this.state;
+        var rights = this.state.rights;
         // bottom buttons
         var task_bottom = [];
         if(self.state.active) {
             task_bottom.push(<button className="solve_but" onClick={this.solve}>Solve</button>);
+            for(let key in rights) {
+                if(rights[key]) {
+                    var but_name = key.charAt(0).toUpperCase() + key.slice(1);
+                    task_bottom.push(<button onClick={this[key]}>{but_name}</button>);
+                }
+            }
         }
         else {
             task_bottom.push(<button className="solve_but" onClick={this.restore}>Restore</button>);
-        }
-        var state = this.state;
-        var rights = this.state.rights;
-        for(let key in rights) {
-            if(rights[key]) {
-                var but_name = key.charAt(0).toUpperCase() + key.slice(1);
-                task_bottom.push(<button onClick={this[key]}>{but_name}</button>);
-            }
         }
         //calculating days
         var expiration_result = '';
@@ -396,6 +357,19 @@ var Task = React.createClass({
         if(state.expiration) {
             var full_date = new Date(state.expiration);
             string_date = full_date.getMonth() + 1 + '/' + full_date.getDate() + '/' + full_date.getFullYear();
+        }
+        //data for closed tasks
+        var performed_user = '', elapsed_time = '', answer_text = '';
+        if(self.state.active) {
+            performed_user = <span className="task_info_elem"><b>Executor: </b>{state.editor}</span>;
+            var elapsed_seconds = +(new Date(state.closed) - new Date(state.created));
+            var elapsed_days = Math.floor(elapsed_seconds / 86400000);
+            var elapsed_hours = (elapsed_seconds - (elapsed_days * 86400000)) / 3600000;
+            elapsed_time = <span className="task_info_elem"><b>Elapsed time: </b>Days - {elapsed_days}, hours - {elapsed_hours}</span>;
+            answer_text = <article className="task_desc">
+                <b>Answer:</b>
+                <article className="task_desc_text">{state.answer}</article>
+            </article>;
         }
         //props data and status
         var status = this.props.status;
@@ -487,7 +461,7 @@ var Task = React.createClass({
                     <span className="task_group">{state.t_group_name}</span>
                 </article>
                 <article className="task_info">
-                    <span className="task_info_elem"><b>Performer: </b>{state.performer_name}</span>
+                    <span className="task_info_elem"><b>Author: </b>{state.author}</span>
                 </article>
                 <article className="task_priority">
                     {priority_blocks}
@@ -503,12 +477,14 @@ var Task = React.createClass({
                         <b>Description:</b>
                         <article className="task_desc_text">{state.description}</article>
                     </article>
+                    {answer_text}
                     <article className="task_info">
                         <span className="task_info_elem"><b>Creation date: </b>{state.created}</span>
                         <span className="task_info_elem"><b>Expiration date: </b>{expiration_date}</span>
                         <span className="task_info_elem"><b>Performer user: </b>{state.performer_name}</span>
                         <span className="task_info_elem"><b>Performer group: </b>{state.u_group_name}</span>
-                        <span className="task_info_elem"><b>Author: </b>{state.author}</span>
+                        {performed_user}
+                        {elapsed_time}
                     </article>
                     <div className="clearfix"></div>
                 </article>
@@ -516,12 +492,12 @@ var Task = React.createClass({
                 <article className="task_action task_solve hidden">
                     <article className="column_sizeless">
                         <textarea name="answer" placeholder="Answer"></textarea>
-                        <button onClick={this.submit('solve')}>Solve</button>
+                        <button onClick={this.submit('close')}>Solve</button>
                     </article>
                 </article>
                 <article className="task_action task_restore hidden">
                     Do you want to restore "{state.name}" task?
-                    <button onClick={this.submit('restore')}>Delete task</button>
+                    <button onClick={this.submit('restore')}>Restore task</button>
                 </article>
                 <article className="task_action task_edit hidden">
                     <article className="column column_text">
