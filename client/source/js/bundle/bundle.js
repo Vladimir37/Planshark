@@ -31194,7 +31194,10 @@
 	var actions_r = ['Success!', 'Server error', 'Required fields are empty', 'Incorrect date'];
 	var deleting_r = ['Success!', 'Server error'];
 
-	//Time left
+	//refresh task list
+	var refresh;
+
+	//time left
 	function time(date_one, date_two) {
 	    date_one = new Date(date_one);
 	    date_two = new Date(date_two);
@@ -31262,6 +31265,7 @@
 	                if (response_status == 0) {
 	                    (0, _toaster2.default)(actions_r[0]);
 	                    (0, _jquery2.default)(elem.target).parent().find('textarea, input[type="text"]').val('');
+	                    refresh();
 	                } else {
 	                    (0, _toaster2.default)(actions_r[response_status]);
 	                }
@@ -31365,9 +31369,13 @@
 	                    'Performer'
 	                ),
 	                _react2.default.createElement(
-	                    'article',
-	                    { className: 'select_box' },
-	                    users
+	                    'form',
+	                    null,
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'select_box' },
+	                        users
+	                    )
 	                )
 	            );
 	            u_groups_item = _react2.default.createElement(
@@ -31379,9 +31387,13 @@
 	                    'Users group'
 	                ),
 	                _react2.default.createElement(
-	                    'article',
-	                    { className: 'select_box' },
-	                    u_groups
+	                    'form',
+	                    null,
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'select_box' },
+	                        u_groups
+	                    )
 	                )
 	            );
 	        }
@@ -31422,22 +31434,26 @@
 	                                'article',
 	                                { className: 'priority_control' },
 	                                _react2.default.createElement(
-	                                    'label',
+	                                    'form',
 	                                    null,
-	                                    'High',
-	                                    _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '3', onChange: this.priorityChange })
-	                                ),
-	                                _react2.default.createElement(
-	                                    'label',
-	                                    null,
-	                                    'Middle',
-	                                    _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '2', onChange: this.priorityChange })
-	                                ),
-	                                _react2.default.createElement(
-	                                    'label',
-	                                    { className: 'active_elem' },
-	                                    'Low',
-	                                    _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '1', onChange: this.priorityChange, defaultChecked: true })
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        null,
+	                                        'High',
+	                                        _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '3', onChange: this.priorityChange })
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        null,
+	                                        'Middle',
+	                                        _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '2', onChange: this.priorityChange })
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        { className: 'active_elem' },
+	                                        'Low',
+	                                        _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '1', defaultChecked: true, onChange: this.priorityChange })
+	                                    )
 	                                )
 	                            )
 	                        ),
@@ -31455,9 +31471,13 @@
 	                            'Tasks group'
 	                        ),
 	                        _react2.default.createElement(
-	                            'article',
-	                            { className: 'select_box' },
-	                            t_groups
+	                            'form',
+	                            null,
+	                            _react2.default.createElement(
+	                                'article',
+	                                { className: 'select_box' },
+	                                t_groups
+	                            )
 	                        )
 	                    ),
 	                    u_groups_item,
@@ -31687,21 +31707,23 @@
 	        var t_groups_list = group_data.body.t_groups;
 	        var u_groups_list = group_data.body.u_groups;
 	        //default priority
-	        var pt_default = '';
+	        var pt_check_1 = '',
+	            pt_check_2 = '',
+	            pt_check_3 = '';
 	        var pt_class_1 = '',
 	            pt_class_2 = '',
 	            pt_class_3 = '';
 	        switch (+state.priority) {
 	            case 1:
-	                pt_default = '1';
+	                pt_check_1 = 'true';
 	                pt_class_1 = 'active_elem';
 	                break;
 	            case 2:
-	                pt_default = '2';
+	                pt_check_2 = 'true';
 	                pt_class_2 = 'active_elem';
 	                break;
 	            case 3:
-	                pt_default = '3';
+	                pt_check_3 = 'true';
 	                pt_class_3 = 'active_elem';
 	                break;
 	            default:
@@ -31710,15 +31732,14 @@
 	        //performers list
 	        var users = [];
 	        if (room && users_list) {
-	            users.push(_react2.default.createElement('input', { type: 'radio', name: 'performer', value: state.performer_num }));
 	            users_list.forEach(function (elem) {
 	                var local_class = elem[0] == state.performer_num ? 'active_elem' : '';
 	                users.push(_react2.default.createElement(
 	                    'label',
 	                    { className: local_class },
 	                    elem[1],
-	                    _react2.default.createElement('input', { type: 'radio', name: 'performer', onChange: self.selectBoxes,
-	                        value: elem[0] })
+	                    _react2.default.createElement('input', { type: 'radio', name: 'performer',
+	                        defaultChecked: elem[0] == state.performer_num, onChange: self.selectBoxes, value: elem[0] })
 	                ));
 	            });
 	            if (!state.performer_num) {
@@ -31734,15 +31755,14 @@
 	        //tasks groups list
 	        var t_groups = [];
 	        if (t_groups_list) {
-	            t_groups.push(_react2.default.createElement('input', { type: 'radio', name: 't_group', value: state.t_group_num, defaultChecked: true }));
 	            t_groups_list.forEach(function (elem) {
 	                var local_class = elem[0] == state.t_group_num ? 'active_elem' : '';
 	                t_groups.push(_react2.default.createElement(
 	                    'label',
 	                    { className: local_class },
 	                    elem[1],
-	                    _react2.default.createElement('input', { type: 'radio', name: 't_group', onChange: self.selectBoxes,
-	                        value: elem[0] })
+	                    _react2.default.createElement('input', { type: 'radio', name: 't_group',
+	                        defaultChecked: elem[0] == state.t_group_num, onChange: self.selectBoxes, value: elem[0] })
 	                ));
 	            });
 	            var no_select = !state.t_group_num ? 'active_elem' : '';
@@ -31757,15 +31777,14 @@
 	        //users groups list
 	        var u_groups = [];
 	        if (status.room && u_groups_list) {
-	            u_groups.push(_react2.default.createElement('input', { type: 'radio', name: 'u_group', value: state.u_group_num, defaultChecked: true }));
 	            u_groups_list.forEach(function (elem) {
 	                var local_class = elem[0] == state.u_group_num ? 'active_elem' : '';
 	                u_groups.push(_react2.default.createElement(
 	                    'label',
 	                    { className: local_class },
 	                    elem[1],
-	                    _react2.default.createElement('input', { type: 'radio', name: 'u_group', onChange: self.selectBoxes,
-	                        value: elem[0] })
+	                    _react2.default.createElement('input', { type: 'radio', name: 'u_group',
+	                        defaultChecked: elem[0] == state.u_group_num, onChange: self.selectBoxes, value: elem[0] })
 	                ));
 	            });
 	            if (!state.u_group_num) {
@@ -31792,9 +31811,13 @@
 	                    'Performer'
 	                ),
 	                _react2.default.createElement(
-	                    'article',
-	                    { className: 'select_box' },
-	                    users
+	                    'form',
+	                    null,
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'select_box' },
+	                        users
+	                    )
 	                )
 	            );
 	            u_groups_item = _react2.default.createElement(
@@ -31806,9 +31829,13 @@
 	                    'Users group'
 	                ),
 	                _react2.default.createElement(
-	                    'article',
-	                    { className: 'select_box' },
-	                    u_groups
+	                    'form',
+	                    null,
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'select_box' },
+	                        u_groups
+	                    )
 	                )
 	            );
 	        }
@@ -31967,24 +31994,30 @@
 	                        _react2.default.createElement('br', null),
 	                        _react2.default.createElement('input', { type: 'text', name: 'expiration', placeholder: 'Expiration time', className: 'time_field', defaultValue: string_date }),
 	                        _react2.default.createElement('br', null),
-	                        _react2.default.createElement('input', { type: 'radio', name: 'priority', value: pt_default, defaultChecked: true }),
 	                        _react2.default.createElement(
-	                            'label',
-	                            { className: pt_class_3 },
-	                            _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '3', onChange: this.priorityChange }),
-	                            'High'
-	                        ),
-	                        _react2.default.createElement(
-	                            'label',
-	                            { className: pt_class_2 },
-	                            _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '2', onChange: this.priorityChange }),
-	                            'Middle'
-	                        ),
-	                        _react2.default.createElement(
-	                            'label',
-	                            { className: pt_class_1 },
-	                            _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '1', onChange: this.priorityChange }),
-	                            'Low'
+	                            'form',
+	                            null,
+	                            _react2.default.createElement(
+	                                'label',
+	                                { className: pt_class_3 },
+	                                _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '3',
+	                                    onChange: this.priorityChange, defaultChecked: pt_check_3 }),
+	                                'High'
+	                            ),
+	                            _react2.default.createElement(
+	                                'label',
+	                                { className: pt_class_2 },
+	                                _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '2',
+	                                    onChange: this.priorityChange, defaultChecked: pt_check_2 }),
+	                                'Middle'
+	                            ),
+	                            _react2.default.createElement(
+	                                'label',
+	                                { className: pt_class_1 },
+	                                _react2.default.createElement('input', { type: 'radio', name: 'priority', value: '1',
+	                                    onChange: this.priorityChange, defaultChecked: pt_check_1 }),
+	                                'Low'
+	                            )
 	                        )
 	                    ),
 	                    _react2.default.createElement(
@@ -31999,9 +32032,13 @@
 	                                'Tasks group'
 	                            ),
 	                            _react2.default.createElement(
-	                                'article',
-	                                { className: 'select_box' },
-	                                t_groups
+	                                'form',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'article',
+	                                    { className: 'select_box' },
+	                                    t_groups
+	                                )
 	                            )
 	                        )
 	                    ),
@@ -32197,6 +32234,8 @@
 	        //state
 	        var data = this.state.data;
 	        var status = this.props.status;
+	        //export refresh
+	        refresh = this.receive;
 	        //classes determination
 	        var active_c = this.state.active && !this.state.all ? ' active_elem' : '';
 	        var inactive_c = this.state.inactive && !this.state.all ? ' active_elem' : '';

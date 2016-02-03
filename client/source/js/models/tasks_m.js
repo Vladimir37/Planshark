@@ -10,7 +10,10 @@ import datepick from '../datepicker.js';
 var actions_r = ['Success!', 'Server error' , 'Required fields are empty', 'Incorrect date'];
 var deleting_r = ['Success!', 'Server error'];
 
-//Time left
+//refresh task list
+var refresh;
+
+//time left
 function time(date_one, date_two) {
     date_one = new Date(date_one);
     date_two = new Date(date_two);
@@ -79,6 +82,7 @@ var Creating = React.createClass({
                 if(response_status == 0) {
                     toast(actions_r[0]);
                     $(elem.target).parent().find('textarea, input[type="text"]').val('');
+                    refresh();
                 }
                 else {
                     toast(actions_r[response_status]);
@@ -146,11 +150,15 @@ var Creating = React.createClass({
         if(this.state.room) {
             performers_item = <article className="select_main">
                 <h3>Performer</h3>
-                <article className="select_box">{users}</article>
+                <form>
+                    <article className="select_box">{users}</article>
+                </form>
             </article>;
             u_groups_item = <article className="select_main">
                 <h3>Users group</h3>
-                <article className="select_box">{u_groups}</article>
+                <form>
+                    <article className="select_box">{u_groups}</article>
+                </form>
             </article>;
         }
         //data not received
@@ -172,9 +180,11 @@ var Creating = React.createClass({
                                 <article className="priority_scale_1"></article>
                             </article>
                             <article className="priority_control">
-                                <label>High<input type="radio" name="priority" value="3" onChange={this.priorityChange}/></label>
-                                <label>Middle<input type="radio" name="priority" value="2" onChange={this.priorityChange}/></label>
-                                <label className="active_elem">Low<input type="radio" name="priority" value="1" onChange={this.priorityChange} defaultChecked/></label>
+                                <form>
+                                    <label>High<input type="radio" name="priority" value="3" onChange={this.priorityChange}/></label>
+                                    <label>Middle<input type="radio" name="priority" value="2" onChange={this.priorityChange}/></label>
+                                    <label className="active_elem">Low<input type="radio" name="priority" value="1" defaultChecked onChange={this.priorityChange} /></label>
+                                </form>
                             </article>
                         </article>
                         <br/>
@@ -183,7 +193,9 @@ var Creating = React.createClass({
                     {performers_item}
                     <article className="select_main">
                         <h3>Tasks group</h3>
-                        <article className="select_box">{t_groups}</article>
+                        <form>
+                            <article className="select_box">{t_groups}</article>
+                        </form>
                     </article>
                     {u_groups_item}<br/>
                     <button className="sub" onClick={this.submit}>Create</button>
@@ -384,19 +396,19 @@ var Task = React.createClass({
         var t_groups_list = group_data.body.t_groups;
         var u_groups_list = group_data.body.u_groups;
         //default priority
-        var pt_default = '';
+        var pt_check_1 = '', pt_check_2 = '', pt_check_3 = '';
         var pt_class_1 = '', pt_class_2 = '', pt_class_3 = '';
         switch(+state.priority) {
             case 1:
-                pt_default = '1';
+                pt_check_1 = 'true';
                 pt_class_1 = 'active_elem';
                 break;
             case 2:
-                pt_default = '2';
+                pt_check_2 = 'true';
                 pt_class_2 = 'active_elem';
                 break;
             case 3:
-                pt_default = '3';
+                pt_check_3 = 'true';
                 pt_class_3 = 'active_elem';
                 break;
             default:
@@ -405,11 +417,10 @@ var Task = React.createClass({
         //performers list
         var users = [];
         if(room && users_list) {
-            users.push(<input type="radio" name="performer" value={state.performer_num}/>);
             users_list.forEach(function (elem) {
                 var local_class = elem[0] == state.performer_num ? 'active_elem' : '';
-                users.push(<label className={local_class}>{elem[1]}<input type="radio" name="performer" onChange={self.selectBoxes}
-                                                  value={elem[0]}/></label>);
+                users.push(<label className={local_class}>{elem[1]}<input type="radio" name="performer"
+                           defaultChecked={elem[0] == state.performer_num} onChange={self.selectBoxes} value={elem[0]}/></label>);
             });
             if(!state.performer_num) {
                 users.unshift(<label className='active_elem'>Me<input type="radio" name="performer" value=''
@@ -419,11 +430,10 @@ var Task = React.createClass({
         //tasks groups list
         var t_groups = [];
         if(t_groups_list) {
-            t_groups.push(<input type="radio" name="t_group" value={state.t_group_num} defaultChecked />);
             t_groups_list.forEach(function (elem) {
                 var local_class = elem[0] == state.t_group_num ? 'active_elem' : '';
-                t_groups.push(<label className={local_class}>{elem[1]}<input type="radio" name="t_group" onChange={self.selectBoxes}
-                                                     value={elem[0]}/></label>);
+                t_groups.push(<label className={local_class}>{elem[1]}<input type="radio" name="t_group"
+                              defaultChecked={elem[0] == state.t_group_num} onChange={self.selectBoxes} value={elem[0]}/></label>);
             });
             var no_select = !state.t_group_num ? 'active_elem' : '';
             t_groups.unshift(<label className={no_select}>No group<input type="radio" name="t_group"
@@ -432,11 +442,10 @@ var Task = React.createClass({
         //users groups list
         var u_groups = [];
         if(status.room && u_groups_list) {
-            u_groups.push(<input type="radio" name="u_group" value={state.u_group_num} defaultChecked />);
             u_groups_list.forEach(function (elem) {
                 var local_class = elem[0] == state.u_group_num ? 'active_elem' : '';
-                u_groups.push(<label className={local_class}>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes}
-                                                     value={elem[0]}/></label>);
+                u_groups.push(<label className={local_class}>{elem[1]}<input type="radio" name="u_group"
+                             defaultChecked={elem[0] == state.u_group_num} onChange={self.selectBoxes} value={elem[0]}/></label>);
             });
             if(!state.u_group_num) {
                 u_groups.unshift(<label className='active_elem'>No group<input type="radio" name="u_group"
@@ -450,11 +459,15 @@ var Task = React.createClass({
         if(status.room) {
             performers_item = <article className="select_main">
                 <h3>Performer</h3>
-                <article className="select_box">{users}</article>
+                <form>
+                    <article className="select_box">{users}</article>
+                </form>
             </article>;
             u_groups_item = <article className="select_main">
                 <h3>Users group</h3>
-                <article className="select_box">{u_groups}</article>
+                <form>
+                    <article className="select_box">{u_groups}</article>
+                </form>
             </article>;
         }
         //render
@@ -502,15 +515,21 @@ var Task = React.createClass({
                         <input type="text" name="name" placeholder="name" defaultValue={state.name} data-req="true" /><br/>
                         <textarea name="description" placeholder="Task description" defaultValue={state.description} data-req="true"></textarea><br/>
                         <input type="text" name="expiration" placeholder="Expiration time" className="time_field" defaultValue={string_date} /><br/>
-                        <input type="radio" name="priority" value={pt_default} defaultChecked />
-                        <label className={pt_class_3}><input type="radio" name="priority" value="3" onChange={this.priorityChange} />High</label>
-                        <label className={pt_class_2}><input type="radio" name="priority" value="2" onChange={this.priorityChange} />Middle</label>
-                        <label className={pt_class_1}><input type="radio" name="priority" value="1" onChange={this.priorityChange} />Low</label>
+                        <form>
+                            <label className={pt_class_3}><input type="radio" name="priority" value="3"
+                                                                 onChange={this.priorityChange} defaultChecked={pt_check_3} />High</label>
+                            <label className={pt_class_2}><input type="radio" name="priority" value="2"
+                                                                 onChange={this.priorityChange} defaultChecked={pt_check_2} />Middle</label>
+                            <label className={pt_class_1}><input type="radio" name="priority" value="1"
+                                                                 onChange={this.priorityChange} defaultChecked={pt_check_1} />Low</label>
+                        </form>
                     </article>
                     <article className="column">
                         <article className="select_main">
                             <h3>Tasks group</h3>
-                            <article className="select_box">{t_groups}</article>
+                            <form>
+                                <article className="select_box">{t_groups}</article>
+                            </form>
                         </article>
                     </article>
                     <button onClick={this.submit('edit')}>Edit</button>
@@ -683,6 +702,8 @@ var TaskList = React.createClass({
         //state
         var data = this.state.data;
         var status = this.props.status;
+        //export refresh
+        refresh = this.receive;
         //classes determination
         var active_c = this.state.active && !this.state.all ? ' active_elem' : '';
         var inactive_c = this.state.inactive && !this.state.all ? ' active_elem' : '';
