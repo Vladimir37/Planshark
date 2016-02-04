@@ -31571,6 +31571,7 @@
 	                    response_status = 1;
 	                }
 	                (0, _toaster2.default)(actions_r[response_status]);
+	                refresh();
 	            }, function (err) {
 	                (0, _toaster2.default)(actions_r[1]);
 	            });
@@ -31686,11 +31687,11 @@
 	                    null,
 	                    'Executor: '
 	                ),
-	                state.editor
+	                state.editor_name
 	            );
 	            var elapsed_seconds = +(new Date(state.closed) - new Date(state.created));
 	            var elapsed_days = Math.floor(elapsed_seconds / 86400000);
-	            var elapsed_hours = (elapsed_seconds - elapsed_days * 86400000) / 3600000;
+	            var elapsed_hours = Math.floor((elapsed_seconds - elapsed_days * 86400000) / 3600000);
 	            elapsed_time = _react2.default.createElement(
 	                'span',
 	                { className: 'task_info_elem' },
@@ -31893,7 +31894,8 @@
 	                            'Author: '
 	                        ),
 	                        state.author
-	                    )
+	                    ),
+	                    performed_user
 	                ),
 	                _react2.default.createElement(
 	                    'article',
@@ -31978,7 +31980,6 @@
 	                                ),
 	                                state.u_group_name
 	                            ),
-	                            performed_user,
 	                            elapsed_time
 	                        )
 	                    ),

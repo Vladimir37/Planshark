@@ -282,6 +282,7 @@ var Task = React.createClass({
                     response_status = 1;
                 }
                 toast(actions_r[response_status]);
+                refresh();
             }, function(err) {
                 toast(actions_r[1]);
             });
@@ -362,10 +363,10 @@ var Task = React.createClass({
         //data for closed tasks
         var performed_user = '', elapsed_time = '', answer_text = '';
         if(!self.state.active) {
-            performed_user = <span className="task_info_elem"><b>Executor: </b>{state.editor}</span>;
+            performed_user = <span className="task_info_elem"><b>Executor: </b>{state.editor_name}</span>;
             var elapsed_seconds = +(new Date(state.closed) - new Date(state.created));
             var elapsed_days = Math.floor(elapsed_seconds / 86400000);
-            var elapsed_hours = (elapsed_seconds - (elapsed_days * 86400000)) / 3600000;
+            var elapsed_hours = Math.floor((elapsed_seconds - (elapsed_days * 86400000)) / 3600000);
             elapsed_time = <span className="task_info_elem"><b>Elapsed time: </b>Days - {elapsed_days}, hours - {elapsed_hours}</span>;
             answer_text = <article className="task_desc">
                 <b>Answer:</b>
@@ -463,6 +464,7 @@ var Task = React.createClass({
                 </article>
                 <article className="task_info">
                     <span className="task_info_elem"><b>Author: </b>{state.author}</span>
+                    {performed_user}
                 </article>
                 <article className="task_priority">
                     {priority_blocks}
@@ -487,7 +489,6 @@ var Task = React.createClass({
                             <span className="task_info_elem"><b>Expiration date: </b>{expiration_date}</span>
                             <span className="task_info_elem"><b>Performer user: </b>{state.performer_name}</span>
                             <span className="task_info_elem"><b>Performer group: </b>{state.u_group_name}</span>
-                            {performed_user}
                             {elapsed_time}
                         </article>
                     </article>
