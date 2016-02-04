@@ -102,7 +102,7 @@ function inactive_tasks(all_tasks) {
             //search
             db.tasks.findAll({
                 where: company_conditions,
-                include: [db.tasks_groups, db.users_groups, db.aliases.author_data, db.aliases.performer_data]
+                include: [db.tasks_groups, db.users_groups, db.aliases.author_data, db.aliases.performer_data, db.aliases.editor_data]
             }).then(function (result) {
                 res.end(serializing(0, result));
             }, function (err) {

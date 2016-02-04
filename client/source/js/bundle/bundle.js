@@ -31502,10 +31502,12 @@
 	        data.tasks_group = data.tasks_group || {};
 	        data.performer_data = data.performer_data || {};
 	        data.author_data = data.author_data || {};
+	        data.editor_data = data.editor_data || {};
 	        return {
 	            id: data.id,
 	            name: data.name,
 	            description: data.description,
+	            answer: data.answer || null,
 	            active: data.active,
 	            t_group_num: data.t_group,
 	            t_group_name: data.tasks_group.name || null,
@@ -31514,9 +31516,11 @@
 	            color: data.tasks_group.color,
 	            performer_num: data.performer,
 	            performer_name: data.performer_data.name || null,
+	            editor_name: data.editor_data.name || null,
 	            priority: data.priority,
 	            author: data.author_data.name || null,
 	            created: new Date(data.createdAt).toString().slice(0, -15),
+	            closed: new Date(data.closedAt),
 	            expiration: data.expiration,
 	            rights: {
 	                editing: status.editing || !status.room || false,
@@ -31668,6 +31672,52 @@
 	        if (state.expiration) {
 	            var full_date = new Date(state.expiration);
 	            string_date = full_date.getMonth() + 1 + '/' + full_date.getDate() + '/' + full_date.getFullYear();
+	        }
+	        //data for closed tasks
+	        var performed_user = '',
+	            elapsed_time = '',
+	            answer_text = '';
+	        if (!self.state.active) {
+	            performed_user = _react2.default.createElement(
+	                'span',
+	                { className: 'task_info_elem' },
+	                _react2.default.createElement(
+	                    'b',
+	                    null,
+	                    'Executor: '
+	                ),
+	                state.editor
+	            );
+	            var elapsed_seconds = +(new Date(state.closed) - new Date(state.created));
+	            var elapsed_days = Math.floor(elapsed_seconds / 86400000);
+	            var elapsed_hours = (elapsed_seconds - elapsed_days * 86400000) / 3600000;
+	            elapsed_time = _react2.default.createElement(
+	                'span',
+	                { className: 'task_info_elem' },
+	                _react2.default.createElement(
+	                    'b',
+	                    null,
+	                    'Elapsed time: '
+	                ),
+	                'Days - ',
+	                elapsed_days,
+	                ', hours - ',
+	                elapsed_hours
+	            );
+	            answer_text = _react2.default.createElement(
+	                'article',
+	                { className: 'task_desc' },
+	                _react2.default.createElement(
+	                    'b',
+	                    null,
+	                    'Answer:'
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_desc_text' },
+	                    state.answer
+	                )
+	            );
 	        }
 	        //props data and status
 	        var status = this.props.status;
@@ -31840,9 +31890,9 @@
 	                        _react2.default.createElement(
 	                            'b',
 	                            null,
-	                            'Performer: '
+	                            'Author: '
 	                        ),
-	                        state.performer_name
+	                        state.author
 	                    )
 	                ),
 	                _react2.default.createElement(
@@ -31865,70 +31915,71 @@
 	                    { className: 'task_middle' },
 	                    _react2.default.createElement(
 	                        'article',
-	                        { className: 'task_desc' },
-	                        _react2.default.createElement(
-	                            'b',
-	                            null,
-	                            'Description:'
-	                        ),
+	                        { className: 'column_half' },
 	                        _react2.default.createElement(
 	                            'article',
-	                            { className: 'task_desc_text' },
-	                            state.description
-	                        )
+	                            { className: 'task_desc' },
+	                            _react2.default.createElement(
+	                                'b',
+	                                null,
+	                                'Description:'
+	                            ),
+	                            _react2.default.createElement(
+	                                'article',
+	                                { className: 'task_desc_text' },
+	                                state.description
+	                            )
+	                        ),
+	                        answer_text
 	                    ),
 	                    _react2.default.createElement(
 	                        'article',
-	                        { className: 'task_info' },
+	                        { className: 'column_half' },
 	                        _react2.default.createElement(
-	                            'span',
-	                            { className: 'task_info_elem' },
+	                            'article',
+	                            { className: 'task_info' },
 	                            _react2.default.createElement(
-	                                'b',
-	                                null,
-	                                'Creation date: '
+	                                'span',
+	                                { className: 'task_info_elem' },
+	                                _react2.default.createElement(
+	                                    'b',
+	                                    null,
+	                                    'Creation date: '
+	                                ),
+	                                state.created
 	                            ),
-	                            state.created
-	                        ),
-	                        _react2.default.createElement(
-	                            'span',
-	                            { className: 'task_info_elem' },
 	                            _react2.default.createElement(
-	                                'b',
-	                                null,
-	                                'Expiration date: '
+	                                'span',
+	                                { className: 'task_info_elem' },
+	                                _react2.default.createElement(
+	                                    'b',
+	                                    null,
+	                                    'Expiration date: '
+	                                ),
+	                                expiration_date
 	                            ),
-	                            expiration_date
-	                        ),
-	                        _react2.default.createElement(
-	                            'span',
-	                            { className: 'task_info_elem' },
 	                            _react2.default.createElement(
-	                                'b',
-	                                null,
-	                                'Performer user: '
+	                                'span',
+	                                { className: 'task_info_elem' },
+	                                _react2.default.createElement(
+	                                    'b',
+	                                    null,
+	                                    'Performer user: '
+	                                ),
+	                                state.performer_name
 	                            ),
-	                            state.performer_name
-	                        ),
-	                        _react2.default.createElement(
-	                            'span',
-	                            { className: 'task_info_elem' },
 	                            _react2.default.createElement(
-	                                'b',
-	                                null,
-	                                'Performer group: '
+	                                'span',
+	                                { className: 'task_info_elem' },
+	                                _react2.default.createElement(
+	                                    'b',
+	                                    null,
+	                                    'Performer group: '
+	                                ),
+	                                state.u_group_name
 	                            ),
-	                            state.u_group_name
-	                        ),
-	                        _react2.default.createElement(
-	                            'span',
-	                            { className: 'task_info_elem' },
-	                            _react2.default.createElement(
-	                                'b',
-	                                null,
-	                                'Author: '
-	                            ),
-	                            state.author
+	                            performed_user,
+	                            elapsed_time
 	                        )
 	                    ),
 	                    _react2.default.createElement('div', { className: 'clearfix' })
@@ -32075,6 +32126,7 @@
 	            expired: false,
 	            all_active: false,
 	            all_inactive: false,
+	            sorting: ['date', false],
 	            data: {
 	                received: false,
 	                error: false,
@@ -32101,73 +32153,75 @@
 	            };
 	        }
 	    },
-	    receive: function receive() {
+	    receive: function receive(resorting) {
 	        var self = this;
-	        var tasks_type;
-	        if (this.state.inactive) {
-	            tasks_type = 'inactive';
-	        } else {
-	            tasks_type = 'active';
-	        }
-	        var all_tasks_type = '';
-	        if (this.state.all) {
-	            all_tasks_type = '_all';
-	        }
-	        (0, _submitting.submitting)(null, '/api/get_tasks/' + tasks_type + all_tasks_type, 'GET', function (data) {
-	            if (typeof data == 'string') {
-	                data = JSON.parse(data);
+	        return function () {
+	            var tasks_type;
+	            if (self.state.inactive) {
+	                tasks_type = 'inactive';
+	            } else {
+	                tasks_type = 'active';
 	            }
-	            if (data.status == 1) {
+	            var all_tasks_type = '';
+	            if (self.state.all) {
+	                all_tasks_type = '_all';
+	            }
+	            (0, _submitting.submitting)(null, '/api/get_tasks/' + tasks_type + all_tasks_type, 'GET', function (data) {
+	                if (typeof data == 'string') {
+	                    data = JSON.parse(data);
+	                }
+	                if (data.status == 1) {
+	                    self.setState({
+	                        data: {
+	                            error: true
+	                        }
+	                    });
+	                } else {
+	                    //active and inactive
+	                    if (!self.state.expired) {
+	                        self.setState({
+	                            data: {
+	                                received: true,
+	                                tasks: data.body
+	                            }
+	                        });
+	                    }
+	                    //expired
+	                    else {
+	                            var expired_tasks = [];
+	                            data.body.forEach(function (task) {
+	                                var today = new Date();
+	                                if (task.expiration && today > new Date(task.expiration)) {
+	                                    expired_tasks.push(task);
+	                                }
+	                            });
+	                            self.setState({
+	                                data: {
+	                                    received: true,
+	                                    tasks: expired_tasks
+	                                }
+	                            });
+	                        }
+	                    //resorting on demand
+	                    if (resorting) {
+	                        self.sort(self.state.sorting[1], self.state.sorting[0])();
+	                    }
+	                }
+	            }, function (err) {
 	                self.setState({
 	                    data: {
 	                        error: true
 	                    }
 	                });
-	            } else {
-	                //active and inactive
-	                if (!self.state.expired) {
-	                    self.setState({
-	                        data: {
-	                            received: true,
-	                            tasks: data.body
-	                        }
-	                    });
-	                }
-	                //expired
-	                else {
-	                        var expired_tasks = [];
-	                        data.body.forEach(function (task) {
-	                            var today = new Date();
-	                            if (task.expiration && today > new Date(task.expiration)) {
-	                                expired_tasks.push(task);
-	                            }
-	                        });
-	                        self.setState({
-	                            data: {
-	                                received: true,
-	                                tasks: expired_tasks
-	                            }
-	                        });
-	                    }
-	            }
-	        }, function (err) {
-	            self.setState({
-	                data: {
-	                    error: true
-	                }
 	            });
-	        });
+	        };
 	    },
 	    sort: function sort(direction, type) {
 	        var self = this;
 	        return function () {
 	            var all_tasks = self.state.data.tasks;
 	            self.setState({
-	                data: {
-	                    received: true,
-	                    error: false,
-	                    tasks: []
-	                }
+	                sorting: [type, direction]
 	            });
 	            function sorting(a, b) {
 	                var result;
@@ -32200,7 +32254,7 @@
 	                }
 	            }
 	            all_tasks.sort(sorting);
-	            if (direction) {
+	            if (!direction) {
 	                all_tasks.reverse();
 	            }
 	            self.setState({
@@ -32217,7 +32271,7 @@
 	        var data = this.state.data;
 	        var status = this.props.status;
 	        //export refresh
-	        refresh = this.receive;
+	        refresh = this.receive(true);
 	        //classes determination
 	        var active_c = this.state.active && !this.state.all ? ' active_elem' : '';
 	        var inactive_c = this.state.inactive && !this.state.all ? ' active_elem' : '';
@@ -32313,7 +32367,7 @@
 	        );
 	        //first load
 	        if (!data.received && !data.error) {
-	            this.receive();
+	            this.receive(false)();
 	            return _react2.default.createElement(
 	                'article',
 	                { className: 'task_list' },

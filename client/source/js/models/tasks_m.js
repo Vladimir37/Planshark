@@ -213,6 +213,7 @@ var Task = React.createClass({
         data.tasks_group = data.tasks_group || {};
         data.performer_data = data.performer_data || {};
         data.author_data = data.author_data || {};
+        data.editor_data = data.editor_data || {};
         return {
             id: data.id,
             name: data.name,
@@ -360,7 +361,7 @@ var Task = React.createClass({
         }
         //data for closed tasks
         var performed_user = '', elapsed_time = '', answer_text = '';
-        if(self.state.active) {
+        if(!self.state.active) {
             performed_user = <span className="task_info_elem"><b>Executor: </b>{state.editor}</span>;
             var elapsed_seconds = +(new Date(state.closed) - new Date(state.created));
             var elapsed_days = Math.floor(elapsed_seconds / 86400000);
@@ -473,18 +474,22 @@ var Task = React.createClass({
             </article>
             <article className="task_additional">
                 <article className="task_middle">
-                    <article className="task_desc">
-                        <b>Description:</b>
-                        <article className="task_desc_text">{state.description}</article>
-                    </article>
+                    <article className="column_half">
+                        <article className="task_desc">
+                            <b>Description:</b>
+                            <article className="task_desc_text">{state.description}</article>
+                        </article>
                     {answer_text}
-                    <article className="task_info">
-                        <span className="task_info_elem"><b>Creation date: </b>{state.created}</span>
-                        <span className="task_info_elem"><b>Expiration date: </b>{expiration_date}</span>
-                        <span className="task_info_elem"><b>Performer user: </b>{state.performer_name}</span>
-                        <span className="task_info_elem"><b>Performer group: </b>{state.u_group_name}</span>
-                        {performed_user}
-                        {elapsed_time}
+                    </article>
+                    <article className="column_half">
+                        <article className="task_info">
+                            <span className="task_info_elem"><b>Creation date: </b>{state.created}</span>
+                            <span className="task_info_elem"><b>Expiration date: </b>{expiration_date}</span>
+                            <span className="task_info_elem"><b>Performer user: </b>{state.performer_name}</span>
+                            <span className="task_info_elem"><b>Performer group: </b>{state.u_group_name}</span>
+                            {performed_user}
+                            {elapsed_time}
+                        </article>
                     </article>
                     <div className="clearfix"></div>
                 </article>
@@ -545,6 +550,7 @@ var TaskList = React.createClass({
             expired: false,
             all_active: false,
             all_inactive: false,
+            sorting: ['date', false],
             data: {
                 received: false,
                 error: false,
@@ -571,75 +577,77 @@ var TaskList = React.createClass({
             }
         }
     },
-    receive() {
+    receive(resorting) {
         var self = this;
-        var tasks_type;
-        if(this.state.inactive) {
-            tasks_type = 'inactive';
-        }
-        else {
-            tasks_type = 'active';
-        }
-        var all_tasks_type = '';
-        if(this.state.all) {
-            all_tasks_type = '_all';
-        }
-        submitting(null, '/api/get_tasks/' + tasks_type + all_tasks_type, 'GET', function(data) {
-            if (typeof data == 'string') {
-                data = JSON.parse(data);
+        return function() {
+            var tasks_type;
+            if (self.state.inactive) {
+                tasks_type = 'inactive';
             }
-            if(data.status == 1) {
+            else {
+                tasks_type = 'active';
+            }
+            var all_tasks_type = '';
+            if (self.state.all) {
+                all_tasks_type = '_all';
+            }
+            submitting(null, '/api/get_tasks/' + tasks_type + all_tasks_type, 'GET', function (data) {
+                if (typeof data == 'string') {
+                    data = JSON.parse(data);
+                }
+                if (data.status == 1) {
+                    self.setState({
+                        data: {
+                            error: true
+                        }
+                    });
+                }
+                else {
+                    //active and inactive
+                    if (!self.state.expired) {
+                        self.setState({
+                            data: {
+                                received: true,
+                                tasks: data.body
+                            }
+                        });
+                    }
+                    //expired
+                    else {
+                        var expired_tasks = [];
+                        data.body.forEach(function (task) {
+                            var today = new Date();
+                            if (task.expiration && today > new Date(task.expiration)) {
+                                expired_tasks.push(task);
+                            }
+                        });
+                        self.setState({
+                            data: {
+                                received: true,
+                                tasks: expired_tasks
+                            }
+                        });
+                    }
+                    //resorting on demand
+                    if (resorting) {
+                        self.sort(self.state.sorting[1], self.state.sorting[0])();
+                    }
+                }
+            }, function (err) {
                 self.setState({
                     data: {
                         error: true
                     }
                 });
-            }
-            else {
-                //active and inactive
-                if(!self.state.expired) {
-                    self.setState({
-                        data: {
-                            received: true,
-                            tasks: data.body
-                        }
-                    });
-                }
-                //expired
-                else {
-                    var expired_tasks = [];
-                    data.body.forEach(function(task) {
-                        var today = new Date();
-                        if(task.expiration && today > new Date(task.expiration)) {
-                            expired_tasks.push(task);
-                        }
-                    });
-                    self.setState({
-                        data: {
-                            received: true,
-                            tasks: expired_tasks
-                        }
-                    });
-                }
-            }
-        }, function(err) {
-            self.setState({
-                data: {
-                    error: true
-                }
             });
-        });
+        }
     },
     sort(direction, type) {
         var self = this;
         return function() {
             var all_tasks = self.state.data.tasks;
             self.setState({
-                data: {
-                    received: true,
-                    error: false,
-                    tasks: []
-                }
+                sorting: [type, direction]
             });
             function sorting(a, b) {
                 var result;
@@ -675,7 +683,7 @@ var TaskList = React.createClass({
                 }
             }
             all_tasks.sort(sorting);
-            if(direction) {
+            if(!direction) {
                 all_tasks.reverse();
             }
             self.setState({
@@ -692,7 +700,7 @@ var TaskList = React.createClass({
         var data = this.state.data;
         var status = this.props.status;
         //export refresh
-        refresh = this.receive;
+        refresh = this.receive(true);
         //classes determination
         var active_c = this.state.active && !this.state.all ? ' active_elem' : '';
         var inactive_c = this.state.inactive && !this.state.all ? ' active_elem' : '';
@@ -733,7 +741,7 @@ var TaskList = React.createClass({
         </article>;
         //first load
         if(!data.received && !data.error) {
-            this.receive();
+            this.receive(false)();
             return <article className="task_list">
                 {tasks_buttons_type}
                 {tasks_buttons_sort}
