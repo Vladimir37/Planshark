@@ -4,7 +4,7 @@ import $ from 'jquery';
 import {submitting, getData} from '../submitting.js';
 import {Waiting, Error, Empty, Menu} from './templates.js';
 import toast from '../toaster.js';
-import datepick from '../datepicker.js';
+import {datepick} from '../picker.js';
 
 //responses
 var actions_r = ['Success!', 'Server error' , 'Required fields are empty', 'Incorrect date'];
@@ -93,7 +93,7 @@ var Creating = React.createClass({
         }
     },
     switching() {
-        $('.taskCreatingBody').slideToggle();
+        $('.creatingFormBody').slideToggle();
     },
     priorityChange(elem) {
         var target = elem.target;
@@ -167,10 +167,10 @@ var Creating = React.createClass({
             return <Waiting />;
         }
         else {
-            return <section className="taskCreating">
-                <article className="taskCreatingHead" onClick={this.switching}>Creating</article>
-                <article className="taskCreatingBody">
-                    <article className="taskCreatingData">
+            return <section className="creatingForm">
+                <article className="creatingFormHead" onClick={this.switching}>Creating</article>
+                <article className="creatingFormBody">
+                    <article className="creatingFormData">
                         <input type="text" name="name" placeholder="Task name" data-req="true"/><br/>
                         <textarea name="description" placeholder="Task description" data-req="true"></textarea><br/>
                         <article className="priority">
@@ -276,16 +276,21 @@ var Task = React.createClass({
             var ajax_data = {};
             ajax_data = getData(target);
             ajax_data.task_id = self.state.id;
-            submitting(ajax_data, '/api/tasks/' + type, 'POST', function(data) {
-                var response_status = +data;
-                if(isNaN(response_status)) {
-                    response_status = 1;
-                }
-                toast(actions_r[response_status]);
-                refresh();
-            }, function(err) {
-                toast(actions_r[1]);
-            });
+            if(ajax_data) {
+                submitting(ajax_data, '/api/tasks/' + type, 'POST', function (data) {
+                    var response_status = +data;
+                    if (isNaN(response_status)) {
+                        response_status = 1;
+                    }
+                    toast(actions_r[response_status]);
+                    refresh();
+                }, function (err) {
+                    toast(actions_r[1]);
+                });
+            }
+            else {
+                toast(actions_r[2]);
+            }
         }
     },
     selectBoxes(elem) {
@@ -605,7 +610,7 @@ var TaskList = React.createClass({
                 }
                 else {
                     //active and inactive
-                    if (!self.state.expired) {
+                    if(!self.state.expired) {
                         self.setState({
                             data: {
                                 received: true,
@@ -762,10 +767,15 @@ var TaskList = React.createClass({
             var all_tasks = [];
             var list_tasks = data.tasks;
             var group_data = this.props.group_data;
-            list_tasks.reverse();
-            list_tasks.forEach(function(task) {
-                all_tasks.push(<Task status={status} data={task} key={task.id} group_data={group_data} />);
-            });
+            if(list_tasks.length) {
+                list_tasks.reverse();
+                list_tasks.forEach(function (task) {
+                    all_tasks.push(<Task status={status} data={task} key={task.id} group_data={group_data}/>);
+                });
+            }
+            else {
+                all_tasks = <Empty />;
+            }
             return <article className="task_list">
                 {tasks_buttons_type}
                 {tasks_buttons_sort}
