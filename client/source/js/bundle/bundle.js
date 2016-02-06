@@ -31558,7 +31558,7 @@
 	                    (0, _toaster2.default)(actions_r[response_status]);
 	                }
 	            }, function (err) {
-	                (0, _toaster2.default)("Server error");
+	                (0, _toaster2.default)(actions_r[1]);
 	            });
 	        }
 	    },
@@ -32836,8 +32836,27 @@
 	    componentDidMount: function componentDidMount() {
 	        setTimeout(_picker.colorpick, 100);
 	    },
-	    submit: function submit() {
-	        //
+	    submit: function submit(elem) {
+	        var ajax_data = (0, _submitting.getData)(elem.target);
+	        if (!ajax_data) {
+	            (0, _toaster2.default)(actions_r[2]);
+	        } else {
+	            (0, _submitting.submitting)(ajax_data, '/api/task_manage/create', 'POST', function (data) {
+	                var response_status = +data;
+	                if (isNaN(response_status)) {
+	                    response_status = 1;
+	                }
+	                if (response_status == 0) {
+	                    (0, _toaster2.default)(actions_r[0]);
+	                    (0, _jquery2.default)(elem.target).parent().find('input[type="text"]').val('');
+	                    //refresh();
+	                } else {
+	                        (0, _toaster2.default)(actions_r[response_status]);
+	                    }
+	            }, function (err) {
+	                (0, _toaster2.default)(actions_r[1]);
+	            });
+	        }
 	    },
 	    switching: function switching() {
 	        (0, _jquery2.default)('.creatingFormBody').slideToggle();

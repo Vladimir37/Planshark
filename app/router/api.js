@@ -7,6 +7,7 @@ var task_manage = require('./api/task_manage');
 var get_tasks = require('./api/get_tasks');
 var manage_data = require('./api/manage_data');
 var data_viewing = require('./api/data_viewing');
+var styles = require('./api/styles');
 
 var router = express.Router();
 
@@ -32,5 +33,8 @@ router.use('/manage_data', manage_data);
 
 //get users, users groups in room, tasks groups for user
 router.use('/data_viewing', data_viewing);
+
+//groups colors
+router.use('/styles', styles);
 
 module.exports = router;

@@ -4,7 +4,7 @@ function creating(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //group data
     var group_name = req.body.name;
     var group_color = req.body.color;
@@ -44,7 +44,7 @@ function editing(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //group data
     var group_id = req.body.id;
     var group_name = req.body.name;
@@ -92,7 +92,7 @@ function deleting(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //group data
     var group_id = req.body.id;
     //right to work with tasks group
@@ -141,7 +141,7 @@ function adding(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //group data
     var task_id = req.body.task_id;
     var group_id = req.body.group_id;

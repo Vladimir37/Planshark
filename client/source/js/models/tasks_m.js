@@ -88,7 +88,7 @@ var Creating = React.createClass({
                     toast(actions_r[response_status]);
                 }
             }, function(err) {
-                toast("Server error");
+                toast(actions_r[1]);
             });
         }
     },

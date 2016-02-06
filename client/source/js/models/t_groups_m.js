@@ -19,8 +19,29 @@ var Creating = React.createClass({
     componentDidMount() {
         setTimeout(colorpick, 100);
     },
-    submit() {
-        //
+    submit(elem) {
+        var ajax_data = getData(elem.target);
+        if(!ajax_data) {
+            toast(actions_r[2]);
+        }
+        else {
+            submitting(ajax_data, '/api/task_manage/create', 'POST', function(data) {
+                var response_status = +data;
+                if(isNaN(response_status)) {
+                    response_status = 1;
+                }
+                if(response_status == 0) {
+                    toast(actions_r[0]);
+                    $(elem.target).parent().find('input[type="text"]').val('');
+                    //refresh();
+                }
+                else {
+                    toast(actions_r[response_status]);
+                }
+            }, function(err) {
+                toast(actions_r[1]);
+            });
+        }
     },
     switching() {
         $('.creatingFormBody').slideToggle();
