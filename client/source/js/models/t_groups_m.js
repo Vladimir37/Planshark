@@ -58,6 +58,21 @@ var Creating = React.createClass({
     }
 });
 
+var Tasks_group = React.createClass({
+    getInitialState() {
+        var data = this.props.data;
+        return {
+            name: data.name,
+            color: data.color,
+            users_count: data.count,
+            created: data.createdAt
+        }
+    },
+    render() {
+        //
+    }
+});
+
 $(document).ready(function() {
     if (document.location.pathname == '/tasks_groups') {
         ReactDOM.render(<Creating />, document.getElementsByClassName('content_inner')[0]);

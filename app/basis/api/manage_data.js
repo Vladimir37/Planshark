@@ -6,10 +6,11 @@ function users_group(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //right to view all users
     var view_right = false;
     author_group == 0 ? view_right = true : view_right = false;
+    var result;
     db.users_groups.findById(author_group).then(function(group) {
         if(!group) {
             throw '1';
@@ -31,47 +32,23 @@ function users_group(req, res, next) {
             }
         });
     }).then(function(groups) {
-        return serializing(0, groups);
-    }).catch(function(err) {
-        console.log(err);
-        res.end(serializing(1));
-    });
-};
-
-//get all users in room
-function users(req, res, next) {
-    //author data
-    var author = res.user_status.id;
-    var room = res.user_status.room;
-    var author_group = res.user_status.group;
-    //right to view all users
-    var view_right = false;
-    author_group == 0 ? view_right = true : view_right = false;
-    db.users_groups.findById(author_group).then(function(group) {
-        if(!group) {
-            throw '1';
-        }
-        group.u_group_manage == 1 ? view_right = true : view_right = false;
-        return Promise.resolve();
-    }).catch(function(err) {
-        console.log(err);
-        if(view_right) {
-            return Promise.resolve();
-        }
-        else {
-            res.end(serializing(1));
-        }
-    }).then(function() {
-        return db.users.findAll({
-            where: {
-                room
-            }
+        result = groups;
+        var users_find_arr = [];
+        groups.forEach(function(group) {
+            users_find_arr.push(db.users.findAll({
+                where: {
+                    u_group: group.id,
+                    active: 1
+                }
+            }));
         });
-    }).then(function(users) {
-        for(var i = 0; i < users.length; i++) {
-            delete users[i].pass;
+        return Promise.all(users_find_arr);
+    }).then(function(users_list) {
+        var group_count = result.length;
+        for(var i = 0; i < group_count; i++) {
+            result[i].dataValues.users = users_list[i];
         };
-        res.end(serializing(0, users));
+        res.end(JSON.stringify(result));
     }).catch(function(err) {
         console.log(err);
         res.end(serializing(1));
@@ -83,7 +60,7 @@ function tasks_group(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //right to view all users
     var view_right = false;
     author_group == 0 ? view_right = true : view_right = false;
@@ -130,5 +107,4 @@ function tasks_group(req, res, next) {
 };
 
 exports.users_group = users_group;
-exports.users = users;
 exports.tasks_groups = tasks_group;

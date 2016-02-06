@@ -142,7 +142,7 @@ var author_data = tables.tasks.belongsTo(tables.users, {foreignKey: 'author', as
 var editor_data = tables.tasks.belongsTo(tables.users, {foreignKey: 'editor', as:'editor_data'});
 
 //synchronization tables
-for(table in tables) {
+for(var table in tables) {
     tables[table].sync().then(function() {
         //success
     }, function(err) {

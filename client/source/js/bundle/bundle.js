@@ -32888,6 +32888,22 @@
 	    }
 	});
 
+	var Tasks_group = _react2.default.createClass({
+	    displayName: 'Tasks_group',
+	    getInitialState: function getInitialState() {
+	        var data = this.props.data;
+	        return {
+	            name: data.name,
+	            color: data.color,
+	            users_count: data.count,
+	            created: data.createdAt
+	        };
+	    },
+	    render: function render() {
+	        //
+	    }
+	});
+
 	(0, _jquery2.default)(document).ready(function () {
 	    if (document.location.pathname == '/tasks_groups') {
 	        _reactDom2.default.render(_react2.default.createElement(Creating, null), document.getElementsByClassName('content_inner')[0]);
