@@ -460,8 +460,11 @@ var Task = React.createClass({
                 </form>
             </article>;
         }
+        //define task classes
+        var color_class = state.t_group_num ? 'task_group_color_' + state.t_group_num : '';
+        var task_classes = 'task task_group_color ' + color_class;
         //render
-        return <article className="task">
+        return <article className={task_classes}>
             <article className="task_top">
                 <article className="task_head">
                     <span className="task_name">{state.name}</span><br/>

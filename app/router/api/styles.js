@@ -11,6 +11,6 @@ router.use(status.hard);
 router.get('/users', styles.users);
 
 //tasks group color
-router.get('/tasks');
+router.get('/tasks', styles.tasks);
 
 module.exports = router;
