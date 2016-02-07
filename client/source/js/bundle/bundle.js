@@ -32888,25 +32888,145 @@
 	    }
 	});
 
-	var Tasks_group = _react2.default.createClass({
-	    displayName: 'Tasks_group',
+	var TasksGroup = _react2.default.createClass({
+	    displayName: 'TasksGroup',
 	    getInitialState: function getInitialState() {
 	        var data = this.props.data;
 	        return {
+	            id: data.id,
 	            name: data.name,
 	            color: data.color,
-	            users_count: data.count,
+	            tasks: data.tasks,
+	            tasks_count: data.tasks.length,
 	            created: data.createdAt
 	        };
 	    },
+	    expand: function expand(elem) {
+	        var target = (0, _jquery2.default)(elem.target).closest('.task');
+	        target.find('.task_additional').slideToggle();
+	    },
 	    render: function render() {
-	        //
+	        var group_classes = 'task task_group_color task_group_color_' + this.state.id;
+	        var tasks_list = [];
+	        this.state.tasks.forEach(function (task) {
+	            tasks_list.push(_react2.default.createElement(
+	                'article',
+	                { className: 'item_list' },
+	                task.name
+	            ));
+	        });
+	        return _react2.default.createElement(
+	            'article',
+	            { className: group_classes },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'task_top' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_head' },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'task_name' },
+	                        this.state.name
+	                    ),
+	                    _react2.default.createElement('br', null),
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'task_group' },
+	                        'Tasks: ',
+	                        this.state.tasks_count
+	                    )
+	                ),
+	                _react2.default.createElement('article', { className: 'task_expand', onClick: this.expand })
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'task_additional' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'select_box' },
+	                    tasks_list
+	                )
+	            )
+	        );
+	    }
+	});
+
+	var TasksGroupsList = _react2.default.createClass({
+	    displayName: 'TasksGroupsList',
+	    getInitialState: function getInitialState() {
+	        return {
+	            received: false,
+	            error: false,
+	            status: null,
+	            groups: null
+	        };
+	    },
+	    receive: function receive() {
+	        var self = this;
+	        (0, _submitting.submitting)(null, '/api/account/status', 'GET', function (status) {
+	            if (typeof status == 'string') {
+	                status = JSON.parse(status);
+	            }
+	            (0, _submitting.submitting)(null, '/api/manage_data/tasks_group', 'GET', function (data) {
+	                if (typeof data == 'string') {
+	                    data = JSON.parse(data);
+	                }
+	                if (data.status == 0) {
+	                    self.setState({
+	                        received: true,
+	                        error: false,
+	                        status: status,
+	                        groups: data.body
+	                    });
+	                } else {
+	                    self.setState({
+	                        error: true
+	                    });
+	                }
+	            }, function (err) {
+	                self.setState({
+	                    error: true
+	                });
+	            });
+	        }, function (err) {
+	            self.setState({
+	                error: true
+	            });
+	        });
+	    },
+	    render: function render() {
+	        //first load
+	        if (!this.state.received && !this.state.error) {
+	            this.receive();
+	            return _react2.default.createElement(_templates.Waiting, null);
+	        } else if (!this.state.received && this.state.error) {
+	            return _react2.default.createElement(_templates.Error, null);
+	        }
+	        //render
+	        else {
+	                var groups = [];
+	                if (!this.state.groups.length) {
+	                    groups = _react2.default.createElement(_templates.Empty, null);
+	                } else {
+	                    this.state.groups.forEach(function (group) {
+	                        groups.push(_react2.default.createElement(TasksGroup, { data: group }));
+	                    });
+	                }
+	                return _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_group_page_inner' },
+	                    _react2.default.createElement(_templates.Menu, { active: 't_groups', data: this.state.status }),
+	                    _react2.default.createElement(Creating, null),
+	                    groups
+	                );
+	            }
 	    }
 	});
 
 	(0, _jquery2.default)(document).ready(function () {
 	    if (document.location.pathname == '/tasks_groups') {
-	        _reactDom2.default.render(_react2.default.createElement(Creating, null), document.getElementsByClassName('content_inner')[0]);
+	        _reactDom2.default.render(_react2.default.createElement(TasksGroupsList, null), document.getElementsByClassName('content_inner')[0]);
 	    }
 	});
 

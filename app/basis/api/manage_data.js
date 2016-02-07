@@ -64,18 +64,37 @@ function tasks_group(req, res, next) {
     //right to view all users
     var view_right = false;
     author_group == 0 ? view_right = true : view_right = false;
+    var result;
+    //personal
     if(!room) {
         db.tasks_groups.findAll({
             where: {
                 user: author
             }
         }).then(function(groups) {
-            res.end(serializing(0, groups));
-        }, function(err) {
+            result = groups;
+            var tasks_find_arr = [];
+            groups.forEach(function(group) {
+                tasks_find_arr.push(db.tasks.findAll({
+                    where: {
+                        t_group: group.id,
+                        active: 1
+                    }
+                }));
+            });
+            return Promise.all(tasks_find_arr);
+        }).then(function(tasks_list) {
+            var group_count = result.length;
+            for(var i = 0; i < group_count; i++) {
+                result[i].dataValues.tasks = tasks_list[i];
+            };
+            res.end(serializing(0, result));
+        }).catch(function(err) {
             console.log(err);
             res.end(serializing(1));
         });
     }
+    //company
     else {
         db.users_groups.findById(author_group).then(function(group) {
             if(!group) {
@@ -98,7 +117,23 @@ function tasks_group(req, res, next) {
                 }
             });
         }).then(function(groups) {
-            res.end(serializing(0, groups));
+            result = groups;
+            var tasks_find_arr = [];
+            groups.forEach(function(group) {
+                tasks_find_arr.push(db.tasks.findAll({
+                    where: {
+                        t_group: group.id,
+                        active: 1
+                    }
+                }));
+            });
+            return Promise.all(tasks_find_arr);
+        }).then(function(tasks_list) {
+            var group_count = result.length;
+            for(var i = 0; i < group_count; i++) {
+                result[i].dataValues.tasks = tasks_list[i];
+            };
+            res.end(serializing(0, result));
         }).catch(function(err) {
             console.log(err);
             res.end(serializing(1));
