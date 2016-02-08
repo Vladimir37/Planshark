@@ -96,6 +96,30 @@ function deleting(req, res, next) {
     //group data
     var group_id = req.body.id;
     var new_group = req.body.t_group || null;
+    //where obj for updating and deleting tasks
+    var destroy_where, update_where;
+    //company
+    if(room) {
+        destroy_where = {
+            id: group_id,
+            room
+        };
+        update_where = {
+            room,
+            t_group: group_id
+        };
+    }
+    //personal
+    else {
+        destroy_where = {
+            id: group_id,
+            user: author
+        };
+        update_where = {
+            room,
+            author
+        };
+    }
     //right to work with tasks group
     var tasks_right = false;
     author_group == 0 ? tasks_right = true : tasks_right = false;
@@ -114,20 +138,14 @@ function deleting(req, res, next) {
             res.end('1');
         }
     }).then(function() {
-        return db.tasks_groups.destroy({
-            where: {
-                id: group_id,
-                room
-            }
-        });
-    }).then(function() {
         return db.tasks.update({
             t_group: new_group
         }, {
-            where: {
-                room,
-                t_group: group_id
-            }
+            where: update_where
+        });
+    }).then(function() {
+        return db.tasks_groups.destroy({
+            where: destroy_where
         });
     }).then(function() {
         res.end('0');

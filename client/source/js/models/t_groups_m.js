@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import {submitting, getData} from '../submitting.js';
-import {Waiting, Error, Empty, Menu} from './templates.js';
+import {Waiting, Error, Empty, Menu, Forbidden} from './templates.js';
 import toast from '../toaster.js';
 import {colorpick} from '../picker.js';
 
@@ -40,7 +40,7 @@ var Creating = React.createClass({
                 if(response_status == 0) {
                     toast(actions_r[0]);
                     $(elem.target).parent().find('input[type="text"]').val('');
-                    //refresh();
+                    refresh();
                 }
                 else {
                     toast(actions_r[response_status]);
@@ -170,11 +170,11 @@ var TasksGroup = React.createClass({
                 </article>
                 <article className="task_action task_delete hidden">
                     <form>
-                        <h3>All tasks in {this.state.name} to other group?</h3>
+                        <h3>Move all tasks in {this.state.name} to other group?</h3>
                         {group_list_block}
                         Are you sure you want to delete "{this.state.name}" tasks group?
                     </form>
-                    <button onClick={this.submitting('deleting')}>Edit</button>
+                    <button onClick={this.submitting('deleting')}>Delete</button>
                 </article>
             </article>
         </article>;
@@ -227,6 +227,7 @@ var TasksGroupsList = React.createClass({
     },
     render() {
         var self = this;
+        refresh = this.receive;
         //first load
         if(!this.state.received && !this.state.error) {
             this.receive();
@@ -234,6 +235,9 @@ var TasksGroupsList = React.createClass({
         }
         else if(!this.state.received && this.state.error) {
             return <Error />;
+        }
+        else if(!Boolean(this.state.t_manage || !this.state.room)) {
+            return <Forbidden />;
         }
         //render
         else {

@@ -99,3 +99,14 @@ export var Empty = React.createClass({
         </article>;
     }
 });
+
+export var Forbidden = React.createClass({
+    getInitialState() {
+        return null;
+    },
+    render() {
+        return <article className="waiting">
+            <p className="message">You can not see it.</p>
+        </article>;
+    }
+});

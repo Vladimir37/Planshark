@@ -31294,7 +31294,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.Empty = exports.Error = exports.Waiting = exports.Menu = undefined;
+	exports.Forbidden = exports.Empty = exports.Error = exports.Waiting = exports.Menu = undefined;
 
 	var _react = __webpack_require__(9);
 
@@ -31441,6 +31441,24 @@
 	                'p',
 	                { className: 'message' },
 	                'List is empty.'
+	            )
+	        );
+	    }
+	});
+
+	var Forbidden = exports.Forbidden = _react2.default.createClass({
+	    displayName: 'Forbidden',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'waiting' },
+	            _react2.default.createElement(
+	                'p',
+	                { className: 'message' },
+	                'You can not see it.'
 	            )
 	        );
 	    }
@@ -32795,7 +32813,7 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _submitting = __webpack_require__(6);
+	var _submitting2 = __webpack_require__(6);
 
 	var _templates = __webpack_require__(167);
 
@@ -32825,14 +32843,14 @@
 	        setTimeout(_picker.colorpick, 100);
 	    },
 	    submit: function submit(elem) {
-	        var ajax_data = (0, _submitting.getData)(elem.target);
+	        var ajax_data = (0, _submitting2.getData)(elem.target);
 	        if (!ajax_data) {
 	            (0, _toaster2.default)(actions_r[2]);
 	        } else if (!re_color.test(ajax_data.color)) {
 	            (0, _toaster2.default)(actions_r[3]);
 	            (0, _jquery2.default)(elem.target).parent().find('input[name="color"]').val('');
 	        } else {
-	            (0, _submitting.submitting)(ajax_data, '/api/task_manage/create', 'POST', function (data) {
+	            (0, _submitting2.submitting)(ajax_data, '/api/task_manage/create', 'POST', function (data) {
 	                var response_status = +data;
 	                if (isNaN(response_status)) {
 	                    response_status = 1;
@@ -32840,10 +32858,10 @@
 	                if (response_status == 0) {
 	                    (0, _toaster2.default)(actions_r[0]);
 	                    (0, _jquery2.default)(elem.target).parent().find('input[type="text"]').val('');
-	                    //refresh();
+	                    refresh();
 	                } else {
-	                        (0, _toaster2.default)(actions_r[response_status]);
-	                    }
+	                    (0, _toaster2.default)(actions_r[response_status]);
+	                }
 	            }, function (err) {
 	                (0, _toaster2.default)(actions_r[1]);
 	            });
@@ -32905,24 +32923,25 @@
 	        return function (elem) {
 	            var target = elem.target;
 	            var ajax_data = {};
-	            ajax_data = (0, _submitting.getData)(target);
+	            ajax_data = (0, _submitting2.getData)(target);
 	            ajax_data.id = self.state.id;
-	            console.log(ajax_data);
-	            //if(ajax_data) {
-	            //    submitting(ajax_data, '/api/task_manage/' + type, 'POST', function (data) {
-	            //        var response_status = +data;
-	            //        if (isNaN(response_status)) {
-	            //            response_status = 1;
-	            //        }
-	            //        toast(actions_r[response_status]);
-	            //        //refresh();
-	            //    }, function (err) {
-	            //        toast(actions_r[1]);
-	            //    });
-	            //}
-	            //else {
-	            //    toast(actions_r[2]);
-	            //}
+	            if (ajax_data) {
+	                (0, _submitting2.submitting)(ajax_data, '/api/task_manage/' + type, 'POST', function (data) {
+	                    var response_status = +data;
+	                    if (isNaN(response_status)) {
+	                        response_status = 1;
+	                    }
+	                    (0, _toaster2.default)(actions_r[response_status]);
+	                    //refresh();
+	                }, function (err) {
+	                    (0, _toaster2.default)(actions_r[1]);
+	                });
+	            } else if (!re_color.test(ajax_data.color)) {
+	                (0, _toaster2.default)(actions_r[3]);
+	                (0, _jquery2.default)(elem.target).parent().find('input[name="color"]').val('');
+	            } else {
+	                (0, _toaster2.default)(actions_r[2]);
+	            }
 	        };
 	    },
 	    selectBoxes: function selectBoxes(elem) {
@@ -33046,7 +33065,7 @@
 	                        _react2.default.createElement(
 	                            'h3',
 	                            null,
-	                            'All tasks in ',
+	                            'Move all tasks in ',
 	                            this.state.name,
 	                            ' to other group?'
 	                        ),
@@ -33058,7 +33077,7 @@
 	                    _react2.default.createElement(
 	                        'button',
 	                        { onClick: this.submitting('deleting') },
-	                        'Edit'
+	                        'Delete'
 	                    )
 	                )
 	            )
@@ -33078,11 +33097,11 @@
 	    },
 	    receive: function receive() {
 	        var self = this;
-	        (0, _submitting.submitting)(null, '/api/account/status', 'GET', function (status) {
+	        (0, _submitting2.submitting)(null, '/api/account/status', 'GET', function (status) {
 	            if (typeof status == 'string') {
 	                status = JSON.parse(status);
 	            }
-	            (0, _submitting.submitting)(null, '/api/manage_data/tasks_group', 'GET', function (data) {
+	            (0, _submitting2.submitting)(null, '/api/manage_data/tasks_group', 'GET', function (data) {
 	                if (typeof data == 'string') {
 	                    data = JSON.parse(data);
 	                }
@@ -33112,12 +33131,15 @@
 	    },
 	    render: function render() {
 	        var self = this;
+	        refresh = this.receive;
 	        //first load
 	        if (!this.state.received && !this.state.error) {
 	            this.receive();
 	            return _react2.default.createElement(_templates.Waiting, null);
 	        } else if (!this.state.received && this.state.error) {
 	            return _react2.default.createElement(_templates.Error, null);
+	        } else if (!Boolean(this.state.t_manage || !this.state.room)) {
+	            return _react2.default.createElement(_templates.Forbidden, null);
 	        }
 	        //render
 	        else {
