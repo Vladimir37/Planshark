@@ -95,6 +95,7 @@ function deleting(req, res, next) {
     var author_group = +res.user_status.group;
     //group data
     var group_id = req.body.id;
+    var new_group = req.body.t_group || null;
     //right to work with tasks group
     var tasks_right = false;
     author_group == 0 ? tasks_right = true : tasks_right = false;
@@ -121,7 +122,7 @@ function deleting(req, res, next) {
         });
     }).then(function() {
         return db.tasks.update({
-            t_group: null
+            t_group: new_group
         }, {
             where: {
                 room,

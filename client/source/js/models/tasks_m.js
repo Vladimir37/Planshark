@@ -234,9 +234,9 @@ var Task = React.createClass({
             closed: new Date(data.closedAt),
             expiration: data.expiration,
             rights: {
-                editing: status.editing || !status.room || false,
-                reassignment: status.reassignment || false,
-                deleting: status.deleting || !status.room || false
+                edit: status.editing || !status.room || false,
+                reassign: status.reassignment || false,
+                delete: status.deleting || !status.room || false
             }
         }
     },
@@ -244,30 +244,12 @@ var Task = React.createClass({
         var target = $(elem.target).closest('.task');
         target.find('.task_additional').slideToggle();
     },
-    editing(elem) {
-        var target = $(elem.target).closest('.task');
-        target.find('.task_action:not(.task_edit)').hide();
-        target.find('.task_edit').slideToggle();
-    },
-    reassignment(elem) {
-        var target = $(elem.target).closest('.task');
-        target.find('.task_action:not(.task_reassign)').hide();
-        target.find('.task_reassign').slideToggle();
-    },
-    deleting(elem) {
-        var target = $(elem.target).closest('.task');
-        target.find('.task_action:not(.task_delete)').hide();
-        target.find('.task_delete').slideToggle();
-    },
-    solve(elem) {
-        var target = $(elem.target).closest('.task');
-        target.find('.task_action:not(.task_solve)').hide();
-        target.find('.task_solve').slideToggle();
-    },
-    restore(elem) {
-        var target = $(elem.target).closest('.task');
-        target.find('.task_action:not(.task_restore)').hide();
-        target.find('.task_restore').slideToggle();
+    actions(type) {
+        return function(elem) {
+            var target = $(elem.target).closest('.task');
+            target.find('.task_action:not(.task_' + type + ')').hide();
+            target.find('.task_' + type).slideToggle();
+        }
     },
     submit(type) {
         var self = this;
@@ -283,7 +265,7 @@ var Task = React.createClass({
                         response_status = 1;
                     }
                     toast(actions_r[response_status]);
-                    refresh();
+                    //refresh();
                 }, function (err) {
                     toast(actions_r[1]);
                 });
@@ -312,16 +294,16 @@ var Task = React.createClass({
         // bottom buttons
         var task_bottom = [];
         if(self.state.active) {
-            task_bottom.push(<button className="solve_but" onClick={this.solve}>Solve</button>);
+            task_bottom.push(<button className="solve_but" onClick={this.actions('solve')}>Solve</button>);
             for(let key in rights) {
                 if(rights[key]) {
                     var but_name = key.charAt(0).toUpperCase() + key.slice(1);
-                    task_bottom.push(<button onClick={this[key]}>{but_name}</button>);
+                    task_bottom.push(<button onClick={this.actions(key)}>{but_name}</button>);
                 }
             }
         }
         else {
-            task_bottom.push(<button className="solve_but" onClick={this.restore}>Restore</button>);
+            task_bottom.push(<button className="solve_but" onClick={this.actions('restore')}>Restore</button>);
         }
         //calculating days
         var expiration_result = '';
@@ -505,7 +487,7 @@ var Task = React.createClass({
                 <article className="task_bottom">{task_bottom}</article>
                 <article className="task_action task_solve hidden">
                     <article className="column_sizeless">
-                        <textarea name="answer" placeholder="Answer"></textarea>
+                        <textarea name="answer" placeholder="Answer" data-req="true"></textarea>
                         <button onClick={this.submit('close')}>Solve</button>
                     </article>
                 </article>

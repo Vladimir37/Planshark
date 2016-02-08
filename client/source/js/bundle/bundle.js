@@ -31811,9 +31811,9 @@
 	            closed: new Date(data.closedAt),
 	            expiration: data.expiration,
 	            rights: {
-	                editing: status.editing || !status.room || false,
-	                reassignment: status.reassignment || false,
-	                deleting: status.deleting || !status.room || false
+	                edit: status.editing || !status.room || false,
+	                reassign: status.reassignment || false,
+	                delete: status.deleting || !status.room || false
 	            }
 	        };
 	    },
@@ -31821,30 +31821,12 @@
 	        var target = (0, _jquery2.default)(elem.target).closest('.task');
 	        target.find('.task_additional').slideToggle();
 	    },
-	    editing: function editing(elem) {
-	        var target = (0, _jquery2.default)(elem.target).closest('.task');
-	        target.find('.task_action:not(.task_edit)').hide();
-	        target.find('.task_edit').slideToggle();
-	    },
-	    reassignment: function reassignment(elem) {
-	        var target = (0, _jquery2.default)(elem.target).closest('.task');
-	        target.find('.task_action:not(.task_reassign)').hide();
-	        target.find('.task_reassign').slideToggle();
-	    },
-	    deleting: function deleting(elem) {
-	        var target = (0, _jquery2.default)(elem.target).closest('.task');
-	        target.find('.task_action:not(.task_delete)').hide();
-	        target.find('.task_delete').slideToggle();
-	    },
-	    solve: function solve(elem) {
-	        var target = (0, _jquery2.default)(elem.target).closest('.task');
-	        target.find('.task_action:not(.task_solve)').hide();
-	        target.find('.task_solve').slideToggle();
-	    },
-	    restore: function restore(elem) {
-	        var target = (0, _jquery2.default)(elem.target).closest('.task');
-	        target.find('.task_action:not(.task_restore)').hide();
-	        target.find('.task_restore').slideToggle();
+	    actions: function actions(type) {
+	        return function (elem) {
+	            var target = (0, _jquery2.default)(elem.target).closest('.task');
+	            target.find('.task_action:not(.task_' + type + ')').hide();
+	            target.find('.task_' + type).slideToggle();
+	        };
 	    },
 	    submit: function submit(type) {
 	        var self = this;
@@ -31860,7 +31842,7 @@
 	                        response_status = 1;
 	                    }
 	                    (0, _toaster2.default)(actions_r[response_status]);
-	                    refresh();
+	                    //refresh();
 	                }, function (err) {
 	                    (0, _toaster2.default)(actions_r[1]);
 	                });
@@ -31890,7 +31872,7 @@
 	        if (self.state.active) {
 	            task_bottom.push(_react2.default.createElement(
 	                'button',
-	                { className: 'solve_but', onClick: this.solve },
+	                { className: 'solve_but', onClick: this.actions('solve') },
 	                'Solve'
 	            ));
 	            for (var key in rights) {
@@ -31898,7 +31880,7 @@
 	                    var but_name = key.charAt(0).toUpperCase() + key.slice(1);
 	                    task_bottom.push(_react2.default.createElement(
 	                        'button',
-	                        { onClick: this[key] },
+	                        { onClick: this.actions(key) },
 	                        but_name
 	                    ));
 	                }
@@ -31906,7 +31888,7 @@
 	        } else {
 	            task_bottom.push(_react2.default.createElement(
 	                'button',
-	                { className: 'solve_but', onClick: this.restore },
+	                { className: 'solve_but', onClick: this.actions('restore') },
 	                'Restore'
 	            ));
 	        }
@@ -32291,7 +32273,7 @@
 	                    _react2.default.createElement(
 	                        'article',
 	                        { className: 'column_sizeless' },
-	                        _react2.default.createElement('textarea', { name: 'answer', placeholder: 'Answer' }),
+	                        _react2.default.createElement('textarea', { name: 'answer', placeholder: 'Answer', 'data-req': 'true' }),
 	                        _react2.default.createElement(
 	                            'button',
 	                            { onClick: this.submit('close') },
@@ -32826,7 +32808,10 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	//responses
-	var actions_r = ['Success!', 'Server error', 'Required fields are empty'];
+	var actions_r = ['Success!', 'Server error', 'Required fields are empty', 'Incorrect color'];
+
+	//RegExp
+	var re_color = new RegExp("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$");
 
 	//refresh groups list
 	var refresh;
@@ -32843,6 +32828,9 @@
 	        var ajax_data = (0, _submitting.getData)(elem.target);
 	        if (!ajax_data) {
 	            (0, _toaster2.default)(actions_r[2]);
+	        } else if (!re_color.test(ajax_data.color)) {
+	            (0, _toaster2.default)(actions_r[3]);
+	            (0, _jquery2.default)(elem.target).parent().find('input[name="color"]').val('');
 	        } else {
 	            (0, _submitting.submitting)(ajax_data, '/api/task_manage/create', 'POST', function (data) {
 	                var response_status = +data;
@@ -32905,8 +32893,48 @@
 	        var target = (0, _jquery2.default)(elem.target).closest('.task');
 	        target.find('.task_additional').slideToggle();
 	    },
+	    actions: function actions(type) {
+	        return function (elem) {
+	            var target = (0, _jquery2.default)(elem.target).closest('.task');
+	            target.find('.task_action:not(.task_' + type + ')').hide();
+	            target.find('.task_' + type).slideToggle();
+	        };
+	    },
+	    submitting: function submitting(type) {
+	        var self = this;
+	        return function (elem) {
+	            var target = elem.target;
+	            var ajax_data = {};
+	            ajax_data = (0, _submitting.getData)(target);
+	            ajax_data.id = self.state.id;
+	            console.log(ajax_data);
+	            //if(ajax_data) {
+	            //    submitting(ajax_data, '/api/task_manage/' + type, 'POST', function (data) {
+	            //        var response_status = +data;
+	            //        if (isNaN(response_status)) {
+	            //            response_status = 1;
+	            //        }
+	            //        toast(actions_r[response_status]);
+	            //        //refresh();
+	            //    }, function (err) {
+	            //        toast(actions_r[1]);
+	            //    });
+	            //}
+	            //else {
+	            //    toast(actions_r[2]);
+	            //}
+	        };
+	    },
+	    selectBoxes: function selectBoxes(elem) {
+	        var target = (0, _jquery2.default)(elem.target);
+	        var elemParent = target.closest('.select_box');
+	        elemParent.find('label').removeClass('active_elem');
+	        target.parent().addClass('active_elem');
+	    },
 	    render: function render() {
+	        var self = this;
 	        var group_classes = 'task task_group_color task_group_color_' + this.state.id;
+	        //all tasks in groups
 	        var tasks_list = [];
 	        this.state.tasks.forEach(function (task) {
 	            tasks_list.push(_react2.default.createElement(
@@ -32915,6 +32943,31 @@
 	                task.name
 	            ));
 	        });
+	        //all groups
+	        var groups_list = [];
+	        groups_list.push(_react2.default.createElement(
+	            'label',
+	            { className: 'active_elem' },
+	            'No group',
+	            _react2.default.createElement('input', { type: 'radio', name: 't_group',
+	                defaultChecked: true, onChange: self.selectBoxes, value: '' })
+	        ));
+	        this.props.all_groups.forEach(function (group) {
+	            if (group.id != self.state.id) {
+	                groups_list.push(_react2.default.createElement(
+	                    'label',
+	                    null,
+	                    group.name,
+	                    _react2.default.createElement('input', { type: 'radio', name: 't_group',
+	                        onChange: self.selectBoxes, value: group.id })
+	                ));
+	            }
+	        });
+	        var group_list_block = _react2.default.createElement(
+	            'article',
+	            { className: 'select_box' },
+	            groups_list
+	        );
 	        return _react2.default.createElement(
 	            'article',
 	            { className: group_classes },
@@ -32943,9 +32996,70 @@
 	                'article',
 	                { className: 'task_additional' },
 	                _react2.default.createElement(
+	                    'h3',
+	                    null,
+	                    'Tasks'
+	                ),
+	                _react2.default.createElement(
 	                    'article',
 	                    { className: 'select_box' },
 	                    tasks_list
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_bottom' },
+	                    _react2.default.createElement(
+	                        'button',
+	                        { className: 'solve_but', onClick: this.actions('edit') },
+	                        'Edit'
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.actions('delete') },
+	                        'Delete'
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_action task_edit hidden' },
+	                    _react2.default.createElement(
+	                        'form',
+	                        null,
+	                        _react2.default.createElement('input', { type: 'text', name: 'name', placeholder: 'Name', 'data-req': 'true', defaultValue: this.state.name }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'text', name: 'color', placeholder: 'Color', defaultValue: this.state.color,
+	                            className: 'color_field', 'data-req': 'true' }),
+	                        _react2.default.createElement('br', null)
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.submitting('edit') },
+	                        'Edit'
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_action task_delete hidden' },
+	                    _react2.default.createElement(
+	                        'form',
+	                        null,
+	                        _react2.default.createElement(
+	                            'h3',
+	                            null,
+	                            'All tasks in ',
+	                            this.state.name,
+	                            ' to other group?'
+	                        ),
+	                        group_list_block,
+	                        'Are you sure you want to delete "',
+	                        this.state.name,
+	                        '" tasks group?'
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.submitting('deleting') },
+	                        'Edit'
+	                    )
 	                )
 	            )
 	        );
@@ -32973,6 +33087,7 @@
 	                    data = JSON.parse(data);
 	                }
 	                if (data.status == 0) {
+	                    data.body.reverse();
 	                    self.setState({
 	                        received: true,
 	                        error: false,
@@ -32996,6 +33111,7 @@
 	        });
 	    },
 	    render: function render() {
+	        var self = this;
 	        //first load
 	        if (!this.state.received && !this.state.error) {
 	            this.receive();
@@ -33010,7 +33126,7 @@
 	                    groups = _react2.default.createElement(_templates.Empty, null);
 	                } else {
 	                    this.state.groups.forEach(function (group) {
-	                        groups.push(_react2.default.createElement(TasksGroup, { data: group }));
+	                        groups.push(_react2.default.createElement(TasksGroup, { key: group.id, data: group, all_groups: self.state.groups }));
 	                    });
 	                }
 	                return _react2.default.createElement(
