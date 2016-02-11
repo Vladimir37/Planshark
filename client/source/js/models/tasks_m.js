@@ -168,7 +168,7 @@ var Creating = React.createClass({
         }
         else {
             return <section className="creatingForm">
-                <article className="creatingFormHead" onClick={this.switching}>Creating</article>
+                <article className="creatingFormHead" onClick={this.switching}>Creating task</article>
                 <article className="creatingFormBody">
                     <article className="creatingFormData">
                         <input type="text" name="name" placeholder="Task name" data-req="true"/><br/>

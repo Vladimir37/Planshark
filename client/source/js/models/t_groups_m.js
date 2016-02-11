@@ -55,7 +55,7 @@ var Creating = React.createClass({
     },
     render() {
         return <section className="creatingForm">
-            <article className="creatingFormHead" onClick={this.switching}>Creating</article>
+            <article className="creatingFormHead" onClick={this.switching}>Creating task group</article>
             <article className="creatingFormBody">
                 <input type="text" name="name" placeholder="Name" data-req="true" />
                 <input type="text" name="color" placeholder="Color" className="color_field" data-req="true" />

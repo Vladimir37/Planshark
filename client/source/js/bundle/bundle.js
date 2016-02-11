@@ -53,6 +53,7 @@
 	__webpack_require__(8);
 	__webpack_require__(168);
 	__webpack_require__(170);
+	__webpack_require__(171);
 	__webpack_require__(167);
 	__webpack_require__(9);
 	module.exports = __webpack_require__(166);
@@ -31714,7 +31715,7 @@
 	                _react2.default.createElement(
 	                    'article',
 	                    { className: 'creatingFormHead', onClick: this.switching },
-	                    'Creating'
+	                    'Creating task'
 	                ),
 	                _react2.default.createElement(
 	                    'article',
@@ -32877,7 +32878,7 @@
 	            _react2.default.createElement(
 	                'article',
 	                { className: 'creatingFormHead', onClick: this.switching },
-	                'Creating'
+	                'Creating task group'
 	            ),
 	            _react2.default.createElement(
 	                'article',
@@ -33165,6 +33166,195 @@
 	(0, _jquery2.default)(document).ready(function () {
 	    if (document.location.pathname == '/tasks_groups') {
 	        _reactDom2.default.render(_react2.default.createElement(TasksGroupsList, null), document.getElementsByClassName('content_inner')[0]);
+	    }
+	});
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _react = __webpack_require__(9);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(166);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _submitting = __webpack_require__(6);
+
+	var _templates = __webpack_require__(167);
+
+	var _toaster = __webpack_require__(7);
+
+	var _toaster2 = _interopRequireDefault(_toaster);
+
+	var _picker = __webpack_require__(169);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	//responses
+	var actions_r = ['Success!', 'Server error', 'Required fields are empty', 'Incorrect color'];
+
+	//RegExp
+	var re_color = new RegExp("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$");
+
+	//refresh groups list
+	var refresh;
+
+	var Creating = _react2.default.createClass({
+	    displayName: 'Creating',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    componentDidMount: function componentDidMount() {
+	        setTimeout(_picker.colorpick, 100);
+	    },
+	    submit: function submit(elem) {
+	        var ajax_data = (0, _submitting.getData)(elem.target);
+	        if (!ajax_data) {
+	            (0, _toaster2.default)(actions_r[2]);
+	        } else if (!re_color.test(ajax_data.color)) {
+	            (0, _toaster2.default)(actions_r[3]);
+	            (0, _jquery2.default)(elem.target).parent().find('input[name="color"]').val('');
+	        } else {
+	            (0, _submitting.submitting)(ajax_data, '/api/user_manage/create', 'POST', function (data) {
+	                var response_status = +data;
+	                if (isNaN(response_status)) {
+	                    response_status = 1;
+	                }
+	                if (response_status == 0) {
+	                    (0, _toaster2.default)(actions_r[0]);
+	                    (0, _jquery2.default)(elem.target).parent().find('input[type="text"]').val('');
+	                    refresh();
+	                } else {
+	                    (0, _toaster2.default)(actions_r[response_status]);
+	                }
+	            }, function (err) {
+	                (0, _toaster2.default)(actions_r[1]);
+	            });
+	        }
+	    },
+	    switching: function switching() {
+	        (0, _jquery2.default)('.creatingFormBody').slideToggle();
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'section',
+	            { className: 'creatingForm' },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'creatingFormHead', onClick: this.switching },
+	                'Creating user group'
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'creatingFormBody' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'creatingFormTop' },
+	                    _react2.default.createElement('input', { type: 'text', name: 'name', placeholder: 'Name', 'data-req': 'true' }),
+	                    _react2.default.createElement('input', { type: 'text', name: 'color', placeholder: 'Color', className: 'color_field', 'data-req': 'true' })
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'creatingFormMiddle' },
+	                    _react2.default.createElement(
+	                        'table',
+	                        null,
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'label',
+	                                    null,
+	                                    'Creating tasks',
+	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'label',
+	                                    null,
+	                                    'Editing tasks',
+	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'label',
+	                                    null,
+	                                    'Reassignment tasks',
+	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'label',
+	                                    null,
+	                                    'Deleting tasks',
+	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'label',
+	                                    null,
+	                                    'Users control',
+	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'label',
+	                                    null,
+	                                    'Tasks control',
+	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                )
+	                            )
+	                        )
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'sub', onClick: this.submit },
+	                    'Create'
+	                )
+	            )
+	        );
+	    }
+	});
+
+	(0, _jquery2.default)(document).ready(function () {
+	    if (document.location.pathname == '/users_groups') {
+	        _reactDom2.default.render(_react2.default.createElement(Creating, null), document.getElementsByClassName('content_inner')[0]);
 	    }
 	});
 
