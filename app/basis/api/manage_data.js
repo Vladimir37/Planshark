@@ -48,7 +48,7 @@ function users_group(req, res, next) {
         for(var i = 0; i < group_count; i++) {
             result[i].dataValues.users = users_list[i];
         };
-        res.end(JSON.stringify(result));
+        res.end(serializing(0, result));
     }).catch(function(err) {
         console.log(err);
         res.end(serializing(1));

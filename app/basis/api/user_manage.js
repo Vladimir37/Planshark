@@ -6,16 +6,17 @@ function creating(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //group data
     var group_name = req.body.name;
     var color = req.body.color;
-    var creating_r = req.body.creating || 0;
-    var editing_r = req.body.editing || 0;
-    var reassignment_r = req.body.reassignment || 0;
-    var deleting_r = req.body.deleting || 0;
-    var user_manage_r = req.body.user_manage || 0;
-    var task_manage_r = req.body.task_manage || 0;
+    var creating_r = +Boolean(req.body.creating) || 0;
+    var editing_r = +Boolean(req.body.editing) || 0;
+    var reassignment_r = +Boolean(req.body.reassignment) || 0;
+    var deleting_r = +Boolean(req.body.deleting) || 0;
+    var user_manage_r = +Boolean(req.body.user_manage) || 0;
+    var task_manage_r = +Boolean(req.body.task_manage) || 0;
+    var all_view_r = +Boolean(req.body.all_view) || 0;
     //right to create
     var create_right = false;
     author_group == 0 ? create_right = true : create_right = false;
@@ -43,7 +44,8 @@ function creating(req, res, next) {
             deleting: deleting_r,
             reassignment: reassignment_r,
             t_group_manage: task_manage_r,
-            u_group_manage: user_manage_r
+            u_group_manage: user_manage_r,
+            all_view: all_view_r
         })
     }).then(function() {
         res.end('0');
@@ -58,17 +60,18 @@ function editing(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //group data
     var group_id = req.body.id;
     var group_name = req.body.name;
     var color = req.body.color;
-    var creating_r = req.body.creating || 0;
-    var editing_r = req.body.editing || 0;
-    var reassignment_r = req.body.reassignment || 0;
-    var deleting_r = req.body.deleting || 0;
-    var user_manage_r = req.body.user_manage || 0;
-    var task_manage_r = req.body.task_manage || 0;
+    var creating_r = +Boolean(req.body.creating) || 0;
+    var editing_r = +Boolean(req.body.editing) || 0;
+    var reassignment_r = +Boolean(req.body.reassignment) || 0;
+    var deleting_r = +Boolean(req.body.deleting) || 0;
+    var user_manage_r = +Boolean(req.body.user_manage) || 0;
+    var task_manage_r = +Boolean(req.body.task_manage) || 0;
+    var all_view_r = +Boolean(req.body.all_view) || 0;
     //right to create
     var edit_right = false;
     author_group == 0 ? edit_right = true : edit_right = false;
@@ -95,7 +98,8 @@ function editing(req, res, next) {
             deleting: deleting_r,
             reassignment: reassignment_r,
             t_group_manage: task_manage_r,
-            u_group_manage: user_manage_r
+            u_group_manage: user_manage_r,
+            all_view: all_view_r
         }, {
             where: {
                 id: group_id,
@@ -115,7 +119,7 @@ function deleting(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //group data
     var group_id = req.body.id;
     var new_group = req.body.u_group || null;
@@ -165,7 +169,7 @@ function adding(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //group data
     var user_id = req.body.u_id;
     var group_id = req.body.g_id;
@@ -220,7 +224,7 @@ function new_user(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //user data
     var target_group = req.body.g_id || 0;
     var name = req.body.name;
@@ -265,7 +269,7 @@ function blocking(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
-    var author_group = res.user_status.group;
+    var author_group = +res.user_status.group;
     //user data
     var target_user = req.body.id;
     //right to blocking

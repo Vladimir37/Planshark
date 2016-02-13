@@ -33278,7 +33278,7 @@
 	                                    'label',
 	                                    null,
 	                                    'Creating tasks',
-	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                    _react2.default.createElement('input', { type: 'checkbox', name: 'creating', value: '1' })
 	                                )
 	                            ),
 	                            _react2.default.createElement(
@@ -33288,7 +33288,7 @@
 	                                    'label',
 	                                    null,
 	                                    'Editing tasks',
-	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                    _react2.default.createElement('input', { type: 'checkbox', name: 'editing', value: '1' })
 	                                )
 	                            )
 	                        ),
@@ -33302,7 +33302,7 @@
 	                                    'label',
 	                                    null,
 	                                    'Reassignment tasks',
-	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                    _react2.default.createElement('input', { type: 'checkbox', name: 'reassignment', value: '1' })
 	                                )
 	                            ),
 	                            _react2.default.createElement(
@@ -33312,7 +33312,7 @@
 	                                    'label',
 	                                    null,
 	                                    'Deleting tasks',
-	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                    _react2.default.createElement('input', { type: 'checkbox', name: 'deleting', value: '1' })
 	                                )
 	                            )
 	                        ),
@@ -33326,7 +33326,7 @@
 	                                    'label',
 	                                    null,
 	                                    'Users control',
-	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                    _react2.default.createElement('input', { type: 'checkbox', name: 'user_manage', value: '1' })
 	                                )
 	                            ),
 	                            _react2.default.createElement(
@@ -33336,7 +33336,21 @@
 	                                    'label',
 	                                    null,
 	                                    'Tasks control',
-	                                    _react2.default.createElement('input', { type: 'checkbox' })
+	                                    _react2.default.createElement('input', { type: 'checkbox', name: 'task_manage', value: '1' })
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'label',
+	                                    null,
+	                                    'View all tasks',
+	                                    _react2.default.createElement('input', { type: 'checkbox', name: 'all_view', value: '1' })
 	                                )
 	                            )
 	                        )
@@ -33352,9 +33366,410 @@
 	    }
 	});
 
+	var UserGroup = _react2.default.createClass({
+	    displayName: 'UserGroup',
+	    getInitialState: function getInitialState() {
+	        var data = this.props.data;
+	        return {
+	            id: data.id,
+	            name: data.name,
+	            color: data.color,
+	            creating: data.creating,
+	            editing: data.editing,
+	            reassignment: data.reassignment,
+	            deleting: data.deleting,
+	            task_manage: data.t_group_manage,
+	            user_manage: data.u_group_manage,
+	            all_view: data.all_view,
+	            users_count: data.users.length,
+	            users: data.users
+	        };
+	    },
+	    expand: function expand(elem) {
+	        var target = (0, _jquery2.default)(elem.target).closest('.user');
+	        target.find('.user_additional').slideToggle();
+	    },
+	    actions: function actions(type) {
+	        return function (elem) {
+	            var target = (0, _jquery2.default)(elem.target).closest('.user');
+	            target.find('.user_action:not(.user_' + type + ')').hide();
+	            target.find('.user_' + type).slideToggle();
+	        };
+	    },
+	    submit: function submit(type) {
+	        var self = this;
+	        return function (elem) {
+	            var target = elem.target;
+	            var ajax_data = {};
+	            ajax_data = (0, _submitting.getData)(target);
+	            ajax_data.id = self.state.id;
+	            if (ajax_data) {
+	                (0, _submitting.submitting)(ajax_data, '/api/user_manage/' + type, 'POST', function (data) {
+	                    var response_status = +data;
+	                    if (isNaN(response_status)) {
+	                        response_status = 1;
+	                    }
+	                    (0, _toaster2.default)(actions_r[response_status]);
+	                    //refresh();
+	                }, function (err) {
+	                    (0, _toaster2.default)(actions_r[1]);
+	                });
+	            } else if (!re_color.test(ajax_data.color)) {
+	                (0, _toaster2.default)(actions_r[3]);
+	                (0, _jquery2.default)(elem.target).parent().find('input[name="color"]').val('');
+	            } else {
+	                (0, _toaster2.default)(actions_r[2]);
+	            }
+	        };
+	    },
+	    selectBoxes: function selectBoxes(elem) {
+	        var target = (0, _jquery2.default)(elem.target);
+	        var elemParent = target.closest('.select_box');
+	        elemParent.find('label').removeClass('active_elem');
+	        target.parent().addClass('active_elem');
+	    },
+	    render: function render() {
+	        var self = this;
+	        var group_classes = 'user user_group_color user_group_color_' + this.state.id;
+	        //all users in groups
+	        var users_list = [];
+	        this.state.users.forEach(function (task) {
+	            users_list.push(_react2.default.createElement(
+	                'article',
+	                { className: 'item_list' },
+	                task.name
+	            ));
+	        });
+	        //all groups
+	        var groups_list = [];
+	        groups_list.push(_react2.default.createElement(
+	            'label',
+	            { className: 'active_elem' },
+	            'No group',
+	            _react2.default.createElement('input', { type: 'radio', name: 'u_group',
+	                defaultChecked: true, onChange: self.selectBoxes, value: '' })
+	        ));
+	        this.props.all_groups.forEach(function (group) {
+	            if (group.id != self.state.id) {
+	                groups_list.push(_react2.default.createElement(
+	                    'label',
+	                    null,
+	                    group.name,
+	                    _react2.default.createElement('input', { type: 'radio', name: 'u_group',
+	                        onChange: self.selectBoxes, value: group.id })
+	                ));
+	            }
+	        });
+	        var group_list_block = _react2.default.createElement(
+	            'article',
+	            { className: 'select_box' },
+	            groups_list
+	        );
+	        //classes
+	        var create_c = this.state.creating ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+	        var edit_c = this.state.editing ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+	        var reassign_c = this.state.reassignment ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+	        var delete_c = this.state.deleting ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+	        var users_c = this.state.user_manage ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+	        var tasks_c = this.state.task_manage ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+	        var view_c = this.state.all_view ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+	        return _react2.default.createElement(
+	            'article',
+	            { className: group_classes },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'user_top' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_head' },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'user_name' },
+	                        this.state.name
+	                    ),
+	                    _react2.default.createElement('br', null),
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'user_group' },
+	                        'Users: ',
+	                        this.state.users_count
+	                    )
+	                ),
+	                _react2.default.createElement('article', { className: 'user_expand', onClick: this.expand })
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'user_additional' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_middle' },
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: create_c },
+	                        'Creating'
+	                    ),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: edit_c },
+	                        'Editing'
+	                    ),
+	                    _react2.default.createElement('br', null),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: reassign_c },
+	                        'Reassignment'
+	                    ),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: delete_c },
+	                        'Deleting'
+	                    ),
+	                    _react2.default.createElement('br', null),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: users_c },
+	                        'Users manage'
+	                    ),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: tasks_c },
+	                        'Tasks manage'
+	                    ),
+	                    _react2.default.createElement('br', null),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: view_c },
+	                        'View all tasks'
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_bottom' },
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.actions('edit'), className: 'solve_but' },
+	                        'Edit'
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.actions('delete') },
+	                        'Delete'
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_action user_edit hidden' },
+	                    _react2.default.createElement(
+	                        'form',
+	                        null,
+	                        _react2.default.createElement('input', { type: 'text', name: 'name', placeholder: 'Name', defaultValue: this.state.name }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'text', name: 'color', placeholder: 'Color', defaultValue: this.state.color,
+	                            className: 'color_field' }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement(
+	                            'table',
+	                            null,
+	                            _react2.default.createElement(
+	                                'tr',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'td',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        null,
+	                                        'Creating',
+	                                        _react2.default.createElement('input', { type: 'checkbox', name: 'creating', value: '1', defaultChecked: this.state.creating })
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
+	                                    'td',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        null,
+	                                        'Editing',
+	                                        _react2.default.createElement('input', { type: 'checkbox', name: 'editing', value: '1', defaultChecked: this.state.editing })
+	                                    )
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'tr',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'td',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        null,
+	                                        'Reassignment',
+	                                        _react2.default.createElement('input', { type: 'checkbox', name: 'reassignment', value: '1', defaultChecked: this.state.reassignment })
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
+	                                    'td',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        null,
+	                                        'Deleting',
+	                                        _react2.default.createElement('input', { type: 'checkbox', name: 'deleting', value: '1', defaultChecked: this.state.deleting })
+	                                    )
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'tr',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'td',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        null,
+	                                        'Users manage',
+	                                        _react2.default.createElement('input', { type: 'checkbox', name: 'user_manage', value: '1', defaultChecked: this.state.user_manage })
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
+	                                    'td',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        null,
+	                                        'Tasks manage',
+	                                        _react2.default.createElement('input', { type: 'checkbox', name: 'task_manage', value: '1', defaultChecked: this.state.task_manage })
+	                                    )
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'tr',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'td',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        null,
+	                                        'View all tasks',
+	                                        _react2.default.createElement('input', { type: 'checkbox', name: 'all_view', value: '1', defaultChecked: this.state.all_view })
+	                                    )
+	                                )
+	                            )
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.submit('edit') },
+	                        'Edit'
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_action user_delete hidden' },
+	                    _react2.default.createElement(
+	                        'h3',
+	                        null,
+	                        'Move all users in ',
+	                        this.state.name,
+	                        ' to other group?'
+	                    ),
+	                    _react2.default.createElement(
+	                        'form',
+	                        null,
+	                        group_list_block
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.submit('deleting') },
+	                        'Delete'
+	                    )
+	                )
+	            )
+	        );
+	    }
+	});
+
+	var UsersGroupsList = _react2.default.createClass({
+	    displayName: 'UsersGroupsList',
+	    getInitialState: function getInitialState() {
+	        return {
+	            received: false,
+	            error: false,
+	            status: null,
+	            groups: null
+	        };
+	    },
+	    receive: function receive() {
+	        var self = this;
+	        (0, _submitting.submitting)(null, '/api/account/status', 'GET', function (status) {
+	            if (typeof status == 'string') {
+	                status = JSON.parse(status);
+	            }
+	            (0, _submitting.submitting)(null, '/api/manage_data/users_group', 'GET', function (data) {
+	                if (typeof data == 'string') {
+	                    data = JSON.parse(data);
+	                }
+	                if (data.status == 0) {
+	                    data.body.reverse();
+	                    self.setState({
+	                        received: true,
+	                        error: false,
+	                        status: status,
+	                        groups: data.body
+	                    });
+	                } else {
+	                    self.setState({
+	                        error: true
+	                    });
+	                }
+	            }, function (err) {
+	                self.setState({
+	                    error: true
+	                });
+	            });
+	        }, function (err) {
+	            self.setState({
+	                error: true
+	            });
+	        });
+	    },
+	    render: function render() {
+	        var self = this;
+	        refresh = this.receive;
+	        //first load
+	        if (!this.state.received && !this.state.error) {
+	            this.receive();
+	            return _react2.default.createElement(_templates.Waiting, null);
+	        } else if (!this.state.received && this.state.error) {
+	            return _react2.default.createElement(_templates.Error, null);
+	        } else if (!Boolean(this.state.t_manage || !this.state.room)) {
+	            return _react2.default.createElement(_templates.Forbidden, null);
+	        }
+	        //render
+	        else {
+	                var groups = [];
+	                if (!this.state.groups.length) {
+	                    groups = _react2.default.createElement(_templates.Empty, null);
+	                } else {
+	                    this.state.groups.forEach(function (group) {
+	                        groups.push(_react2.default.createElement(UserGroup, { key: group.id, data: group, all_groups: self.state.groups }));
+	                    });
+	                }
+	                return _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_group_page_inner' },
+	                    _react2.default.createElement(_templates.Menu, { active: 'u_groups', data: this.state.status }),
+	                    _react2.default.createElement(Creating, null),
+	                    groups
+	                );
+	            }
+	    }
+	});
+
 	(0, _jquery2.default)(document).ready(function () {
 	    if (document.location.pathname == '/users_groups') {
-	        _reactDom2.default.render(_react2.default.createElement(Creating, null), document.getElementsByClassName('content_inner')[0]);
+	        _reactDom2.default.render(_react2.default.createElement(UsersGroupsList, null), document.getElementsByClassName('content_inner')[0]);
 	    }
 	});
 

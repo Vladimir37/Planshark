@@ -75,6 +75,9 @@ var Creating = React.createClass({
                             <td><label>Users control<input type="checkbox" name="user_manage" value="1" /></label></td>
                             <td><label>Tasks control<input type="checkbox" name="task_manage" value="1" /></label></td>
                         </tr>
+                        <tr>
+                            <td><label>View all tasks<input type="checkbox" name="all_view" value="1"/></label></td>
+                        </tr>
                     </table>
                 </article>
                 <button className="sub" onClick={this.submit}>Create</button>
@@ -96,22 +99,24 @@ var UserGroup = React.createClass({
             deleting: data.deleting,
             task_manage: data.t_group_manage,
             user_manage: data.u_group_manage,
+            all_view: data.all_view,
             users_count: data.users.length,
             users: data.users
         }
     },
     expand(elem) {
-        var target = $(elem.target).closest('.task');
-        target.find('.task_additional').slideToggle();
+        var target = $(elem.target).closest('.user');
+        target.find('.user_additional').slideToggle();
     },
     actions(type) {
         return function(elem) {
-            var target = $(elem.target).closest('.task');
-            target.find('.task_action:not(.task_' + type + ')').hide();
-            target.find('.task_' + type).slideToggle();
+            var target = $(elem.target).closest('.user');
+            target.find('.user_action:not(.user_' + type + ')').hide();
+            target.find('.user_' + type).slideToggle();
         }
     },
     submit(type) {
+        var self = this;
         return function(elem) {
             var target = elem.target;
             var ajax_data = {};
@@ -166,12 +171,13 @@ var UserGroup = React.createClass({
             {groups_list}
         </article>;
         //classes
-        var create_c = this.state.creating ? 'active_elem' : 'inactive_elem';
-        var edit_c = this.state.editing ? 'active_elem' : 'inactive_elem';
-        var reassign_c = this.state.reassignment ? 'active_elem' : 'inactive_elem';
-        var delete_c = this.state.deleting ? 'active_elem' : 'inactive_elem';
-        var users_c = this.state.user_manage ? 'active_elem' : 'inactive_elem';
-        var tasks_c = this.state.task_manage ? 'active_elem' : 'inactive_elem';
+        var create_c = this.state.creating ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+        var edit_c = this.state.editing ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+        var reassign_c = this.state.reassignment ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+        var delete_c = this.state.deleting ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+        var users_c = this.state.user_manage ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+        var tasks_c = this.state.task_manage ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
+        var view_c = this.state.all_view ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
         return <article className={group_classes}>
             <article className="user_top">
                 <article className="user_head">
@@ -190,6 +196,8 @@ var UserGroup = React.createClass({
                     <br/>
                     <article className={users_c}>Users manage</article>
                     <article className={tasks_c}>Tasks manage</article>
+                    <br/>
+                    <article className={view_c}>View all tasks</article>
                 </article>
                 <article className="user_bottom">
                     <button onClick={this.actions('edit')} className="solve_but">Edit</button>
@@ -200,12 +208,23 @@ var UserGroup = React.createClass({
                         <input type="text" name="name" placeholder="Name" defaultValue={this.state.name}/><br/>
                         <input type="text" name="color" placeholder="Color" defaultValue={this.state.color}
                                className="color_field"/><br/>
-                        <label>Creating<input type="checkbox" name="creating" defaultChecked={this.state.creating}/></label>
-                        <label>Editing<input type="checkbox" name="editing" defaultChecked={this.state.editing}/></label><br/>
-                        <label>Reassignment<input type="checkbox" name="reassignment" defaultChecked={this.state.reassignment}/></label>
-                        <label>Deleting<input type="checkbox" name="deleting" defaultChecked={this.state.deleting}/></label><br/>
-                        <label>Users manage<input type="checkbox" name="user_manage" defaultChecked={this.state.user_manage}/></label>
-                        <label>Tasks manage<input type="checkbox" name="task_manage" defaultChecked={this.state.task_manage}/></label><br/>
+                        <table>
+                            <tr>
+                                <td><label>Creating<input type="checkbox" name="creating" value="1" defaultChecked={this.state.creating}/></label></td>
+                                <td><label>Editing<input type="checkbox" name="editing" value="1" defaultChecked={this.state.editing}/></label></td>
+                            </tr>
+                            <tr>
+                                <td><label>Reassignment<input type="checkbox" name="reassignment" value="1" defaultChecked={this.state.reassignment}/></label></td>
+                                <td><label>Deleting<input type="checkbox" name="deleting" value="1" defaultChecked={this.state.deleting}/></label></td>
+                            </tr>
+                            <tr>
+                                <td><label>Users manage<input type="checkbox" name="user_manage" value="1" defaultChecked={this.state.user_manage}/></label></td>
+                                <td><label>Tasks manage<input type="checkbox" name="task_manage" value="1" defaultChecked={this.state.task_manage}/></label></td>
+                            </tr>
+                            <tr>
+                                <td><label>View all tasks<input type="checkbox" name="all_view" value="1" defaultChecked={this.state.all_view}/></label></td>
+                            </tr>
+                        </table>
                     </form>
                     <button onClick={this.submit('edit')}>Edit</button>
                 </article>
@@ -221,9 +240,86 @@ var UserGroup = React.createClass({
     }
 });
 
+var UsersGroupsList = React.createClass({
+    getInitialState() {
+        return {
+            received: false,
+            error: false,
+            status: null,
+            groups: null
+        }
+    },
+    receive() {
+        var self = this;
+        submitting(null, '/api/account/status', 'GET', function(status) {
+            if (typeof status == 'string') {
+                status = JSON.parse(status);
+            }
+            submitting(null, '/api/manage_data/users_group', 'GET', function (data) {
+                if (typeof data == 'string') {
+                    data = JSON.parse(data);
+                }
+                if(data.status == 0) {
+                    data.body.reverse();
+                    self.setState({
+                        received: true,
+                        error: false,
+                        status,
+                        groups: data.body
+                    });
+                }
+                else {
+                    self.setState({
+                        error: true
+                    });
+                }
+            }, function (err) {
+                self.setState({
+                    error: true
+                });
+            });
+        }, function(err) {
+            self.setState({
+                error: true
+            });
+        });
+    },
+    render() {
+        var self = this;
+        refresh = this.receive;
+        //first load
+        if(!this.state.received && !this.state.error) {
+            this.receive();
+            return <Waiting />;
+        }
+        else if(!this.state.received && this.state.error) {
+            return <Error />;
+        }
+        else if(!Boolean(this.state.t_manage || !this.state.room)) {
+            return <Forbidden />;
+        }
+        //render
+        else {
+            var groups = [];
+            if(!this.state.groups.length) {
+                groups = <Empty />;
+            }
+            else {
+                this.state.groups.forEach(function(group) {
+                    groups.push(<UserGroup key={group.id} data={group} all_groups={self.state.groups} />);
+                });
+            }
+            return <article className="task_group_page_inner">
+                <Menu active="u_groups" data={this.state.status} />
+                <Creating />
+                {groups}
+            </article>;
+        }
+    }
+});
 
 $(document).ready(function() {
     if (document.location.pathname == '/users_groups') {
-        ReactDOM.render(<Creating />, document.getElementsByClassName('content_inner')[0]);
+        ReactDOM.render(<UsersGroupsList />, document.getElementsByClassName('content_inner')[0]);
     }
 });
