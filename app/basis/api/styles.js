@@ -10,8 +10,10 @@ function users(req, res, next) {
             room
         }
     }).then(function(groups) {
+        res.write('.user_group_color {box-shadow: 0 -2px 0 0 #001448 inset;border-bottom:2px solid #001448;}');
         groups.forEach(function(group) {
-            res.write('.user_group_color_' + group.id + '{box-shadow: 0 -2px 0 0 ' + group.color + ' inset;}')
+            res.write('.user_group_color_' + group.id + '{box-shadow: 0 -2px 0 0 ' + group.color + ' inset;' +
+                'border-bottom: 2px solid ' + group.color + '}')
         });
         res.end();
     }, function(err) {

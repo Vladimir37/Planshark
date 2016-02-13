@@ -118,6 +118,7 @@ function deleting(req, res, next) {
     var author_group = res.user_status.group;
     //group data
     var group_id = req.body.id;
+    var new_group = req.body.u_group || null;
     //right to delete
     var delete_right = false;
     author_group == 0 ? delete_right = true : delete_right = false;
@@ -136,18 +137,18 @@ function deleting(req, res, next) {
             res.end('1');
         }
     }).then(function() {
-        return db.users_groups.destroy({
+        return db.users.update({
+            u_group: new_group
+        }, {
             where: {
-                id: group_id,
+                u_group: group_id,
                 room
             }
         });
     }).then(function() {
-        return db.users.update({
-            u_group: 0
-        }, {
+        return db.users_groups.destroy({
             where: {
-                u_group: group_id,
+                id: group_id,
                 room
             }
         });

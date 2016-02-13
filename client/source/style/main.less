@@ -159,7 +159,7 @@ body {
                     }
                 }
             }
-            .task {
+            .task, .user {
                 margin: 5px;
                 padding: 5px;
                 width: 750px;
@@ -169,23 +169,23 @@ body {
                 border-right: 2px solid @main;
                 position: relative;
                 &_top {
-                    .task_head {
+                    .task_head, .user_head {
                         display: inline-block;
                         width: 35%;
                         vertical-align: top;
-                        .task_name {
+                        .task_name, .user_name {
                             font-size: 22px;
                         }
-                        .task_group {
+                        .task_group, .user_group {
                             font-size: 20px;
                         }
                     }
-                    .task_info {
+                    .task_info, .user_info {
                         display: inline-block;
                         width: 45%;
                         vertical-align: top;
                     }
-                    .task_priority {
+                    .task_priority, .user_priority {
                         display: inline-block;
                         width: 15%;
                         text-align: right;
@@ -209,7 +209,7 @@ body {
                             visibility: hidden;
                         }
                     }
-                    .task_expand {
+                    .task_expand, .user_expand {
                         display: inline-block;
                         width: 20px;
                         height: 25px;
@@ -233,7 +233,7 @@ body {
                 }
                 &_additional {
                     display: none;
-                    .task_middle {
+                    .task_middle, .user_middle {
                         .task_desc {
                             vertical-align: top;
                             display: inline-block;
@@ -246,7 +246,7 @@ body {
                             }
                         }
                     }
-                    .task_bottom {
+                    .task_bottom, .user_bottom {
                         .solve_but {
                             margin-right: 10px;
                         }
@@ -254,7 +254,7 @@ body {
                             margin: 5px 0;
                         }
                     }
-                    .task_action {
+                    .task_action, .user_action {
                         input[type="radio"] {
                             display: none;
                         }
@@ -266,7 +266,7 @@ body {
                         }
                     }
                 }
-                .task_info {
+                .task_info, .user_info {
                     display: inline-block;
                     width: 350px;
                     float: right;
@@ -352,6 +352,9 @@ body {
     .active {
         background: @main;
         color: white;
+    }
+    .inactive_elem {
+        border: 2px solid @main;
     }
     .active_elem {
         background: @main;

@@ -111,10 +111,116 @@ var UserGroup = React.createClass({
             target.find('.task_' + type).slideToggle();
         }
     },
+    submit(type) {
+        return function(elem) {
+            var target = elem.target;
+            var ajax_data = {};
+            ajax_data = getData(target);
+            ajax_data.id = self.state.id;
+            if(ajax_data) {
+                submitting(ajax_data, '/api/user_manage/' + type, 'POST', function (data) {
+                    var response_status = +data;
+                    if (isNaN(response_status)) {
+                        response_status = 1;
+                    }
+                    toast(actions_r[response_status]);
+                    //refresh();
+                }, function (err) {
+                    toast(actions_r[1]);
+                });
+            }
+            else if(!re_color.test(ajax_data.color)) {
+                toast(actions_r[3]);
+                $(elem.target).parent().find('input[name="color"]').val('');
+            }
+            else {
+                toast(actions_r[2]);
+            }
+        }
+    },
+    selectBoxes(elem) {
+        var target = $(elem.target);
+        var elemParent = target.closest('.select_box');
+        elemParent.find('label').removeClass('active_elem');
+        target.parent().addClass('active_elem');
+    },
     render() {
-        //
+        var self = this;
+        var group_classes = 'user user_group_color user_group_color_' + this.state.id;
+        //all users in groups
+        var users_list = [];
+        this.state.users.forEach(function(task) {
+            users_list.push(<article className="item_list">{task.name}</article>);
+        });
+        //all groups
+        var groups_list = [];
+        groups_list.push(<label className='active_elem'>No group<input type="radio" name="u_group"
+                                                                       defaultChecked onChange={self.selectBoxes} value=''/></label>);
+        this.props.all_groups.forEach(function(group) {
+            if(group.id != self.state.id) {
+                groups_list.push(<label>{group.name}<input type="radio" name="u_group"
+                                                           onChange={self.selectBoxes} value={group.id}/></label>);
+            }
+        });
+        var group_list_block = <article className="select_box">
+            {groups_list}
+        </article>;
+        //classes
+        var create_c = this.state.creating ? 'active_elem' : 'inactive_elem';
+        var edit_c = this.state.editing ? 'active_elem' : 'inactive_elem';
+        var reassign_c = this.state.reassignment ? 'active_elem' : 'inactive_elem';
+        var delete_c = this.state.deleting ? 'active_elem' : 'inactive_elem';
+        var users_c = this.state.user_manage ? 'active_elem' : 'inactive_elem';
+        var tasks_c = this.state.task_manage ? 'active_elem' : 'inactive_elem';
+        return <article className={group_classes}>
+            <article className="user_top">
+                <article className="user_head">
+                    <span className="user_name">{this.state.name}</span><br/>
+                    <span className="user_group">Users: {this.state.users_count}</span>
+                </article>
+                <article className="user_expand" onClick={this.expand}></article>
+            </article>
+            <article className="user_additional">
+                <article className="user_middle">
+                    <article className={create_c}>Creating</article>
+                    <article className={edit_c}>Editing</article>
+                    <br/>
+                    <article className={reassign_c}>Reassignment</article>
+                    <article className={delete_c}>Deleting</article>
+                    <br/>
+                    <article className={users_c}>Users manage</article>
+                    <article className={tasks_c}>Tasks manage</article>
+                </article>
+                <article className="user_bottom">
+                    <button onClick={this.actions('edit')} className="solve_but">Edit</button>
+                    <button onClick={this.actions('delete')}>Delete</button>
+                </article>
+                <article className="user_action user_edit hidden">
+                    <form>
+                        <input type="text" name="name" placeholder="Name" defaultValue={this.state.name}/><br/>
+                        <input type="text" name="color" placeholder="Color" defaultValue={this.state.color}
+                               className="color_field"/><br/>
+                        <label>Creating<input type="checkbox" name="creating" defaultChecked={this.state.creating}/></label>
+                        <label>Editing<input type="checkbox" name="editing" defaultChecked={this.state.editing}/></label><br/>
+                        <label>Reassignment<input type="checkbox" name="reassignment" defaultChecked={this.state.reassignment}/></label>
+                        <label>Deleting<input type="checkbox" name="deleting" defaultChecked={this.state.deleting}/></label><br/>
+                        <label>Users manage<input type="checkbox" name="user_manage" defaultChecked={this.state.user_manage}/></label>
+                        <label>Tasks manage<input type="checkbox" name="task_manage" defaultChecked={this.state.task_manage}/></label><br/>
+                    </form>
+                    <button onClick={this.submit('edit')}>Edit</button>
+                </article>
+                <article className="user_action user_delete hidden">
+                    <h3>Move all users in {this.state.name} to other group?</h3>
+                    <form>
+                        {group_list_block}
+                    </form>
+                    <button onClick={this.submit('deleting')}>Delete</button>
+                </article>
+            </article>
+        </article>;
     }
 });
+
 
 $(document).ready(function() {
     if (document.location.pathname == '/users_groups') {
