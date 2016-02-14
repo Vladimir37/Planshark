@@ -16,7 +16,10 @@ router.get('/t_groups', data_viewing.t_groups);
 //get users groups
 router.get('/u_groups', data_viewing.u_groups);
 
-//all data
+//get all data above
 router.get('/all' , data_viewing.all);
+
+//get master users
+router.get('/masters', data_viewing.masters);
 
 module.exports = router;

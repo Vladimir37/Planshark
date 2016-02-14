@@ -33440,6 +33440,11 @@
 	                task.name
 	            ));
 	        });
+	        var user_list_block = _react2.default.createElement(
+	            'article',
+	            { className: 'select_box' },
+	            users_list
+	        );
 	        //all groups
 	        var groups_list = [];
 	        groups_list.push(_react2.default.createElement(
@@ -33465,6 +33470,23 @@
 	            { className: 'select_box' },
 	            groups_list
 	        );
+	        var user_group_buttons = '';
+	        if (this.state.id != 0) {
+	            user_group_buttons = _react2.default.createElement(
+	                'article',
+	                { className: 'user_bottom' },
+	                _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.actions('edit'), className: 'solve_but' },
+	                    'Edit'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.actions('delete') },
+	                    'Delete'
+	                )
+	            );
+	        }
 	        //classes
 	        var create_c = this.state.creating ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
 	        var edit_c = this.state.editing ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
@@ -33505,57 +33527,63 @@
 	                    { className: 'user_middle' },
 	                    _react2.default.createElement(
 	                        'article',
-	                        { className: create_c },
-	                        'Creating'
+	                        { className: 'column_half' },
+	                        _react2.default.createElement(
+	                            'h3',
+	                            null,
+	                            'Rights'
+	                        ),
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: create_c },
+	                            'Creating'
+	                        ),
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: edit_c },
+	                            'Editing'
+	                        ),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: reassign_c },
+	                            'Reassignment'
+	                        ),
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: delete_c },
+	                            'Deleting'
+	                        ),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: users_c },
+	                            'Users manage'
+	                        ),
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: tasks_c },
+	                            'Tasks manage'
+	                        ),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: view_c },
+	                            'View all tasks'
+	                        )
 	                    ),
 	                    _react2.default.createElement(
 	                        'article',
-	                        { className: edit_c },
-	                        'Editing'
-	                    ),
-	                    _react2.default.createElement('br', null),
-	                    _react2.default.createElement(
-	                        'article',
-	                        { className: reassign_c },
-	                        'Reassignment'
-	                    ),
-	                    _react2.default.createElement(
-	                        'article',
-	                        { className: delete_c },
-	                        'Deleting'
-	                    ),
-	                    _react2.default.createElement('br', null),
-	                    _react2.default.createElement(
-	                        'article',
-	                        { className: users_c },
-	                        'Users manage'
-	                    ),
-	                    _react2.default.createElement(
-	                        'article',
-	                        { className: tasks_c },
-	                        'Tasks manage'
-	                    ),
-	                    _react2.default.createElement('br', null),
-	                    _react2.default.createElement(
-	                        'article',
-	                        { className: view_c },
-	                        'View all tasks'
+	                        { className: 'column_half' },
+	                        _react2.default.createElement(
+	                            'h3',
+	                            null,
+	                            'Users'
+	                        ),
+	                        user_list_block
 	                    )
 	                ),
-	                _react2.default.createElement(
-	                    'article',
-	                    { className: 'user_bottom' },
-	                    _react2.default.createElement(
-	                        'button',
-	                        { onClick: this.actions('edit'), className: 'solve_but' },
-	                        'Edit'
-	                    ),
-	                    _react2.default.createElement(
-	                        'button',
-	                        { onClick: this.actions('delete') },
-	                        'Delete'
-	                    )
-	                ),
+	                user_group_buttons,
 	                _react2.default.createElement(
 	                    'article',
 	                    { className: 'user_action user_edit hidden' },
@@ -33697,7 +33725,8 @@
 	            received: false,
 	            error: false,
 	            status: null,
-	            groups: null
+	            groups: null,
+	            masters: null
 	        };
 	    },
 	    receive: function receive() {
@@ -33710,19 +33739,29 @@
 	                if (typeof data == 'string') {
 	                    data = JSON.parse(data);
 	                }
-	                if (data.status == 0) {
-	                    data.body.reverse();
-	                    self.setState({
-	                        received: true,
-	                        error: false,
-	                        status: status,
-	                        groups: data.body
-	                    });
-	                } else {
+	                (0, _submitting.submitting)(null, '/api/data_viewing/masters', 'GET', function (masters) {
+	                    if (typeof masters == 'string') {
+	                        masters = JSON.parse(masters);
+	                    }
+	                    if (data.status == 0 && masters.status == 0) {
+	                        data.body.reverse();
+	                        self.setState({
+	                            received: true,
+	                            error: false,
+	                            status: status,
+	                            groups: data.body,
+	                            masters: masters.body
+	                        });
+	                    } else {
+	                        self.setState({
+	                            error: true
+	                        });
+	                    }
+	                }, function (err) {
 	                    self.setState({
 	                        error: true
 	                    });
-	                }
+	                });
 	            }, function (err) {
 	                self.setState({
 	                    error: true
@@ -33749,13 +33788,26 @@
 	        //render
 	        else {
 	                var groups = [];
-	                if (!this.state.groups.length) {
-	                    groups = _react2.default.createElement(_templates.Empty, null);
-	                } else {
-	                    this.state.groups.forEach(function (group) {
-	                        groups.push(_react2.default.createElement(UserGroup, { key: group.id, data: group, all_groups: self.state.groups }));
-	                    });
-	                }
+	                //master group
+	                var master_group_data = {
+	                    id: 0,
+	                    name: 'Masters',
+	                    color: 'none',
+	                    creating: 1,
+	                    editing: 1,
+	                    reassignment: 1,
+	                    deleting: 1,
+	                    t_group_manage: 1,
+	                    u_group_manage: 1,
+	                    all_view: 1,
+	                    users_count: this.state.masters.length,
+	                    users: this.state.masters
+	                };
+	                groups.push(_react2.default.createElement(UserGroup, { key: '0', data: master_group_data, all_groups: self.state.groups }));
+	                //user groups
+	                this.state.groups.forEach(function (group) {
+	                    groups.push(_react2.default.createElement(UserGroup, { key: group.id, data: group, all_groups: self.state.groups }));
+	                });
 	                return _react2.default.createElement(
 	                    'article',
 	                    { className: 'task_group_page_inner' },

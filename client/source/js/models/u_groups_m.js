@@ -157,6 +157,9 @@ var UserGroup = React.createClass({
         this.state.users.forEach(function(task) {
             users_list.push(<article className="item_list">{task.name}</article>);
         });
+        var user_list_block = <article className="select_box">
+            {users_list}
+        </article>;
         //all groups
         var groups_list = [];
         groups_list.push(<label className='active_elem'>No group<input type="radio" name="u_group"
@@ -170,6 +173,13 @@ var UserGroup = React.createClass({
         var group_list_block = <article className="select_box">
             {groups_list}
         </article>;
+        var user_group_buttons = '';
+        if(this.state.id != 0) {
+            user_group_buttons = <article className="user_bottom">
+                <button onClick={this.actions('edit')} className="solve_but">Edit</button>
+                <button onClick={this.actions('delete')}>Delete</button>
+            </article>;
+        }
         //classes
         var create_c = this.state.creating ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
         var edit_c = this.state.editing ? 'detect_elem active_elem' : 'detect_elem inactive_elem';
@@ -188,21 +198,25 @@ var UserGroup = React.createClass({
             </article>
             <article className="user_additional">
                 <article className="user_middle">
-                    <article className={create_c}>Creating</article>
-                    <article className={edit_c}>Editing</article>
-                    <br/>
-                    <article className={reassign_c}>Reassignment</article>
-                    <article className={delete_c}>Deleting</article>
-                    <br/>
-                    <article className={users_c}>Users manage</article>
-                    <article className={tasks_c}>Tasks manage</article>
-                    <br/>
-                    <article className={view_c}>View all tasks</article>
+                    <article className="column_half">
+                        <h3>Rights</h3>
+                        <article className={create_c}>Creating</article>
+                        <article className={edit_c}>Editing</article>
+                        <br/>
+                        <article className={reassign_c}>Reassignment</article>
+                        <article className={delete_c}>Deleting</article>
+                        <br/>
+                        <article className={users_c}>Users manage</article>
+                        <article className={tasks_c}>Tasks manage</article>
+                        <br/>
+                        <article className={view_c}>View all tasks</article>
+                    </article>
+                    <article className="column_half">
+                        <h3>Users</h3>
+                        {user_list_block}
+                    </article>
                 </article>
-                <article className="user_bottom">
-                    <button onClick={this.actions('edit')} className="solve_but">Edit</button>
-                    <button onClick={this.actions('delete')}>Delete</button>
-                </article>
+                {user_group_buttons}
                 <article className="user_action user_edit hidden">
                     <form>
                         <input type="text" name="name" placeholder="Name" defaultValue={this.state.name}/><br/>
@@ -246,7 +260,8 @@ var UsersGroupsList = React.createClass({
             received: false,
             error: false,
             status: null,
-            groups: null
+            groups: null,
+            masters: null
         }
     },
     receive() {
@@ -259,20 +274,30 @@ var UsersGroupsList = React.createClass({
                 if (typeof data == 'string') {
                     data = JSON.parse(data);
                 }
-                if(data.status == 0) {
-                    data.body.reverse();
-                    self.setState({
-                        received: true,
-                        error: false,
-                        status,
-                        groups: data.body
-                    });
-                }
-                else {
+                submitting(null, '/api/data_viewing/masters', 'GET', function (masters) {
+                    if (typeof masters == 'string') {
+                        masters = JSON.parse(masters);
+                    }
+                    if (data.status == 0 && masters.status == 0) {
+                        data.body.reverse();
+                        self.setState({
+                            received: true,
+                            error: false,
+                            status,
+                            groups: data.body,
+                            masters: masters.body
+                        });
+                    }
+                    else {
+                        self.setState({
+                            error: true
+                        });
+                    }
+                }, function (err) {
                     self.setState({
                         error: true
                     });
-                }
+                });
             }, function (err) {
                 self.setState({
                     error: true
@@ -301,14 +326,26 @@ var UsersGroupsList = React.createClass({
         //render
         else {
             var groups = [];
-            if(!this.state.groups.length) {
-                groups = <Empty />;
-            }
-            else {
-                this.state.groups.forEach(function(group) {
-                    groups.push(<UserGroup key={group.id} data={group} all_groups={self.state.groups} />);
-                });
-            }
+            //master group
+            var master_group_data = {
+                id: 0,
+                name: 'Masters',
+                color: 'none',
+                creating: 1,
+                editing: 1,
+                reassignment: 1,
+                deleting: 1,
+                t_group_manage: 1,
+                u_group_manage: 1,
+                all_view: 1,
+                users_count: this.state.masters.length,
+                users: this.state.masters
+            };
+            groups.push(<UserGroup key='0' data={master_group_data} all_groups={self.state.groups} />);
+            //user groups
+            this.state.groups.forEach(function(group) {
+                groups.push(<UserGroup key={group.id} data={group} all_groups={self.state.groups} />);
+            });
             return <article className="task_group_page_inner">
                 <Menu active="u_groups" data={this.state.status} />
                 <Creating />
