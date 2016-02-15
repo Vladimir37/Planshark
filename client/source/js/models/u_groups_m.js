@@ -320,7 +320,7 @@ var UsersGroupsList = React.createClass({
         else if(!this.state.received && this.state.error) {
             return <Error />;
         }
-        else if(!Boolean(this.state.t_manage || !this.state.room)) {
+        else if(!Boolean(this.state.u_manage || this.state.room)) {
             return <Forbidden />;
         }
         //render
