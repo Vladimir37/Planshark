@@ -58,7 +58,7 @@ var Creating = React.createClass({
         var u_groups = [];
         this.props.groups.forEach(function (group) {
             u_groups.push(<label>{group.name}<input type="radio" name="u_group" onChange={self.selectBoxes}
-                                                 value={group.id}/></label>);
+                         value={group.id}/></label>);
         });
         u_groups.unshift(<label className="active_elem">Master<input type="radio" name="u_group"
                          onChange={self.selectBoxes} value='' defaultChecked/></label>);
@@ -234,13 +234,17 @@ var UserList = React.createClass({
         return function() {
             if(!self.state[type]) {
                 self.props.switch(type);
+                self.setState({
+                    active: !self.state.active,
+                    inactive: !self.state.inactive
+                })
             }
         }
     },
     render() {
         //filter buttons
-        var active_c = this.state.active ? 'panel_elem active_elem' : 'panel_elem';
-        var inactive_c = this.state.inactive ? 'panel_elem active_elem' : 'panel_elem';
+        var active_c = this.state.active ? 'panel_elem active_elem_panel' : 'panel_elem';
+        var inactive_c = this.state.inactive ? 'panel_elem active_elem_panel' : 'panel_elem';
         //creating user panels
         var users = this.props.users;
         var groups = this.props.groups;
@@ -316,15 +320,15 @@ var UserPage = React.createClass({
         });
     },
     users_receive() {
+        var self = this;
         var users_type = this.state.active ? 'active' : 'inactive';
-        submitting(null, '/api/user_manage/' + users_type, 'GET', function (users) {
+        submitting(null, '/api/manage_data/' + users_type + '_users', 'GET', function (users) {
             if (typeof users == 'string') {
                 users = JSON.parse(users);
             }
             if (users.status == 0) {
-                data.body.reverse();
                 self.setState({
-                    users
+                    users: users.body
                 });
             }
             else {
@@ -338,14 +342,14 @@ var UserPage = React.createClass({
             });
         });
     },
-    switching() {
-        var users_type = this.state.active ? 'active' : 'inactive';
+    switching(type) {
         this.setState({
             active: false,
             inactive: false,
-            [users_type]: true
+            [type]: true
+        }, function() {
+            this.users_receive();
         });
-        this.users_receive();
     },
     render() {
         var self = this;

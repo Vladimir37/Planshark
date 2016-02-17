@@ -32571,12 +32571,12 @@
 	        //export refresh
 	        refresh = this.receive(true);
 	        //classes determination
-	        var active_c = this.state.active && !this.state.all ? ' active_elem' : '';
-	        var inactive_c = this.state.inactive && !this.state.all ? ' active_elem' : '';
-	        var expired_c = this.state.expired && !this.state.all ? ' active_elem' : '';
-	        var all_active_c = this.state.active && this.state.all ? ' active_elem' : '';
-	        var all_inactive_c = this.state.inactive && this.state.all ? ' active_elem' : '';
-	        var all_expired_c = this.state.expired && this.state.all ? ' active_elem' : '';
+	        var active_c = this.state.active && !this.state.all ? ' active_elem_panel' : '';
+	        var inactive_c = this.state.inactive && !this.state.all ? ' active_elem_panel' : '';
+	        var expired_c = this.state.expired && !this.state.all ? ' active_elem_panel' : '';
+	        var all_active_c = this.state.active && this.state.all ? ' active_elem_panel' : '';
+	        var all_inactive_c = this.state.inactive && this.state.all ? ' active_elem_panel' : '';
+	        var all_expired_c = this.state.expired && this.state.all ? ' active_elem_panel' : '';
 	        //button panel (type)
 	        var room_master_buttons = [];
 	        if (status.room && (!status.group || status.viewing)) {
@@ -34243,13 +34243,17 @@
 	        return function () {
 	            if (!self.state[type]) {
 	                self.props.switch(type);
+	                self.setState({
+	                    active: !self.state.active,
+	                    inactive: !self.state.inactive
+	                });
 	            }
 	        };
 	    },
 	    render: function render() {
 	        //filter buttons
-	        var active_c = this.state.active ? 'panel_elem active_elem' : 'panel_elem';
-	        var inactive_c = this.state.inactive ? 'panel_elem active_elem' : 'panel_elem';
+	        var active_c = this.state.active ? 'panel_elem active_elem_panel' : 'panel_elem';
+	        var inactive_c = this.state.inactive ? 'panel_elem active_elem_panel' : 'panel_elem';
 	        //creating user panels
 	        var users = this.props.users;
 	        var groups = this.props.groups;
@@ -34337,15 +34341,15 @@
 	        });
 	    },
 	    users_receive: function users_receive() {
+	        var self = this;
 	        var users_type = this.state.active ? 'active' : 'inactive';
-	        (0, _submitting.submitting)(null, '/api/user_manage/' + users_type, 'GET', function (users) {
+	        (0, _submitting.submitting)(null, '/api/manage_data/' + users_type + '_users', 'GET', function (users) {
 	            if (typeof users == 'string') {
 	                users = JSON.parse(users);
 	            }
 	            if (users.status == 0) {
-	                data.body.reverse();
 	                self.setState({
-	                    users: users
+	                    users: users.body
 	                });
 	            } else {
 	                self.setState({
@@ -34358,13 +34362,13 @@
 	            });
 	        });
 	    },
-	    switching: function switching() {
-	        var users_type = this.state.active ? 'active' : 'inactive';
+	    switching: function switching(type) {
 	        this.setState(_defineProperty({
 	            active: false,
 	            inactive: false
-	        }, users_type, true));
-	        this.users_receive();
+	        }, type, true), function () {
+	            this.users_receive();
+	        });
 	    },
 	    render: function render() {
 	        var self = this;

@@ -693,12 +693,12 @@ var TaskList = React.createClass({
         //export refresh
         refresh = this.receive(true);
         //classes determination
-        var active_c = this.state.active && !this.state.all ? ' active_elem' : '';
-        var inactive_c = this.state.inactive && !this.state.all ? ' active_elem' : '';
-        var expired_c = this.state.expired && !this.state.all ? ' active_elem' : '';
-        var all_active_c = this.state.active && this.state.all ? ' active_elem' : '';
-        var all_inactive_c = this.state.inactive && this.state.all ? ' active_elem' : '';
-        var all_expired_c = this.state.expired && this.state.all ? ' active_elem' : '';
+        var active_c = this.state.active && !this.state.all ? ' active_elem_panel' : '';
+        var inactive_c = this.state.inactive && !this.state.all ? ' active_elem_panel' : '';
+        var expired_c = this.state.expired && !this.state.all ? ' active_elem_panel' : '';
+        var all_active_c = this.state.active && this.state.all ? ' active_elem_panel' : '';
+        var all_inactive_c = this.state.inactive && this.state.all ? ' active_elem_panel' : '';
+        var all_expired_c = this.state.expired && this.state.all ? ' active_elem_panel' : '';
         //button panel (type)
         var room_master_buttons = [];
         if(status.room && (!status.group || status.viewing)) {

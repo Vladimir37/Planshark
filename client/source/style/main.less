@@ -143,9 +143,6 @@ body {
             }
             .panel_tasks_type {
                 margin-left: 5px;
-                .active_elem {
-                    background: lighten(@main, 20%);
-                }
             }
             .panel_tasks_sort {
                 .sorting_point {
@@ -359,6 +356,9 @@ body {
     .active_elem {
         background: @main;
         color: white;
+    }
+    .active_elem_panel {
+        background: lighten(@main, 20%);
     }
     .column {
         display: inline-block;
