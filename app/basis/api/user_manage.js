@@ -226,7 +226,7 @@ function new_user(req, res, next) {
     var room = res.user_status.room;
     var author_group = +res.user_status.group;
     //user data
-    var target_group = req.body.g_id || 0;
+    var target_group = req.body.u_group || 0;
     var name = req.body.name;
     var pass_raw = req.body.pass;
     var mail = req.body.mail;
@@ -275,24 +275,122 @@ function blocking(req, res, next) {
     //right to blocking
     var block_right = false;
     author_group == 0 ? block_right = true : block_right = false;
-    if(!block_right) {
-        res.end('1');
-    }
-    else {
-        db.users.update({
+    db.users_groups.findById(author_group).then(function(group) {
+        if(!group || !pass) {
+            throw '1';
+        }
+        group.u_group_manage == 1 ? block_right = true : block_right = false;
+        return Promise.resolve();
+    }).catch(function(err) {
+        if(block_right) {
+            return Promise.resolve();
+        }
+        else {
+            res.end('1');
+        }
+    }).then(function() {
+        return db.users.update({
             active: 0
         }, {
             where: {
                 id: target_user,
+                active: 1,
                 room
             }
-        }).then(function() {
-            res.end('0');
-        }, function(err) {
-            console.log(err);
-            res.end('1');
         });
-    }
+    }).then(function () {
+        res.end('0');
+    }).catch(function (err) {
+        console.log(err);
+        res.end('1');
+    });
+};
+
+function unblock(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    var author_group = +res.user_status.group;
+    //user data
+    var target_user = req.body.id;
+    //right to blocking
+    var block_right = false;
+    author_group == 0 ? block_right = true : block_right = false;
+    db.users_groups.findById(author_group).then(function(group) {
+        if(!group || !pass) {
+            throw '1';
+        }
+        group.u_group_manage == 1 ? block_right = true : block_right = false;
+        return Promise.resolve();
+    }).catch(function(err) {
+        if(block_right) {
+            return Promise.resolve();
+        }
+        else {
+            res.end('1');
+        }
+    }).then(function() {
+        return db.users.update({
+            active: 1
+        }, {
+            where: {
+                id: target_user,
+                active: 0,
+                room
+            }
+        });
+    }).then(function () {
+        res.end('0');
+    }).catch(function (err) {
+        console.log(err);
+        res.end('1');
+    });
+};
+
+//edit user
+function change(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    var author_group = +res.user_status.group;
+    //user data
+    var target_user = req.body.id;
+    var mail = req.body.mail;
+    var target_group = req.body.group;
+    //right to blocking
+    var edit_right = false;
+    author_group == 0 ? edit_right = true : edit_right = false;
+    db.users_groups.findById(author_group).then(function(group) {
+        if(!group || !pass) {
+            throw '1';
+        }
+        group.u_group_manage == 1 ? edit_right = true : edit_right = false;
+        return Promise.resolve();
+    }).catch(function(err) {
+        if(edit_right) {
+            return Promise.resolve();
+        }
+        else {
+            res.end('1');
+        }
+    }).then(function() {
+        return db.users.update({
+            active: 1,
+            mail,
+            u_group: target_group
+        }, {
+            where: {
+                id: target_user,
+                active: 1,
+                room
+            }
+        });
+    }).then(function () {
+        res.end('0');
+    }).catch(function (err) {
+        console.log(err);
+        res.end('1');
+    });
 };
 
 exports.create = creating;
@@ -301,3 +399,5 @@ exports.deleting = deleting;
 exports.add = adding;
 exports.new_user = new_user;
 exports.block = blocking;
+exports.unblock = unblock;
+exports.change = change;

@@ -137,6 +137,7 @@ tables.tasks = sequelize.define('tasks', {
 //connection tables
 tables.tasks.belongsTo(tables.tasks_groups, {foreignKey: 't_group'});
 tables.tasks.belongsTo(tables.users_groups, {foreignKey: 'u_group'});
+tables.users.belongsTo(tables.users_groups, {foreignKey: 'u_group'});
 var performer_data = tables.tasks.belongsTo(tables.users, {foreignKey: 'performer', as: 'performer_data'});
 var author_data = tables.tasks.belongsTo(tables.users, {foreignKey: 'author', as:'author_data'});
 var editor_data = tables.tasks.belongsTo(tables.users, {foreignKey: 'editor', as:'editor_data'});

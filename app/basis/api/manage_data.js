@@ -141,5 +141,24 @@ function tasks_group(req, res, next) {
     }
 };
 
+//get all users in the room
+function users(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    db.users.findAll({
+        where: {
+            room
+        },
+        include: [db.users_groups]
+    }).then(function(users) {
+        res.end(serializing(0, users));
+    }, function(err) {
+        console.log(err);
+        res.end(serializing(1));
+    });
+};
+
 exports.users_group = users_group;
 exports.tasks_groups = tasks_group;
+exports.users = users;

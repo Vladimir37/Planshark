@@ -54,6 +54,7 @@
 	__webpack_require__(168);
 	__webpack_require__(170);
 	__webpack_require__(171);
+	__webpack_require__(172);
 	__webpack_require__(167);
 	__webpack_require__(9);
 	module.exports = __webpack_require__(166);
@@ -33782,7 +33783,7 @@
 	            return _react2.default.createElement(_templates.Waiting, null);
 	        } else if (!this.state.received && this.state.error) {
 	            return _react2.default.createElement(_templates.Error, null);
-	        } else if (!Boolean(this.state.t_manage || !this.state.room)) {
+	        } else if (!Boolean(this.state.u_manage || this.state.room)) {
 	            return _react2.default.createElement(_templates.Forbidden, null);
 	        }
 	        //render
@@ -33822,6 +33823,185 @@
 	(0, _jquery2.default)(document).ready(function () {
 	    if (document.location.pathname == '/users_groups') {
 	        _reactDom2.default.render(_react2.default.createElement(UsersGroupsList, null), document.getElementsByClassName('content_inner')[0]);
+	    }
+	});
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _react = __webpack_require__(9);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(166);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _submitting = __webpack_require__(6);
+
+	var _templates = __webpack_require__(167);
+
+	var _toaster = __webpack_require__(7);
+
+	var _toaster2 = _interopRequireDefault(_toaster);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	//responses
+	var actions_r = ['Success!', 'Server error', 'Required fields are empty'];
+
+	//refresh groups list
+	var refresh;
+
+	var Creating = _react2.default.createClass({
+	    displayName: 'Creating',
+	    getInitialState: function getInitialState() {
+	        return {
+	            groups: null
+	        };
+	    },
+	    submit: function submit(elem) {
+	        var ajax_data = (0, _submitting.getData)(elem.target);
+	        if (!ajax_data) {
+	            (0, _toaster2.default)(actions_r[2]);
+	        } else if (!re_color.test(ajax_data.color)) {
+	            (0, _toaster2.default)(actions_r[3]);
+	            (0, _jquery2.default)(elem.target).parent().find('input[name="color"]').val('');
+	        } else {
+	            (0, _submitting.submitting)(ajax_data, '/api/user_manage/new', 'POST', function (data) {
+	                var response_status = +data;
+	                if (isNaN(response_status)) {
+	                    response_status = 1;
+	                }
+	                if (response_status == 0) {
+	                    (0, _toaster2.default)(actions_r[0]);
+	                    (0, _jquery2.default)(elem.target).parent().find('input[type="text"]').val('');
+	                    refresh();
+	                } else {
+	                    (0, _toaster2.default)(actions_r[response_status]);
+	                }
+	            }, function (err) {
+	                (0, _toaster2.default)(actions_r[1]);
+	            });
+	        }
+	    },
+	    switching: function switching() {
+	        (0, _jquery2.default)('.creatingFormBody').slideToggle();
+	    },
+	    selectBoxes: function selectBoxes(elem) {
+	        var target = (0, _jquery2.default)(elem.target);
+	        var elemParent = target.closest('.select_box');
+	        elemParent.find('label').removeClass('active_elem');
+	        target.parent().addClass('active_elem');
+	    },
+	    render: function render() {
+	        var self = this;
+	        //users groups list
+	        var u_groups = [];
+	        if (this.state.room && this.state.u_groups) {
+	            this.state.u_groups.forEach(function (elem) {
+	                u_groups.push(_react2.default.createElement(
+	                    'label',
+	                    null,
+	                    elem[1],
+	                    _react2.default.createElement('input', { type: 'radio', name: 'u_group', onChange: self.selectBoxes,
+	                        value: elem[0] })
+	                ));
+	            });
+	            u_groups.unshift(_react2.default.createElement(
+	                'label',
+	                { className: 'active_elem' },
+	                'Master',
+	                _react2.default.createElement('input', { type: 'radio', name: 'u_group',
+	                    onChange: self.selectBoxes, value: '', defaultChecked: true })
+	            ));
+	        }
+	        var u_groups_item = _react2.default.createElement(
+	            'article',
+	            { className: 'select_main' },
+	            _react2.default.createElement(
+	                'h3',
+	                null,
+	                'Users group'
+	            ),
+	            _react2.default.createElement(
+	                'form',
+	                null,
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'select_box' },
+	                    u_groups
+	                )
+	            )
+	        );
+	        return _react2.default.createElement(
+	            'section',
+	            { className: 'creatingForm' },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'creatingFormHead', onClick: this.switching },
+	                'Creating user group'
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'creatingFormBody' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'creatingFormTop' },
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'column_half' },
+	                        _react2.default.createElement(
+	                            'h3',
+	                            null,
+	                            'User data'
+	                        ),
+	                        _react2.default.createElement('input', { type: 'text', name: 'name', placeholder: 'Name', 'data-req': 'true' }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'text', name: 'pass', placeholder: 'Password', 'data-req': 'true' }),
+	                        _react2.default.createElement('br', null),
+	                        _react2.default.createElement('input', { type: 'text', name: 'mail', placeholder: 'E-Mail', 'data-req': 'true' }),
+	                        _react2.default.createElement('br', null)
+	                    ),
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'column_half' },
+	                        u_groups_item
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: 'sub', onClick: this.submit },
+	                    'Create'
+	                )
+	            )
+	        );
+	    }
+	});
+
+	var User = _react2.default.createClass({
+	    displayName: 'User',
+	    getInitialState: function getInitialState() {
+	        var data = this.props.data;
+	        return {
+	            id: data.id,
+	            name: data.name,
+	            mail: data.mail
+
+	        };
+	    }
+	});
+
+	(0, _jquery2.default)(document).ready(function () {
+	    if (document.location.pathname == '/users') {
+	        _reactDom2.default.render(_react2.default.createElement(Creating, null), document.getElementsByClassName('content_inner')[0]);
 	    }
 	});
 

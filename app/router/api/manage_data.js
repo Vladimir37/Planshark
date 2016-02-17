@@ -11,4 +11,7 @@ router.get('/users_group', manage_data.users_group);
 //get all task groups in room with users count
 router.get('/tasks_group', manage_data.tasks_groups);
 
+//get all users in the room
+router.get('/users', manage_data.users);
+
 module.exports = router;

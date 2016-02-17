@@ -22,5 +22,9 @@ router.post('/add', user_manage.add);
 router.post('/new', user_manage.new_user);
 //blocking and deleting user
 router.post('/block', user_manage.block);
+//unblocking user
+router.post('/unblock', user_manage.unblock);
+//edit user data
+router.post('/change', user_manage.change);
 
 module.exports = router;
