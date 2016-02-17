@@ -13,9 +13,7 @@ var refresh;
 
 var Creating = React.createClass({
     getInitialState() {
-        return {
-            groups: null
-        };
+        return null;
     },
     submit(elem) {
         var ajax_data = getData(elem.target);
@@ -58,14 +56,12 @@ var Creating = React.createClass({
         var self = this;
         //users groups list
         var u_groups = [];
-        if(this.state.room && this.state.u_groups) {
-            this.state.u_groups.forEach(function (elem) {
-                u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes}
-                                                     value={elem[0]}/></label>);
-            });
-            u_groups.unshift(<label className="active_elem">Master<input type="radio" name="u_group"
-                             onChange={self.selectBoxes} value='' defaultChecked/></label>);
-        }
+        this.props.groups.forEach(function (elem) {
+            u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes}
+                                                 value={elem[0]}/></label>);
+        });
+        u_groups.unshift(<label className="active_elem">Master<input type="radio" name="u_group"
+                         onChange={self.selectBoxes} value='' defaultChecked/></label>);
         var u_groups_item = <article className="select_main">
             <h3>Users group</h3>
             <form>
@@ -124,7 +120,7 @@ var User = React.createClass({
             ajax_data = getData(target);
             ajax_data.user_id = self.state.id;
             if(ajax_data) {
-                submitting(ajax_data, '/api/users/' + type, 'POST', function (data) {
+                submitting(ajax_data, '/api/user_manage/' + type, 'POST', function (data) {
                     var response_status = +data;
                     if (isNaN(response_status)) {
                         response_status = 1;
@@ -209,6 +205,161 @@ var User = React.createClass({
                 </article>
             </article>
         </article>;
+    }
+});
+
+var UserList = React.createClass({
+    getInitialState() {
+        var condition = this.props.condition;
+        return {
+            active: condition.active,
+            inactive: condition.inactive
+        };
+    },
+    switching(type) {
+        var self = this;
+        return function() {
+            if(!self.state[type]) {
+                self.props.switch(type);
+            }
+        }
+    },
+    render() {
+        //filter buttons
+        var active_c = this.state.active ? 'panel_elem active_elem' : 'panel_elem';
+        var inactive_c = this.state.inactive ? 'panel_elem active_elem' : 'panel_elem';
+        //creating user panels
+        var users = this.props.users;
+        var groups = this.state.groups;
+        var users_list = [];
+        users.forEach(function(user) {
+            users_list.push(<User key={user.id} data={user} all_groups={groups} />);
+        });
+        return <article className="users_list_inner">
+            <article className="panel_users_type">
+                <button className={active_c} onClick={this.switching('active')}>Active</button>
+                <button className={inactive_c} onClick={this.switching('inactive')}>Inactive</button>
+            </article>
+            {users_list}
+        </article>;
+    }
+});
+
+var UserPage = React.createClass({
+    getInitialState() {
+        return {
+            active: true,
+            inactive: false,
+            status: null,
+            users: null,
+            groups: null,
+            received: false,
+            error: false
+        };
+    },
+    all_receive() {
+        var users_type = this.state.active ? 'active' : 'inactive';
+        submitting(null, '/api/account/status', 'GET', function(status) {
+            if (typeof status == 'string') {
+                status = JSON.parse(status);
+            }
+            submitting(null, '/api/manage_data/users_group', 'GET', function (groups) {
+                if (typeof groups == 'string') {
+                    groups = JSON.parse(groups);
+                }
+                submitting(null, '/api/user_manage/' + users_type, 'GET', function (users) {
+                    if (typeof users == 'string') {
+                        users = JSON.parse(users);
+                    }
+                    if (users.status == 0 && groups.status == 0) {
+                        data.body.reverse();
+                        self.setState({
+                            users,
+                            status,
+                            groups,
+                            received: true,
+                            error: false
+                        });
+                    }
+                    else {
+                        self.setState({
+                            error: true
+                        });
+                    }
+                }, function (err) {
+                    self.setState({
+                        error: true
+                    });
+                });
+            }, function (err) {
+                self.setState({
+                    error: true
+                });
+            });
+        }, function(err) {
+            self.setState({
+                error: true
+            });
+        });
+    },
+    users_reveive() {
+        var users_type = this.state.active ? 'active' : 'inactive';
+        submitting(null, '/api/user_manage/' + users_type, 'GET', function (users) {
+            if (typeof users == 'string') {
+                users = JSON.parse(users);
+            }
+            if (users.status == 0) {
+                data.body.reverse();
+                self.setState({
+                    users
+                });
+            }
+            else {
+                self.setState({
+                    error: true
+                });
+            }
+        }, function (err) {
+            self.setState({
+                error: true
+            });
+        });
+    },
+    switching(type) {
+        var users_type = this.state.active ? 'active' : 'inactive';
+        this.setState({
+            active: false,
+            inactive: false,
+            [users_type]: true
+        });
+        this.users_reveive();
+    },
+    render() {
+        var self = this;
+        refresh = this.receive;
+        //first load
+        if(!this.state.received && !this.state.error) {
+            this.receive();
+            return <Waiting />;
+        }
+        else if(!this.state.received && this.state.error) {
+            return <Error />;
+        }
+        else if(!Boolean(this.state.status.u_manage || this.state.status.room)) {
+            return <Forbidden />;
+        }
+        //render
+        else {
+            var condition = {
+                active: this.state.active,
+                inactive: this.state.inactive
+            };
+            return <article className="task_group_page_inner">
+                <Menu active="users" data={this.state.status} />
+                <Creating groups={this.state.groups} />
+                <UserList condition={condition} users={this.state.users} groups={this.state.groups} switch={this.switching} />
+            </article>;
+        }
     }
 });
 

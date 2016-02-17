@@ -141,14 +141,34 @@ function tasks_group(req, res, next) {
     }
 };
 
-//get all users in the room
-function users(req, res, next) {
+//get all active users in the room
+function active_users(req, res, next) {
     //author data
     var author = res.user_status.id;
     var room = res.user_status.room;
     db.users.findAll({
         where: {
-            room
+            room,
+            active: 1
+        },
+        include: [db.users_groups]
+    }).then(function(users) {
+        res.end(serializing(0, users));
+    }, function(err) {
+        console.log(err);
+        res.end(serializing(1));
+    });
+};
+
+//get all inactive users in the room
+function inactive_users(req, res, next) {
+    //author data
+    var author = res.user_status.id;
+    var room = res.user_status.room;
+    db.users.findAll({
+        where: {
+            room,
+            active: 0
         },
         include: [db.users_groups]
     }).then(function(users) {
@@ -161,4 +181,5 @@ function users(req, res, next) {
 
 exports.users_group = users_group;
 exports.tasks_groups = tasks_group;
-exports.users = users;
+exports.active_users = active_users;
+exports.inactive_users = inactive_users;
