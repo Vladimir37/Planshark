@@ -33854,6 +33854,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	//responses
 	var actions_r = ['Success!', 'Server error', 'Required fields are empty'];
 
@@ -33863,9 +33865,7 @@
 	var Creating = _react2.default.createClass({
 	    displayName: 'Creating',
 	    getInitialState: function getInitialState() {
-	        return {
-	            groups: null
-	        };
+	        return null;
 	    },
 	    submit: function submit(elem) {
 	        var ajax_data = (0, _submitting.getData)(elem.target);
@@ -33905,24 +33905,22 @@
 	        var self = this;
 	        //users groups list
 	        var u_groups = [];
-	        if (this.state.room && this.state.u_groups) {
-	            this.state.u_groups.forEach(function (elem) {
-	                u_groups.push(_react2.default.createElement(
-	                    'label',
-	                    null,
-	                    elem[1],
-	                    _react2.default.createElement('input', { type: 'radio', name: 'u_group', onChange: self.selectBoxes,
-	                        value: elem[0] })
-	                ));
-	            });
-	            u_groups.unshift(_react2.default.createElement(
+	        this.props.groups.forEach(function (group) {
+	            u_groups.push(_react2.default.createElement(
 	                'label',
-	                { className: 'active_elem' },
-	                'Master',
-	                _react2.default.createElement('input', { type: 'radio', name: 'u_group',
-	                    onChange: self.selectBoxes, value: '', defaultChecked: true })
+	                null,
+	                group.name,
+	                _react2.default.createElement('input', { type: 'radio', name: 'u_group', onChange: self.selectBoxes,
+	                    value: group.id })
 	            ));
-	        }
+	        });
+	        u_groups.unshift(_react2.default.createElement(
+	            'label',
+	            { className: 'active_elem' },
+	            'Master',
+	            _react2.default.createElement('input', { type: 'radio', name: 'u_group',
+	                onChange: self.selectBoxes, value: '', defaultChecked: true })
+	        ));
 	        var u_groups_item = _react2.default.createElement(
 	            'article',
 	            { className: 'select_main' },
@@ -33947,7 +33945,7 @@
 	            _react2.default.createElement(
 	                'article',
 	                { className: 'creatingFormHead', onClick: this.switching },
-	                'Creating user group'
+	                'Creating user'
 	            ),
 	            _react2.default.createElement(
 	                'article',
@@ -33990,18 +33988,416 @@
 	    displayName: 'User',
 	    getInitialState: function getInitialState() {
 	        var data = this.props.data;
+	        data.users_group = data.users_group || {
+	            id: 0,
+	            name: 'Masters'
+	        };
 	        return {
 	            id: data.id,
 	            name: data.name,
-	            mail: data.mail
-
+	            mail: data.mail,
+	            group_id: data.users_group.id,
+	            group_name: data.users_group.name,
+	            active: data.active,
+	            created: data.createdAt.toString().slice(0, -14)
 	        };
+	    },
+	    expand: function expand(elem) {
+	        var target = (0, _jquery2.default)(elem.target).closest('.user');
+	        target.find('.user_additional').slideToggle();
+	    },
+	    actions: function actions(type) {
+	        return function (elem) {
+	            var target = (0, _jquery2.default)(elem.target).closest('.user');
+	            target.find('.user_action:not(.user_' + type + ')').hide();
+	            target.find('.user_' + type).slideToggle();
+	        };
+	    },
+	    submit: function submit(type) {
+	        var self = this;
+	        return function (elem) {
+	            var target = elem.target;
+	            var ajax_data = {};
+	            ajax_data = (0, _submitting.getData)(target);
+	            ajax_data.user_id = self.state.id;
+	            if (ajax_data) {
+	                (0, _submitting.submitting)(ajax_data, '/api/user_manage/' + type, 'POST', function (data) {
+	                    var response_status = +data;
+	                    if (isNaN(response_status)) {
+	                        response_status = 1;
+	                    }
+	                    (0, _toaster2.default)(actions_r[response_status]);
+	                    //refresh();
+	                }, function (err) {
+	                    (0, _toaster2.default)(actions_r[1]);
+	                });
+	            } else {
+	                (0, _toaster2.default)(actions_r[2]);
+	            }
+	        };
+	    },
+	    selectBoxes: function selectBoxes(elem) {
+	        var target = (0, _jquery2.default)(elem.target);
+	        var elemParent = target.closest('.select_box');
+	        elemParent.find('label').removeClass('active_elem');
+	        target.parent().addClass('active_elem');
+	    },
+	    render: function render() {
+	        var self = this;
+	        var group_classes = 'user user_group_color user_group_color_' + this.state.group_id;
+	        //all groups
+	        var groups_list = [];
+	        var master_c = self.state.group_id == 0 ? 'active_elem' : '';
+	        groups_list.push(_react2.default.createElement(
+	            'label',
+	            { className: master_c },
+	            'Master',
+	            _react2.default.createElement('input', { type: 'radio', name: 'u_group',
+	                defaultChecked: self.state.group_id == 0, onChange: self.selectBoxes, value: '0' })
+	        ));
+	        this.props.all_groups.forEach(function (group) {
+	            var group_c = self.state.group_id == group.id ? 'active_elem' : '';
+	            groups_list.push(_react2.default.createElement(
+	                'label',
+	                { className: group_c },
+	                group.name,
+	                _react2.default.createElement('input', { type: 'radio', name: 'u_group',
+	                    onChange: self.selectBoxes, defaultChecked: self.state.group_id == group.id, value: group.id })
+	            ));
+	        });
+	        var group_list_block = _react2.default.createElement(
+	            'article',
+	            { className: 'select_box' },
+	            groups_list
+	        );
+	        //buttons
+	        var user_buttons = [];
+	        user_buttons.push(_react2.default.createElement(
+	            'button',
+	            { onClick: this.actions('change'), className: 'solve_but' },
+	            'Edit'
+	        ));
+	        if (this.state.active) {
+	            user_buttons.push(_react2.default.createElement(
+	                'button',
+	                { onClick: this.actions('block') },
+	                'Block'
+	            ));
+	        } else {
+	            user_buttons.push(_react2.default.createElement(
+	                'button',
+	                { onClick: this.actions('unblock') },
+	                'Unblock'
+	            ));
+	        }
+	        var user_group_buttons = _react2.default.createElement(
+	            'article',
+	            { className: 'user_bottom' },
+	            user_buttons
+	        );
+	        //render
+	        return _react2.default.createElement(
+	            'article',
+	            { className: group_classes },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'user_top' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_head' },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'user_name' },
+	                        this.state.name
+	                    ),
+	                    _react2.default.createElement('br', null),
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'user_group' },
+	                        this.state.group_name
+	                    )
+	                ),
+	                _react2.default.createElement('article', { className: 'user_expand', onClick: this.expand })
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'user_additional' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_middle' },
+	                    _react2.default.createElement(
+	                        'article',
+	                        { className: 'task_info' },
+	                        _react2.default.createElement(
+	                            'span',
+	                            { className: 'task_info_elem' },
+	                            _react2.default.createElement(
+	                                'b',
+	                                null,
+	                                'Mail: '
+	                            ),
+	                            this.state.mail
+	                        ),
+	                        _react2.default.createElement(
+	                            'span',
+	                            { className: 'task_info_elem' },
+	                            _react2.default.createElement(
+	                                'b',
+	                                null,
+	                                'Created: '
+	                            ),
+	                            this.state.created
+	                        )
+	                    )
+	                ),
+	                _react2.default.createElement('article', { className: 'clearfix' }),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_bottom' },
+	                    user_group_buttons
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_action user_change hidden' },
+	                    _react2.default.createElement(
+	                        'form',
+	                        null,
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: 'column' },
+	                            _react2.default.createElement(
+	                                'h3',
+	                                null,
+	                                'Data'
+	                            ),
+	                            _react2.default.createElement('input', { type: 'text', name: 'name', placeholder: 'Name', defaultValue: this.state.name }),
+	                            _react2.default.createElement('br', null),
+	                            _react2.default.createElement('input', { type: 'text', name: 'mail', placeholder: 'Mail', defaultValue: this.state.mail }),
+	                            _react2.default.createElement('br', null)
+	                        ),
+	                        _react2.default.createElement(
+	                            'article',
+	                            { className: 'column' },
+	                            _react2.default.createElement(
+	                                'h3',
+	                                null,
+	                                'Group'
+	                            ),
+	                            group_list_block
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.submit('edit') },
+	                        'Edit'
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_action user_block hidden' },
+	                    _react2.default.createElement(
+	                        'h3',
+	                        null,
+	                        'Are you sure you want to block ',
+	                        this.state.name,
+	                        '?'
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.submit('block') },
+	                        'Block'
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'user_action user_unblock hidden' },
+	                    _react2.default.createElement(
+	                        'h3',
+	                        null,
+	                        'Are you sure you want to unblock ',
+	                        this.state.name,
+	                        '?'
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: this.submit('unblock') },
+	                        'Unblock'
+	                    )
+	                )
+	            )
+	        );
+	    }
+	});
+
+	var UserList = _react2.default.createClass({
+	    displayName: 'UserList',
+	    getInitialState: function getInitialState() {
+	        var condition = this.props.condition;
+	        return {
+	            active: condition.active,
+	            inactive: condition.inactive
+	        };
+	    },
+	    switching: function switching(type) {
+	        var self = this;
+	        return function () {
+	            if (!self.state[type]) {
+	                self.props.switch(type);
+	            }
+	        };
+	    },
+	    render: function render() {
+	        //filter buttons
+	        var active_c = this.state.active ? 'panel_elem active_elem' : 'panel_elem';
+	        var inactive_c = this.state.inactive ? 'panel_elem active_elem' : 'panel_elem';
+	        //creating user panels
+	        var users = this.props.users;
+	        var groups = this.props.groups;
+	        var users_list = [];
+	        users.forEach(function (user) {
+	            users_list.push(_react2.default.createElement(User, { key: user.id, data: user, all_groups: groups }));
+	        });
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'users_list_inner' },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'panel_users_type' },
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: active_c, onClick: this.switching('active') },
+	                    'Active'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { className: inactive_c, onClick: this.switching('inactive') },
+	                    'Inactive'
+	                )
+	            ),
+	            users_list
+	        );
+	    }
+	});
+
+	var UserPage = _react2.default.createClass({
+	    displayName: 'UserPage',
+	    getInitialState: function getInitialState() {
+	        return {
+	            active: true,
+	            inactive: false,
+	            status: null,
+	            users: null,
+	            groups: null,
+	            received: false,
+	            error: false
+	        };
+	    },
+	    all_receive: function all_receive() {
+	        var users_type = this.state.active ? 'active' : 'inactive';
+	        var self = this;
+	        (0, _submitting.submitting)(null, '/api/account/status', 'GET', function (status) {
+	            if (typeof status == 'string') {
+	                status = JSON.parse(status);
+	            }
+	            (0, _submitting.submitting)(null, '/api/manage_data/users_group', 'GET', function (groups) {
+	                if (typeof groups == 'string') {
+	                    groups = JSON.parse(groups);
+	                }
+	                (0, _submitting.submitting)(null, '/api/manage_data/' + users_type + '_users', 'GET', function (users) {
+	                    if (typeof users == 'string') {
+	                        users = JSON.parse(users);
+	                    }
+	                    if (users.status == 0 && groups.status == 0) {
+	                        self.setState({
+	                            users: users.body,
+	                            status: status,
+	                            groups: groups.body,
+	                            received: true,
+	                            error: false
+	                        });
+	                    } else {
+	                        self.setState({
+	                            error: true
+	                        });
+	                    }
+	                }, function (err) {
+	                    self.setState({
+	                        error: true
+	                    });
+	                });
+	            }, function (err) {
+	                self.setState({
+	                    error: true
+	                });
+	            });
+	        }, function (err) {
+	            self.setState({
+	                error: true
+	            });
+	        });
+	    },
+	    users_receive: function users_receive() {
+	        var users_type = this.state.active ? 'active' : 'inactive';
+	        (0, _submitting.submitting)(null, '/api/user_manage/' + users_type, 'GET', function (users) {
+	            if (typeof users == 'string') {
+	                users = JSON.parse(users);
+	            }
+	            if (users.status == 0) {
+	                data.body.reverse();
+	                self.setState({
+	                    users: users
+	                });
+	            } else {
+	                self.setState({
+	                    error: true
+	                });
+	            }
+	        }, function (err) {
+	            self.setState({
+	                error: true
+	            });
+	        });
+	    },
+	    switching: function switching() {
+	        var users_type = this.state.active ? 'active' : 'inactive';
+	        this.setState(_defineProperty({
+	            active: false,
+	            inactive: false
+	        }, users_type, true));
+	        this.users_receive();
+	    },
+	    render: function render() {
+	        var self = this;
+	        refresh = this.users_receive;
+	        //first load
+	        if (!this.state.received && !this.state.error) {
+	            this.all_receive();
+	            return _react2.default.createElement(_templates.Waiting, null);
+	        } else if (!this.state.received && this.state.error) {
+	            return _react2.default.createElement(_templates.Error, null);
+	        } else if (!Boolean(this.state.status.u_manage || this.state.status.room)) {
+	            return _react2.default.createElement(_templates.Forbidden, null);
+	        }
+	        //render
+	        else {
+	                var condition = {
+	                    active: this.state.active,
+	                    inactive: this.state.inactive
+	                };
+	                return _react2.default.createElement(
+	                    'article',
+	                    { className: 'task_group_page_inner' },
+	                    _react2.default.createElement(_templates.Menu, { active: 'users', data: this.state.status }),
+	                    _react2.default.createElement(Creating, { groups: this.state.groups }),
+	                    _react2.default.createElement(UserList, { condition: condition, users: this.state.users, groups: this.state.groups, 'switch': this.switching })
+	                );
+	            }
 	    }
 	});
 
 	(0, _jquery2.default)(document).ready(function () {
 	    if (document.location.pathname == '/users') {
-	        _reactDom2.default.render(_react2.default.createElement(Creating, null), document.getElementsByClassName('content_inner')[0]);
+	        _reactDom2.default.render(_react2.default.createElement(UserPage, null), document.getElementsByClassName('content_inner')[0]);
 	    }
 	});
 

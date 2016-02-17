@@ -56,9 +56,9 @@ var Creating = React.createClass({
         var self = this;
         //users groups list
         var u_groups = [];
-        this.props.groups.forEach(function (elem) {
-            u_groups.push(<label>{elem[1]}<input type="radio" name="u_group" onChange={self.selectBoxes}
-                                                 value={elem[0]}/></label>);
+        this.props.groups.forEach(function (group) {
+            u_groups.push(<label>{group.name}<input type="radio" name="u_group" onChange={self.selectBoxes}
+                                                 value={group.id}/></label>);
         });
         u_groups.unshift(<label className="active_elem">Master<input type="radio" name="u_group"
                          onChange={self.selectBoxes} value='' defaultChecked/></label>);
@@ -91,6 +91,10 @@ var Creating = React.createClass({
 var User = React.createClass({
     getInitialState() {
         var data = this.props.data;
+        data.users_group = data.users_group || {
+                id: 0,
+                name: 'Masters'
+            };
         return {
             id: data.id,
             name: data.name,
@@ -98,7 +102,7 @@ var User = React.createClass({
             group_id: data.users_group.id,
             group_name: data.users_group.name,
             active: data.active,
-            created: data.createdAt.toString().slice(0, -15)
+            created: data.createdAt.toString().slice(0, -14)
         };
     },
     expand(elem) {
@@ -147,13 +151,13 @@ var User = React.createClass({
         var group_classes = 'user user_group_color user_group_color_' + this.state.group_id;
         //all groups
         var groups_list = [];
-        groups_list.push(<label className='active_elem'>No group<input type="radio" name="u_group"
-                                                                       defaultChecked onChange={self.selectBoxes} value=''/></label>);
+        var master_c = self.state.group_id == 0 ? 'active_elem' : '';
+        groups_list.push(<label className={master_c}>Master<input type="radio" name="u_group"
+                        defaultChecked={self.state.group_id == 0} onChange={self.selectBoxes} value='0'/></label>);
         this.props.all_groups.forEach(function(group) {
-            if(group.id != self.state.id) {
-                groups_list.push(<label>{group.name}<input type="radio" name="u_group"
-                                                           onChange={self.selectBoxes} value={group.id}/></label>);
-            }
+            var group_c = self.state.group_id == group.id ? 'active_elem' : '';
+            groups_list.push(<label className={group_c}>{group.name}<input type="radio" name="u_group"
+                            onChange={self.selectBoxes} defaultChecked={self.state.group_id == group.id} value={group.id}/></label>);
         });
         var group_list_block = <article className="select_box">
             {groups_list}
@@ -186,12 +190,21 @@ var User = React.createClass({
                         <span className="task_info_elem"><b>Created: </b>{this.state.created}</span>
                     </article>
                 </article>
-                {user_group_buttons}
+                <article className="clearfix"></article>
+                <article className="user_bottom">
+                    {user_group_buttons}
+                </article>
                 <article className="user_action user_change hidden">
                     <form>
-                        <input type="text" name="name" placeholder="Name" defaultValue={this.state.name}/><br/>
-                        <input type="text" name="mail" placeholder="Mail" defaultValue={this.state.mail}/><br/>
-                        {group_list_block}
+                        <article className="column">
+                            <h3>Data</h3>
+                            <input type="text" name="name" placeholder="Name" defaultValue={this.state.name}/><br/>
+                            <input type="text" name="mail" placeholder="Mail" defaultValue={this.state.mail}/><br/>
+                        </article>
+                        <article className="column">
+                            <h3>Group</h3>
+                            {group_list_block}
+                        </article>
                     </form>
                     <button onClick={this.submit('edit')}>Edit</button>
                 </article>
@@ -230,7 +243,7 @@ var UserList = React.createClass({
         var inactive_c = this.state.inactive ? 'panel_elem active_elem' : 'panel_elem';
         //creating user panels
         var users = this.props.users;
-        var groups = this.state.groups;
+        var groups = this.props.groups;
         var users_list = [];
         users.forEach(function(user) {
             users_list.push(<User key={user.id} data={user} all_groups={groups} />);
@@ -259,6 +272,7 @@ var UserPage = React.createClass({
     },
     all_receive() {
         var users_type = this.state.active ? 'active' : 'inactive';
+        var self = this;
         submitting(null, '/api/account/status', 'GET', function(status) {
             if (typeof status == 'string') {
                 status = JSON.parse(status);
@@ -267,16 +281,15 @@ var UserPage = React.createClass({
                 if (typeof groups == 'string') {
                     groups = JSON.parse(groups);
                 }
-                submitting(null, '/api/user_manage/' + users_type, 'GET', function (users) {
+                submitting(null, '/api/manage_data/' + users_type + '_users', 'GET', function (users) {
                     if (typeof users == 'string') {
                         users = JSON.parse(users);
                     }
                     if (users.status == 0 && groups.status == 0) {
-                        data.body.reverse();
                         self.setState({
-                            users,
+                            users: users.body,
                             status,
-                            groups,
+                            groups: groups.body,
                             received: true,
                             error: false
                         });
@@ -302,7 +315,7 @@ var UserPage = React.createClass({
             });
         });
     },
-    users_reveive() {
+    users_receive() {
         var users_type = this.state.active ? 'active' : 'inactive';
         submitting(null, '/api/user_manage/' + users_type, 'GET', function (users) {
             if (typeof users == 'string') {
@@ -325,21 +338,21 @@ var UserPage = React.createClass({
             });
         });
     },
-    switching(type) {
+    switching() {
         var users_type = this.state.active ? 'active' : 'inactive';
         this.setState({
             active: false,
             inactive: false,
             [users_type]: true
         });
-        this.users_reveive();
+        this.users_receive();
     },
     render() {
         var self = this;
-        refresh = this.receive;
+        refresh = this.users_receive;
         //first load
         if(!this.state.received && !this.state.error) {
-            this.receive();
+            this.all_receive();
             return <Waiting />;
         }
         else if(!this.state.received && this.state.error) {
@@ -365,6 +378,6 @@ var UserPage = React.createClass({
 
 $(document).ready(function() {
     if (document.location.pathname == '/users') {
-        ReactDOM.render(<Creating />, document.getElementsByClassName('content_inner')[0]);
+        ReactDOM.render(<UserPage />, document.getElementsByClassName('content_inner')[0]);
     }
 });
