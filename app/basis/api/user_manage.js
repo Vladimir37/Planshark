@@ -355,13 +355,14 @@ function change(req, res, next) {
     var author_group = +res.user_status.group;
     //user data
     var target_user = req.body.id;
+    var target_name = req.body.name;
     var mail = req.body.mail;
-    var target_group = req.body.group;
+    var target_group = req.body.u_group;
     //right to blocking
     var edit_right = false;
     author_group == 0 ? edit_right = true : edit_right = false;
     db.users_groups.findById(author_group).then(function(group) {
-        if(!group || !pass) {
+        if(!group) {
             throw '1';
         }
         group.u_group_manage == 1 ? edit_right = true : edit_right = false;
@@ -375,8 +376,8 @@ function change(req, res, next) {
         }
     }).then(function() {
         return db.users.update({
-            active: 1,
             mail,
+            name: target_name,
             u_group: target_group
         }, {
             where: {

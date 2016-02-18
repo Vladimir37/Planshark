@@ -33871,9 +33871,6 @@
 	        var ajax_data = (0, _submitting.getData)(elem.target);
 	        if (!ajax_data) {
 	            (0, _toaster2.default)(actions_r[2]);
-	        } else if (!re_color.test(ajax_data.color)) {
-	            (0, _toaster2.default)(actions_r[3]);
-	            (0, _jquery2.default)(elem.target).parent().find('input[name="color"]').val('');
 	        } else {
 	            (0, _submitting.submitting)(ajax_data, '/api/user_manage/new', 'POST', function (data) {
 	                var response_status = +data;
@@ -34019,7 +34016,8 @@
 	            var target = elem.target;
 	            var ajax_data = {};
 	            ajax_data = (0, _submitting.getData)(target);
-	            ajax_data.user_id = self.state.id;
+	            ajax_data.id = self.state.id;
+	            console.log(ajax_data);
 	            if (ajax_data) {
 	                (0, _submitting.submitting)(ajax_data, '/api/user_manage/' + type, 'POST', function (data) {
 	                    var response_status = +data;
@@ -34027,7 +34025,7 @@
 	                        response_status = 1;
 	                    }
 	                    (0, _toaster2.default)(actions_r[response_status]);
-	                    //refresh();
+	                    refresh();
 	                }, function (err) {
 	                    (0, _toaster2.default)(actions_r[1]);
 	                });
@@ -34072,12 +34070,12 @@
 	        );
 	        //buttons
 	        var user_buttons = [];
-	        user_buttons.push(_react2.default.createElement(
-	            'button',
-	            { onClick: this.actions('change'), className: 'solve_but' },
-	            'Edit'
-	        ));
 	        if (this.state.active) {
+	            user_buttons.push(_react2.default.createElement(
+	                'button',
+	                { onClick: this.actions('change'), className: 'solve_but' },
+	                'Edit'
+	            ));
 	            user_buttons.push(_react2.default.createElement(
 	                'button',
 	                { onClick: this.actions('block') },
@@ -34188,7 +34186,7 @@
 	                    ),
 	                    _react2.default.createElement(
 	                        'button',
-	                        { onClick: this.submit('edit') },
+	                        { onClick: this.submit('change') },
 	                        'Edit'
 	                    )
 	                ),

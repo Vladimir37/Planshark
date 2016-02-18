@@ -20,10 +20,6 @@ var Creating = React.createClass({
         if(!ajax_data) {
             toast(actions_r[2]);
         }
-        else if(!re_color.test(ajax_data.color)) {
-            toast(actions_r[3]);
-            $(elem.target).parent().find('input[name="color"]').val('');
-        }
         else {
             submitting(ajax_data, '/api/user_manage/new', 'POST', function(data) {
                 var response_status = +data;
@@ -122,7 +118,8 @@ var User = React.createClass({
             var target = elem.target;
             var ajax_data = {};
             ajax_data = getData(target);
-            ajax_data.user_id = self.state.id;
+            ajax_data.id = self.state.id;
+            console.log(ajax_data);
             if(ajax_data) {
                 submitting(ajax_data, '/api/user_manage/' + type, 'POST', function (data) {
                     var response_status = +data;
@@ -130,7 +127,7 @@ var User = React.createClass({
                         response_status = 1;
                     }
                     toast(actions_r[response_status]);
-                    //refresh();
+                    refresh();
                 }, function (err) {
                     toast(actions_r[1]);
                 });
@@ -164,8 +161,8 @@ var User = React.createClass({
         </article>;
         //buttons
         var user_buttons = [];
-        user_buttons.push(<button onClick={this.actions('change')} className="solve_but">Edit</button>);
         if(this.state.active) {
+            user_buttons.push(<button onClick={this.actions('change')} className="solve_but">Edit</button>);
             user_buttons.push(<button onClick={this.actions('block')}>Block</button>);
         }
         else {
@@ -206,7 +203,7 @@ var User = React.createClass({
                             {group_list_block}
                         </article>
                     </form>
-                    <button onClick={this.submit('edit')}>Edit</button>
+                    <button onClick={this.submit('change')}>Edit</button>
                 </article>
                 <article className="user_action user_block hidden">
                     <h3>Are you sure you want to block {this.state.name}?</h3>
