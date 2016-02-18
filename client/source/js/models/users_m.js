@@ -7,6 +7,7 @@ import toast from '../toaster.js';
 
 //responses
 var actions_r = ['Success!', 'Server error' , 'Required fields are empty'];
+var creating_r = ['Success!', 'Server error', 'Name is exist!', 'Mail is exist!'];
 
 //refresh groups list
 var refresh;
@@ -27,15 +28,15 @@ var Creating = React.createClass({
                     response_status = 1;
                 }
                 if(response_status == 0) {
-                    toast(actions_r[0]);
+                    toast(creating_r[0]);
                     $(elem.target).parent().find('input[type="text"]').val('');
                     refresh();
                 }
                 else {
-                    toast(actions_r[response_status]);
+                    toast(creating_r[response_status]);
                 }
             }, function(err) {
-                toast(actions_r[1]);
+                toast(creating_r[1]);
             });
         }
     },

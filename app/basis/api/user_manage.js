@@ -249,13 +249,35 @@ function new_user(req, res, next) {
             res.end('1');
         }
     }).then(function() {
-        return db.users.create({
-            name,
-            pass,
-            mail,
-            room,
-            u_group: target_group
+        return db.users.findOne({
+            where: {
+                name
+            }
         });
+    }).then(function(user) {
+        if(user) {
+            res.end('2');
+        }
+        else {
+            return db.users.findOne({
+                where: {
+                    mail
+                }
+            });
+        }
+    }).then(function(user) {
+        if(user) {
+            res.end('3');
+        }
+        else {
+            return db.users.create({
+                name,
+                pass,
+                mail,
+                room,
+                u_group: target_group
+            });
+        }
     }).then(function() {
         res.end('0');
     }, function(err) {

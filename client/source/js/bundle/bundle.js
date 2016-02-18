@@ -37903,6 +37903,7 @@
 
 	//responses
 	var actions_r = ['Success!', 'Server error', 'Required fields are empty'];
+	var creating_r = ['Success!', 'Server error', 'Name is exist!', 'Mail is exist!'];
 
 	//refresh groups list
 	var refresh;
@@ -37923,14 +37924,14 @@
 	                    response_status = 1;
 	                }
 	                if (response_status == 0) {
-	                    (0, _toaster2.default)(actions_r[0]);
+	                    (0, _toaster2.default)(creating_r[0]);
 	                    (0, _jquery2.default)(elem.target).parent().find('input[type="text"]').val('');
 	                    refresh();
 	                } else {
-	                    (0, _toaster2.default)(actions_r[response_status]);
+	                    (0, _toaster2.default)(creating_r[response_status]);
 	                }
 	            }, function (err) {
-	                (0, _toaster2.default)(actions_r[1]);
+	                (0, _toaster2.default)(creating_r[1]);
 	            });
 	        }
 	    },
