@@ -320,7 +320,7 @@ var UsersGroupsList = React.createClass({
         else if(!this.state.received && this.state.error) {
             return <Error />;
         }
-        else if(!Boolean(this.state.u_manage || this.state.room)) {
+        else if(!Boolean(this.state.status.u_manage || this.state.room)) {
             return <Forbidden />;
         }
         //render
@@ -355,8 +355,4 @@ var UsersGroupsList = React.createClass({
     }
 });
 
-$(document).ready(function() {
-    if (document.location.pathname == '/users_groups') {
-        ReactDOM.render(<UsersGroupsList />, document.getElementsByClassName('content_inner')[0]);
-    }
-});
+export default UsersGroupsList;

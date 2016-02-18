@@ -377,8 +377,4 @@ var UserPage = React.createClass({
     }
 });
 
-$(document).ready(function() {
-    if (document.location.pathname == '/users') {
-        ReactDOM.render(<UserPage />, document.getElementsByClassName('content_inner')[0]);
-    }
-});
+export default UserPage;

@@ -1,7 +1,7 @@
 {
     "name": "Planshark",
-    "version": "0.5.0",
-    "license": "MIT License",
+    "version": "0.8.0",
+    "license": "MIT",
     "main": "planshark.js",
     "repository": {
         "type": "git",
@@ -23,6 +23,7 @@
         "random-token": "*",
         "react": "0.14.6",
         "react-dom": "0.14.6",
+        "react-router": "2.0.0",
         "babel-loader": "6.2.1",
         "babel-core": "*",
         "babel-preset-es2015": "*",

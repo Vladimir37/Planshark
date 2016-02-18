@@ -4,9 +4,8 @@ var path = require('path');
 var config = {
     context: path.join(__dirname, "../../client/source/js"),
     entry: [
-        "jquery", "./libs/toastr.js","./libs/jquery-ui.min.js", "./libs/colorpicker.min.js", "./submitting", "./toaster",
-        "./models/account_m", "./models/tasks_m", "./models/t_groups_m", "./models/u_groups_m", "./models/users_m", "./models/templates",
-        "react", "react-dom"
+        "jquery", "./libs/toastr.js","./libs/jquery-ui.min.js", "./libs/colorpicker.min.js",
+        "./router", "react", "react-dom", "react-router"
     ],
     output: {
         path: path.join(__dirname, "../../client/source/js/bundle")

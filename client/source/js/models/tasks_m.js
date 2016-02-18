@@ -265,7 +265,7 @@ var Task = React.createClass({
                         response_status = 1;
                     }
                     toast(actions_r[response_status]);
-                    //refresh();
+                    refresh();
                 }, function (err) {
                     toast(actions_r[1]);
                 });
@@ -828,8 +828,4 @@ var TasksPage = React.createClass({
     }
 });
 
-$(document).ready(function() {
-    if (document.location.pathname == '/tasks') {
-        ReactDOM.render(<TasksPage />, document.getElementsByClassName('content_inner')[0]);
-    }
-});
+export default TasksPage;

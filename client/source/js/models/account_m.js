@@ -253,8 +253,4 @@ var StartAccount = React.createClass({
     }
 });
 
-$(document).ready(function() {
-    if(document.location.pathname == '/') {
-        ReactDOM.render(<StartAccount />, document.getElementsByClassName('index_forms')[0]);
-    }
-});
+export default StartAccount;

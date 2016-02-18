@@ -259,8 +259,4 @@ var TasksGroupsList = React.createClass({
     }
 });
 
-$(document).ready(function() {
-    if (document.location.pathname == '/tasks_groups') {
-        ReactDOM.render(<TasksGroupsList />, document.getElementsByClassName('content_inner')[0]);
-    }
-});
+export default TasksGroupsList;
