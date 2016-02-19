@@ -39512,7 +39512,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	//responses
-	var actions_r = ['Success!', 'Server error', 'Required fields are empty', 'Incorrect mail'];
+	var actions_r = ['Success!', 'Server error', 'Required fields are empty', 'Incorrect login or old password', 'Passwords a nor equal'];
 
 	var RemindPassword = _react2.default.createClass({
 	    displayName: 'RemindPassword',
@@ -39578,6 +39578,7 @@
 	        ajax_data = (0, _submitting.getData)(target);
 	        if (ajax_data) {
 	            (0, _submitting.submitting)(ajax_data, '/api/account/change', 'POST', function (data) {
+	                console.log(data);
 	                var response_status = +data;
 	                if (isNaN(response_status)) {
 	                    response_status = 1;

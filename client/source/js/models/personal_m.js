@@ -6,7 +6,8 @@ import {Waiting, Error} from './templates.js';
 import toast from '../toaster.js';
 
 //responses
-var actions_r = ['Success!', 'Server error' , 'Required fields are empty', 'Incorrect mail'];
+var actions_r = ['Success!', 'Server error' , 'Required fields are empty',
+    'Incorrect login or old password', 'Passwords are nor equal'];
 
 var RemindPassword = React.createClass({
     getInitialState() {
@@ -59,6 +60,7 @@ var ChangePass = React.createClass({
         ajax_data = getData(target);
         if(ajax_data) {
             submitting(ajax_data, '/api/account/change', 'POST', function (data) {
+                console.log(data);
                 var response_status = +data;
                 if (isNaN(response_status)) {
                     response_status = 1;

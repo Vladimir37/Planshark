@@ -143,7 +143,7 @@ function change(req, res, next) {
     var new_pass_one = req.body.new_pass_one;
     var new_pass_two = req.body.new_pass_two;
     if(new_pass_one != new_pass_two || !new_pass_one || !new_pass_two) {
-        res.end('1');
+        res.end('4');
     }
     else {
         db.users.findOne({
@@ -151,11 +151,14 @@ function change(req, res, next) {
                 mail
             }
         }).then(function(user) {
-            var target_pass = crypt.decrypt(user.pass);
-            if(!user || target_pass != old_pass) {
-                throw '1';
+            if(!user) {
+                throw '3';
             }
             else {
+                var target_pass = crypt.decrypt(user.pass);
+                if(target_pass != old_pass) {
+                    throw '3';
+                }
                 var new_pass_encrypt = crypt.encrypt(new_pass_one);
                 return db.users.update({
                     pass: new_pass_encrypt
@@ -169,7 +172,7 @@ function change(req, res, next) {
             mail_send('change', mail, 'Password in Planshark', {new_pass_one});
             res.end('0');
         }).catch(function(err) {
-            res.end('1');
+            res.end(err.toString());
         })
     }
 };
