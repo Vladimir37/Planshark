@@ -1,0 +1,12 @@
+extends ../basis/mail_layout
+
+block content
+    h1 You have been invited to PlanShark!
+    p On PlanShark account has been created for you. If you do not know what it ignore letter.
+    article.warn Your login:
+        article.main=login
+    article.warn Your password:
+        article.main=pass
+    p='Now you can enter to '
+        a(href="http://theplanshark.com/") PlanShark
+        | .
