@@ -11267,6 +11267,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	$(document).ready(function () {
+	    $('.content .wrapper').css('min-height', window.innerHeight - 180 + 'px');
 	    _reactDom2.default.render(_react2.default.createElement(
 	        _reactRouter.Router,
 	        { history: _reactRouter.browserHistory },
@@ -36022,6 +36023,12 @@
 	                'button',
 	                { className: 'sub', onClick: this.submit },
 	                'Login'
+	            ),
+	            _react2.default.createElement('br', null),
+	            _react2.default.createElement(
+	                'a',
+	                { href: '/personal', className: 'forgotten' },
+	                'Forgot your password?'
 	            )
 	        );
 	    }
@@ -36169,6 +36176,15 @@
 	                    'Users'
 	                )
 	            ) : '';
+	            var personal = _react2.default.createElement(
+	                'a',
+	                { href: '/personal' },
+	                _react2.default.createElement(
+	                    'article',
+	                    { className: 'index_panel_elem' },
+	                    'Personal'
+	                )
+	            );
 	            var exit = _react2.default.createElement(
 	                'article',
 	                { className: 'index_panel_elem', onClick: this.props.exit },
@@ -36182,6 +36198,7 @@
 	                t_groups,
 	                u_groups,
 	                users,
+	                personal,
 	                exit
 	            );
 	        }
@@ -36358,7 +36375,6 @@
 	    },
 	    dataHandling: function dataHandling() {
 	        var data = this.props.data;
-	        var self = this;
 	        if (data && !this.state.received) {
 	            this.setState({
 	                received: true,
@@ -36409,6 +36425,11 @@
 	                { onClick: this.transition('/users'), className: users_c },
 	                'Users'
 	            ) : '';
+	            var personal = _react2.default.createElement(
+	                'nav',
+	                { onClick: this.transition('/personal'), className: users_c },
+	                'Personal'
+	            );
 	            var exit_but = _react2.default.createElement(
 	                'nav',
 	                { onClick: this.exit },
@@ -36421,6 +36442,7 @@
 	                t_groups,
 	                u_groups,
 	                users,
+	                personal,
 	                exit_but
 	            );
 	        } else {
@@ -39512,7 +39534,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	//responses
-	var actions_r = ['Success!', 'Server error', 'Required fields are empty', 'Incorrect login or old password', 'Passwords a nor equal'];
+	var actions_r = ['Success!', 'Server error', 'Required fields are empty', 'Incorrect login or old password', 'Passwords are nor equal'];
 
 	var RemindPassword = _react2.default.createClass({
 	    displayName: 'RemindPassword',

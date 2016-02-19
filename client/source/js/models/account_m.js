@@ -70,7 +70,8 @@ var Login = React.createClass({
                 <input type="text" name="name" placeholder="Name" data-req="true"/><br/>
                 <input type="password" name="pass" placeholder="Password" data-req="true"/><br/>
                 <label>Remember me<input type="checkbox" name="remember"/></label><br/>
-                <button className="sub" onClick={this.submit}>Login</button>
+                <button className="sub" onClick={this.submit}>Login</button><br/>
+                <a href="/personal" className="forgotten">Forgot your password?</a>
             </article>;
     }
 });
@@ -166,6 +167,9 @@ var Panel = React.createClass({
             var users = this.state.users ? <a href="/users">
                 <article className="index_panel_elem">Users</article>
             </a> : '';
+            var personal = <a href="/personal">
+                <article className="index_panel_elem">Personal</article>
+            </a>;
             var exit = <article className="index_panel_elem" onClick={this.props.exit}>
                 Exit
             </article>;
@@ -175,6 +179,7 @@ var Panel = React.createClass({
                 {t_groups}
                 {u_groups}
                 {users}
+                {personal}
                 {exit}
             </article>;
         }

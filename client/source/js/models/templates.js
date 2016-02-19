@@ -13,7 +13,6 @@ export var Menu = React.createClass({
     },
     dataHandling() {
         var data = this.props.data;
-        var self = this;
         if(data && !this.state.received) {
             this.setState({
                 received: true,
@@ -51,12 +50,14 @@ export var Menu = React.createClass({
                 <nav onClick={this.transition('/users_groups')} className={u_groups_c}>Users groups</nav> : '';
             var users = this.state.users ?
                 <nav onClick={this.transition('/users')} className={users_c}>Users</nav> : '';
+            var personal = <nav onClick={this.transition('/personal')} className={users_c}>Personal</nav>;
             var exit_but = <nav onClick={this.exit}>Exit</nav>;
             return <article className="menu_inner">
                 {tasks}
                 {t_groups}
                 {u_groups}
                 {users}
+                {personal}
                 {exit_but}
             </article>;
         }

@@ -10,6 +10,7 @@ import user_groups from "./models/u_groups_m.js"
 import personal from "./models/personal_m.js"
 
 $(document).ready(function() {
+    $('.content .wrapper').css('min-height', window.innerHeight - 180 + 'px');
     ReactDOM.render((
         <Router history={browserHistory}>
             <Route path="/" component={account}></Route>
