@@ -1,6 +1,7 @@
 var db = require('../database');
 var crypt = require('../crypt');
 var mail_send = require('../mail');
+var config = require('../../../config/app');
 
 //RegExp for mail
 var re_mail = new RegExp('.+@.+\..+');
@@ -165,7 +166,7 @@ function change(req, res, next) {
                 });
             }
         }).then(function() {
-            mail('change', mail, 'Password in Planshark', {new_pass_one});
+            mail_send('change', mail, 'Password in Planshark', {new_pass_one});
             res.end('0');
         }).catch(function(err) {
             res.end('1');
@@ -182,12 +183,15 @@ function reminder(req, res, next) {
         }
     }).then(function(user) {
         if(!user) {
-            res.end('0');
+            res.end('3');
         }
         else {
             var pass = crypt.decrypt(user.pass);
-            mail('reminder', mail, 'Password in Planshark', {pass, name: user.name});
+            mail_send('reminder', mail, 'Password in Planshark', {pass, name: user.name});
+            res.end('0');
         }
+    }, function(err) {
+        res.end('1');
     });
 };
 
@@ -238,6 +242,14 @@ function status(req, res, next) {
     }
 };
 
+//appeal to support
+function appeal(req, res, next) {
+    var mail = req.body.mail;
+    var text = req.body.text;
+    mail_send('appeal', config.support_mail, 'Appeal', {mail, text});
+    res.end('0');
+};
+
 //exit from account
 function exit(req, res, next) {
     res.clearCookie('planshark_status');
@@ -249,4 +261,5 @@ exports.registration = registration;
 exports.change = change;
 exports.reminder = reminder;
 exports.status = status;
+exports.appeal = appeal;
 exports.exit = exit;

@@ -8,6 +8,9 @@ var router = express.Router();
 //index page
 router.get('/', render('main/index'));
 
+//operation with password and appeal to support
+router.get('/personal', render('main/personal'));
+
 //tasks manage
 router.get('/tasks', status.hard, render('main/tasks'));
 

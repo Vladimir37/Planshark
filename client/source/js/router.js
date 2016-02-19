@@ -7,6 +7,7 @@ import tasks from "./models/tasks_m.js";
 import users from "./models/users_m.js";
 import task_groups from "./models/t_groups_m.js";
 import user_groups from "./models/u_groups_m.js"
+import personal from "./models/personal_m.js"
 
 $(document).ready(function() {
     ReactDOM.render((
@@ -16,6 +17,7 @@ $(document).ready(function() {
             <Route path="/users_groups" component={user_groups}></Route>
             <Route path="/tasks_groups" component={task_groups}></Route>
             <Route path="/users" component={users}></Route>
+            <Route path="/personal" component={personal}></Route>
         </Router>
     ), document.getElementsByClassName('content_inner')[0]);
 });

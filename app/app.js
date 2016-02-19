@@ -1,6 +1,7 @@
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var favicon = require('serve-favicon');
 
 var status = require('./basis/status');
 var webpack = require('./basis/webpack');
@@ -23,6 +24,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+//favicon
+app.use(favicon('client/source/img/favicon/favicon.ico'));
 
 //Determination user status
 app.use(status.soft);

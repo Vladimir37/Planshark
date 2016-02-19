@@ -19,6 +19,9 @@ router.post('/reminder', account.reminder);
 //object with user status
 router.get('/status', account.status);
 
+//appeal to support
+router.post('/appeal', account.appeal);
+
 //exit from account
 router.post('/exit', account.exit);
 

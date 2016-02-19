@@ -11260,6 +11260,10 @@
 
 	var _u_groups_m2 = _interopRequireDefault(_u_groups_m);
 
+	var _personal_m = __webpack_require__(231);
+
+	var _personal_m2 = _interopRequireDefault(_personal_m);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	$(document).ready(function () {
@@ -11270,7 +11274,8 @@
 	        _react2.default.createElement(_reactRouter.Route, { path: "/tasks", component: _tasks_m2.default }),
 	        _react2.default.createElement(_reactRouter.Route, { path: "/users_groups", component: _u_groups_m2.default }),
 	        _react2.default.createElement(_reactRouter.Route, { path: "/tasks_groups", component: _t_groups_m2.default }),
-	        _react2.default.createElement(_reactRouter.Route, { path: "/users", component: _users_m2.default })
+	        _react2.default.createElement(_reactRouter.Route, { path: "/users", component: _users_m2.default }),
+	        _react2.default.createElement(_reactRouter.Route, { path: "/personal", component: _personal_m2.default })
 	    ), document.getElementsByClassName('content_inner')[0]);
 	});
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
@@ -39473,6 +39478,226 @@
 	});
 
 	exports.default = UsersGroupsList;
+
+/***/ },
+/* 231 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(7);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(221);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _submitting = __webpack_require__(223);
+
+	var _templates = __webpack_require__(224);
+
+	var _toaster = __webpack_require__(225);
+
+	var _toaster2 = _interopRequireDefault(_toaster);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	//responses
+	var actions_r = ['Success!', 'Server error', 'Required fields are empty', 'Incorrect mail'];
+
+	var RemindPassword = _react2.default.createClass({
+	    displayName: 'RemindPassword',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    submit: function submit(elem) {
+	        var target = elem.target;
+	        var ajax_data = {};
+	        ajax_data = (0, _submitting.getData)(target);
+	        if (ajax_data) {
+	            (0, _submitting.submitting)(ajax_data, '/api/account/reminder', 'POST', function (data) {
+	                var response_status = +data;
+	                if (isNaN(response_status)) {
+	                    response_status = 1;
+	                }
+	                (0, _toaster2.default)(actions_r[response_status]);
+	                if (response_status == 0) {
+	                    (0, _jquery2.default)(target).parent().find('input[type="text"], textarea').val('');
+	                }
+	            }, function (err) {
+	                (0, _toaster2.default)(actions_r[1]);
+	            });
+	        } else {
+	            (0, _toaster2.default)(actions_r[2]);
+	        }
+	    },
+	    switching: function switching(elem) {
+	        (0, _jquery2.default)(elem.target).next('.creatingFormBody').slideToggle();
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'creatingForm' },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'creatingFormHead', onClick: this.switching },
+	                'Remind password'
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'creatingFormBody' },
+	                _react2.default.createElement('input', { type: 'text', placeholder: 'Your mail', name: 'mail', 'data-req': 'true' }),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.submit },
+	                    'Remind'
+	                )
+	            )
+	        );
+	    }
+	});
+
+	var ChangePass = _react2.default.createClass({
+	    displayName: 'ChangePass',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    submit: function submit(elem) {
+	        var target = elem.target;
+	        var ajax_data = {};
+	        ajax_data = (0, _submitting.getData)(target);
+	        if (ajax_data) {
+	            (0, _submitting.submitting)(ajax_data, '/api/account/change', 'POST', function (data) {
+	                var response_status = +data;
+	                if (isNaN(response_status)) {
+	                    response_status = 1;
+	                }
+	                (0, _toaster2.default)(actions_r[response_status]);
+	                if (response_status == 0) {
+	                    (0, _jquery2.default)(target).parent().find('input[type="text"], textarea').val('');
+	                }
+	            }, function (err) {
+	                (0, _toaster2.default)(actions_r[1]);
+	            });
+	        } else {
+	            (0, _toaster2.default)(actions_r[2]);
+	        }
+	    },
+	    switching: function switching(elem) {
+	        (0, _jquery2.default)(elem.target).next('.creatingFormBody').slideToggle();
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'creatingForm' },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'creatingFormHead', onClick: this.switching },
+	                'Change password'
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'creatingFormBody' },
+	                _react2.default.createElement('input', { type: 'text', placeholder: 'Your mail', name: 'mail', 'data-req': 'true' }),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement('input', { type: 'text', placeholder: 'Old password', name: 'old_pass', 'data-req': 'true' }),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement('input', { type: 'password', placeholder: 'New password', name: 'new_pass_one', 'data-req': 'true' }),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement('input', { type: 'password', placeholder: 'New password again', name: 'new_pass_two', 'data-req': 'true' }),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.submit },
+	                    'Change'
+	                )
+	            )
+	        );
+	    }
+	});
+
+	var AppealToSupport = _react2.default.createClass({
+	    displayName: 'AppealToSupport',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    submit: function submit(elem) {
+	        var target = elem.target;
+	        var ajax_data = {};
+	        ajax_data = (0, _submitting.getData)(target);
+	        if (ajax_data) {
+	            (0, _submitting.submitting)(ajax_data, '/api/account/appeal', 'POST', function (data) {
+	                var response_status = +data;
+	                if (isNaN(response_status)) {
+	                    response_status = 1;
+	                }
+	                (0, _toaster2.default)(actions_r[response_status]);
+	                if (response_status == 0) {
+	                    (0, _jquery2.default)(target).parent().find('input[type="text"], textarea').val('');
+	                }
+	            }, function (err) {
+	                (0, _toaster2.default)(actions_r[1]);
+	            });
+	        } else {
+	            (0, _toaster2.default)(actions_r[2]);
+	        }
+	    },
+	    switching: function switching(elem) {
+	        (0, _jquery2.default)(elem.target).next('.creatingFormBody').slideToggle();
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'creatingForm' },
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'creatingFormHead', onClick: this.switching },
+	                'Appeal to support'
+	            ),
+	            _react2.default.createElement(
+	                'article',
+	                { className: 'creatingFormBody' },
+	                _react2.default.createElement('input', { type: 'text', placeholder: 'Your mail', name: 'mail', 'data-req': 'true' }),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement('textarea', { name: 'text', placeholder: 'Your text', 'data-req': 'true' }),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.submit },
+	                    'Submit'
+	                )
+	            )
+	        );
+	    }
+	});
+
+	var PersonalPage = _react2.default.createClass({
+	    displayName: 'PersonalPage',
+	    getInitialState: function getInitialState() {
+	        return null;
+	    },
+	    render: function render() {
+	        return _react2.default.createElement(
+	            'article',
+	            { className: 'account_forms' },
+	            _react2.default.createElement(RemindPassword, null),
+	            _react2.default.createElement(ChangePass, null),
+	            _react2.default.createElement(AppealToSupport, null)
+	        );
+	    }
+	});
+
+	exports.default = PersonalPage;
 
 /***/ }
 /******/ ]);
