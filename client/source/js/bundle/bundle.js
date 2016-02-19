@@ -36004,13 +36004,18 @@
 	            (0, _toaster2.default)("Server error");
 	        });
 	    },
+	    handlingKeyPress: function handlingKeyPress(elem) {
+	        if (elem.key == 'Enter') {
+	            this.submit(elem);
+	        }
+	    },
 	    render: function render() {
 	        return _react2.default.createElement(
 	            'article',
 	            { className: 'form index_form login_form' },
-	            _react2.default.createElement('input', { type: 'text', name: 'name', placeholder: 'Name', 'data-req': 'true' }),
+	            _react2.default.createElement('input', { type: 'text', name: 'name', placeholder: 'Name', 'data-req': 'true', onKeyPress: this.handlingKeyPress }),
 	            _react2.default.createElement('br', null),
-	            _react2.default.createElement('input', { type: 'password', name: 'pass', placeholder: 'Password', 'data-req': 'true' }),
+	            _react2.default.createElement('input', { type: 'password', name: 'pass', placeholder: 'Password', 'data-req': 'true', onKeyPress: this.handlingKeyPress }),
 	            _react2.default.createElement('br', null),
 	            _react2.default.createElement(
 	                'label',
@@ -36055,15 +36060,20 @@
 	            (0, _toaster2.default)(registration_r[4]);
 	        });
 	    },
+	    handlingKeyPress: function handlingKeyPress(elem) {
+	        if (elem.key == 'Enter') {
+	            this.submit(elem);
+	        }
+	    },
 	    render: function render() {
 	        return _react2.default.createElement(
 	            'article',
 	            { className: 'form index_form register_form hidden', 'data-addr': '/api/account/registration' },
-	            _react2.default.createElement('input', { type: 'text', name: 'mail', placeholder: 'E-mail', 'data-req': 'true' }),
+	            _react2.default.createElement('input', { type: 'text', name: 'mail', placeholder: 'E-mail', 'data-req': 'true', onKeyPress: this.handlingKeyPress }),
 	            _react2.default.createElement('br', null),
-	            _react2.default.createElement('input', { type: 'text', name: 'name', placeholder: 'Name', 'data-req': 'true' }),
+	            _react2.default.createElement('input', { type: 'text', name: 'name', placeholder: 'Name', 'data-req': 'true', onKeyPress: this.handlingKeyPress }),
 	            _react2.default.createElement('br', null),
-	            _react2.default.createElement('input', { type: 'text', name: 'pass', placeholder: 'Password', 'data-req': 'true' }),
+	            _react2.default.createElement('input', { type: 'text', name: 'pass', placeholder: 'Password', 'data-req': 'true', onKeyPress: this.handlingKeyPress }),
 	            _react2.default.createElement('br', null),
 	            _react2.default.createElement(
 	                'label',

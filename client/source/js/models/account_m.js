@@ -65,10 +65,15 @@ var Login = React.createClass({
             toast("Server error");
         });
     },
+    handlingKeyPress(elem) {
+        if(elem.key == 'Enter') {
+            this.submit(elem);
+        }
+    },
     render() {
         return <article className="form index_form login_form">
-                <input type="text" name="name" placeholder="Name" data-req="true"/><br/>
-                <input type="password" name="pass" placeholder="Password" data-req="true"/><br/>
+                <input type="text" name="name" placeholder="Name" data-req="true" onKeyPress={this.handlingKeyPress}/><br/>
+                <input type="password" name="pass" placeholder="Password" data-req="true" onKeyPress={this.handlingKeyPress}/><br/>
                 <label>Remember me<input type="checkbox" name="remember"/></label><br/>
                 <button className="sub" onClick={this.submit}>Login</button><br/>
                 <a href="/personal" className="forgotten">Forgot your password?</a>
@@ -96,11 +101,16 @@ var Registration = React.createClass({
             toast(registration_r[4]);
         });
     },
+    handlingKeyPress(elem) {
+        if(elem.key == 'Enter') {
+            this.submit(elem);
+        }
+    },
     render() {
         return <article className="form index_form register_form hidden" data-addr="/api/account/registration">
-                <input type="text" name="mail" placeholder="E-mail" data-req="true"/><br/>
-                <input type="text" name="name" placeholder="Name" data-req="true"/><br/>
-                <input type="text" name="pass" placeholder="Password" data-req="true"/><br/>
+                <input type="text" name="mail" placeholder="E-mail" data-req="true" onKeyPress={this.handlingKeyPress}/><br/>
+                <input type="text" name="name" placeholder="Name" data-req="true" onKeyPress={this.handlingKeyPress}/><br/>
+                <input type="text" name="pass" placeholder="Password" data-req="true" onKeyPress={this.handlingKeyPress}/><br/>
                 <label>Personal<input type="radio" name="type" value="personal" defaultChecked/></label>
                 <label>Company<input type="radio" name="type" value="company"/></label><br/>
                 <button className="sub" onClick={this.submit}>Registration</button>

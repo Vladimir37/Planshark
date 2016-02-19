@@ -1,5 +1,6 @@
 var db = require('../database');
 var crypt = require('../crypt');
+var mail_send = require('../mail');
 
 //creating user group
 function creating(req, res, next) {
@@ -279,6 +280,10 @@ function new_user(req, res, next) {
             });
         }
     }).then(function() {
+        mail_send('invite', mail, 'You are invited to Planshark', {
+            login: name,
+            pass: pass_raw
+        });
         res.end('0');
     }, function(err) {
         console.log(err);
