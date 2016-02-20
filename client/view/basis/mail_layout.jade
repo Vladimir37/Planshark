@@ -1,30 +1,5 @@
-style(type="text/css").
-    .header {
-        background: #001448;
-    }
-    .logo {
-        width: 120px;
-        padding: 10px;
-    }
-    a {
-        color: #001448;
-        text-decoration: none;
-    }
-    .content {
-        font-family: Helvetica;
-        padding: 10px;
-        font-size: 16px;
-    }
-    .content .warn {
-        font-size: 18px;
-        font-weight: bold;
-    }
-    .content .warn .main {
-        font-weight: normal;
-    }
-
 section.main
-    section.header
-        img(src="http://theplanshark.com/src/img/logo.png" alt="logo").logo
-    section.content
+    section(style="background: #001448;")
+        img(src="http://theplanshark.com/src/img/logo.png" alt="logo" style="width: 120px;  padding: 10px;").logo
+    section.content(style="font-family: Helvetica;  padding: 10px;  font-size: 16px;")
         block content

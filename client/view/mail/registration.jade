@@ -2,10 +2,10 @@ extends ../basis/mail_layout
 
 block content
     h1 Registration on PlanShark successfully completed!
-    article.warn Your login:
-        article.main=name
-    article.warn Your password:
-        article.main=pass
+    article(style="font-size: 18px; font-weight: bold;") Your login:
+        article(style="font-weight: normal;")=name
+    article(style="font-size: 18px; font-weight: bold;") Your password:
+        article(style="font-weight: normal;")=pass
     p='Now you can enter to '
-    a(href="http://theplanshark.com/") PlanShark
+    a(href="http://theplanshark.com/" style="color: #001448; text-decoration: none;") PlanShark
     | .
