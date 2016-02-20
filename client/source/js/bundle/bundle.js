@@ -11267,7 +11267,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	$(document).ready(function () {
-	    $('.content .wrapper').css('min-height', window.innerHeight - 180 + 'px');
+	    $('.content .wrapper').css('min-height', window.innerHeight - 160 + 'px');
 	    _reactDom2.default.render(_react2.default.createElement(
 	        _reactRouter.Router,
 	        { history: _reactRouter.browserHistory },
