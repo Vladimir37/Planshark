@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 //favicon
-app.use(favicon('client/source/img/favicon/favicon.ico'));
+app.use(favicon(__dirname + '/../client/source/img/favicon/favicon.ico'));
 
 //Determination user status
 app.use(status.soft);
