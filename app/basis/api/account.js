@@ -89,7 +89,6 @@ function registration(req, res, next) {
                 return free_name(req, 'mail');
             }
             else {
-                console.log('REGISTRATION');
                 throw '1';
             }
         }).then(function(mail_status) {
@@ -131,6 +130,7 @@ function registration(req, res, next) {
             mail_send('registration', mail, 'Registration in Planshark', {name, pass});
             res.end('0');
         }).catch(function(err) {
+            console.log(err);
             var error_type = err.toString();
             res.end(error_type);
         });
