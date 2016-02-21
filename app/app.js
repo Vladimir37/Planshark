@@ -10,7 +10,7 @@ var index = require('./router/index');
 var api = require('./router/api');
 
 //start packaging
-//webpack();
+webpack();
 
 var app = express();
 

@@ -35934,7 +35934,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	//responses
-	var registration_r = ['Success!', 'Name is busy', 'Mail is busy', 'Required fields are empty', 'Server error'];
+	var registration_r = ['Success!', 'Name is busy', 'Mail is busy', 'Required fields are empty', 'Incorrect mail', 'Server error'];
 	var login_r = ['Success!', 'Incorrect login or password', 'Server error'];
 
 	var Buttons = _react2.default.createClass({
@@ -35991,7 +35991,7 @@
 	        (0, _submitting.submitting)(ajax_data, '/api/account/login', 'POST', function (data) {
 	            var response_status = +data;
 	            if (isNaN(response_status)) {
-	                response_status = 2;
+	                response_status = 5;
 	            }
 	            (0, _toaster2.default)(login_r[response_status]);
 	            if (response_status == 0) {
