@@ -38340,7 +38340,7 @@
 	        var groups = this.props.groups;
 	        var users_list = [];
 	        users.forEach(function (user) {
-	            users_list.push(_react2.default.createElement(User, { key: user.id, data: user, all_groups: groups }));
+	            users_list.push(_react2.default.createElement(User, { key: user.id + new Date().getTime(), data: user, all_groups: groups }));
 	        });
 	        return _react2.default.createElement(
 	            'article',
@@ -38839,7 +38839,7 @@
 	                    groups = _react2.default.createElement(_templates.Empty, null);
 	                } else {
 	                    this.state.groups.forEach(function (group) {
-	                        groups.push(_react2.default.createElement(TasksGroup, { key: group.id, data: group, all_groups: self.state.groups }));
+	                        groups.push(_react2.default.createElement(TasksGroup, { key: group.id + new Date().getTime(), data: group, all_groups: self.state.groups }));
 	                    });
 	                }
 	                return _react2.default.createElement(
@@ -39496,7 +39496,7 @@
 	                groups.push(_react2.default.createElement(UserGroup, { key: '0', data: master_group_data, all_groups: self.state.groups }));
 	                //user groups
 	                this.state.groups.forEach(function (group) {
-	                    groups.push(_react2.default.createElement(UserGroup, { key: group.id, data: group, all_groups: self.state.groups }));
+	                    groups.push(_react2.default.createElement(UserGroup, { key: group.id + new Date().getTime(), data: group, all_groups: self.state.groups }));
 	                });
 	                return _react2.default.createElement(
 	                    'article',
