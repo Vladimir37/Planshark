@@ -33,7 +33,7 @@ tables.users = sequelize.define('users', {
     },
     u_group: {
         type: Sequelize.INTEGER,
-        defaultValue: 0
+        defaultValue: null
     },
     active: {
         type: Sequelize.INTEGER,

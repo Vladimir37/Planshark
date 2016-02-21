@@ -36050,7 +36050,7 @@
 	        (0, _submitting.submitting)(ajax_data, '/api/account/registration', 'POST', function (data) {
 	            var response_status = +data;
 	            if (isNaN(response_status)) {
-	                response_status = 4;
+	                response_status = 5;
 	            }
 	            (0, _toaster2.default)(registration_r[response_status]);
 	            if (response_status == 0) {

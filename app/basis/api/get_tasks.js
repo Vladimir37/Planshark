@@ -7,7 +7,7 @@ function active_tasks(all_tasks) {
         //author data
         var author = res.user_status.id;
         var room = res.user_status.room;
-        var author_group = res.user_status.group || 0;
+        var author_group = +res.user_status.group;
         //personal
         if (!room) {
             db.tasks.findAll({
@@ -63,7 +63,7 @@ function inactive_tasks(all_tasks) {
         //author data
         var author = res.user_status.id;
         var room = res.user_status.room;
-        var author_group = res.user_status.group;
+        var author_group = +res.user_status.group;
         //personal
         if (!room) {
             db.tasks.findAll({
