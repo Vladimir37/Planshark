@@ -29,7 +29,7 @@ function tasks(req, res, next) {
     var condition = {};
     //personal
     if(!room) {
-        condition.author = author;
+        condition.user = author;
     }
     //company
     else {
