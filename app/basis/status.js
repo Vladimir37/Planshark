@@ -19,7 +19,7 @@ function status(type) {
                 var status_data = JSON.parse(result);
                 var user_status = {
                     room: status_data[0],
-                    group: status_data[1],
+                    group: +status_data[1],
                     id: status_data[2]
                 };
                 if(type == 'hard') {

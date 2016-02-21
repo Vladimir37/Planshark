@@ -8,6 +8,22 @@ function creating(req, res, next) {
     //group data
     var group_name = req.body.name;
     var group_color = req.body.color;
+    //creating task group data
+    var group_data;
+    if(room) {
+        group_data = {
+            room,
+            name: group_name,
+            color: group_color
+        };
+    }
+    else {
+        group_data = {
+            user: author,
+            name: group_name,
+            color: group_color
+        };
+    }
     //right to work with tasks group
     var tasks_right = false;
     author_group == 0 ? tasks_right = true : tasks_right = false;
@@ -26,11 +42,7 @@ function creating(req, res, next) {
             res.end('1');
         }
     }).then(function() {
-        return db.tasks_groups.create({
-            room,
-            name: group_name,
-            color: group_color
-        });
+        return db.tasks_groups.create(group_data);
     }).then(function() {
         res.end('0');
     }, function(err) {
@@ -49,6 +61,20 @@ function editing(req, res, next) {
     var group_id = req.body.id;
     var group_name = req.body.name;
     var group_color = req.body.color;
+    //creating task group data
+    var group_where;
+    if(room) {
+        group_where = {
+            id: group_id,
+            room
+        };
+    }
+    else {
+        group_where = {
+            id: group_id,
+            user: author
+        };
+    }
     //access u_groups
     var group_access = req.body.groups;
     //right to work with tasks group
@@ -74,10 +100,7 @@ function editing(req, res, next) {
             name: group_name,
             color: group_color
         }, {
-            where: {
-                id: group_id,
-                room
-            }
+            where: group_where
         });
     }).then(function() {
         res.end('0');
@@ -116,8 +139,8 @@ function deleting(req, res, next) {
             user: author
         };
         update_where = {
-            room,
-            author
+            author,
+            t_group: group_id
         };
     }
     //right to work with tasks group
