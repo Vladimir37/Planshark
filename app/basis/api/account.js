@@ -173,6 +173,7 @@ function change(req, res, next) {
             mail_send('change', mail, 'Password in Planshark', {new_pass_one});
             res.end('0');
         }).catch(function(err) {
+            console.log(err);
             res.end(err.toString());
         })
     }
@@ -195,6 +196,7 @@ function reminder(req, res, next) {
             res.end('0');
         }
     }, function(err) {
+        console.log(err);
         res.end('1');
     });
 };
