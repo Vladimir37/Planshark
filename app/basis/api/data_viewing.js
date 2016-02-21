@@ -180,7 +180,8 @@ function masters(req, res, next) {
         db.users.findAll({
             where: {
                 room,
-                u_group: 0
+                active: 1,
+                u_group: null
             }
         }).then(function(users) {
             res.end(serializing(0, users));
