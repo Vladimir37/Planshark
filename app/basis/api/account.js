@@ -128,7 +128,7 @@ function registration(req, res, next) {
                 return Promise.resolve();
             }
         }).then(function() {
-            mail_send('registration', mail, 'Registration in Planshark', {name, pass});
+            mail_send('registration', mail, 'Registration in Planshark', {name, pass: raw_pass});
             res.end('0');
         }).catch(function(err) {
             console.log(err);
