@@ -89,6 +89,7 @@ function registration(req, res, next) {
                 return free_name(req, 'mail');
             }
             else {
+                console.log('REGISTRATION');
                 throw '1';
             }
         }).then(function(mail_status) {
