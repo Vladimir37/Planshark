@@ -6,7 +6,7 @@ import {Waiting, Error} from './templates.js';
 import toast from '../toaster.js';
 
 //responses
-var registration_r = ['Success!', 'Name is busy', 'Mail is busy', 'Required fields are empty', 'Server error'];
+var registration_r = ['Success!', 'Name is busy', 'Mail is busy', 'Required fields are empty', 'Incorrect mail', 'Server error'];
 var login_r = ['Success!', 'Incorrect login or password', 'Server error'];
 
 var Buttons = React.createClass({
@@ -51,7 +51,7 @@ var Login = React.createClass({
         submitting(ajax_data, '/api/account/login', 'POST', function(data) {
             var response_status = +data;
             if(isNaN(response_status)) {
-                response_status = 2;
+                response_status = 5;
             }
             toast(login_r[response_status]);
             if(response_status == 0) {

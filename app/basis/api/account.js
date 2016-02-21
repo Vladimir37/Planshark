@@ -61,8 +61,8 @@ function free_name(req, type) {
                     reject(1);
                 }
                 else {
-                    if (type == 'mail' && !re_mail.test(name)) {
-                        reject(4);
+                    if(type == 'mail' && !re_mail.test(name)) {
+                        reject(5);
                     }
                     resolve(0);
                 }
