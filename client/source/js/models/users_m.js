@@ -248,7 +248,7 @@ var UserList = React.createClass({
         var groups = this.props.groups;
         var users_list = [];
         users.forEach(function(user) {
-            users_list.push(<User key={user.id} data={user} all_groups={groups} />);
+            users_list.push(<User key={user.id + new Date().getTime()} data={user} all_groups={groups} />);
         });
         return <article className="users_list_inner">
             <article className="panel_users_type">

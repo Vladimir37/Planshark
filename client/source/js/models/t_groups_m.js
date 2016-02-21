@@ -247,7 +247,7 @@ var TasksGroupsList = React.createClass({
             }
             else {
                 this.state.groups.forEach(function(group) {
-                    groups.push(<TasksGroup key={group.id} data={group} all_groups={self.state.groups} />);
+                    groups.push(<TasksGroup key={group.id + new Date().getTime()} data={group} all_groups={self.state.groups} />);
                 });
             }
             return <article className="task_group_page_inner">

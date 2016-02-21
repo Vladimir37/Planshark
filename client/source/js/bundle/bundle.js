@@ -37803,7 +37803,7 @@
 	                    if (list_tasks.length) {
 	                        list_tasks.reverse();
 	                        list_tasks.forEach(function (task) {
-	                            all_tasks.push(_react2.default.createElement(Task, { status: status, data: task, key: task.id, group_data: group_data }));
+	                            all_tasks.push(_react2.default.createElement(Task, { status: status, data: task, key: task.id + new Date().getTime(), group_data: group_data }));
 	                        });
 	                    } else {
 	                        all_tasks = _react2.default.createElement(_templates.Empty, null);

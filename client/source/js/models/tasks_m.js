@@ -755,7 +755,7 @@ var TaskList = React.createClass({
             if(list_tasks.length) {
                 list_tasks.reverse();
                 list_tasks.forEach(function (task) {
-                    all_tasks.push(<Task status={status} data={task} key={task.id} group_data={group_data}/>);
+                    all_tasks.push(<Task status={status} data={task} key={task.id + new Date().getTime()} group_data={group_data}/>);
                 });
             }
             else {

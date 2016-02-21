@@ -344,7 +344,7 @@ var UsersGroupsList = React.createClass({
             groups.push(<UserGroup key='0' data={master_group_data} all_groups={self.state.groups} />);
             //user groups
             this.state.groups.forEach(function(group) {
-                groups.push(<UserGroup key={group.id} data={group} all_groups={self.state.groups} />);
+                groups.push(<UserGroup key={group.id + new Date().getTime()} data={group} all_groups={self.state.groups} />);
             });
             return <article className="task_group_page_inner">
                 <Menu active="u_groups" data={this.state.status} />
