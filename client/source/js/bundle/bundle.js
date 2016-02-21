@@ -38623,7 +38623,7 @@
 	                        response_status = 1;
 	                    }
 	                    (0, _toaster2.default)(actions_r[response_status]);
-	                    //refresh();
+	                    refresh();
 	                }, function (err) {
 	                    (0, _toaster2.default)(actions_r[1]);
 	                });
@@ -39100,7 +39100,7 @@
 	                        response_status = 1;
 	                    }
 	                    (0, _toaster2.default)(actions_r[response_status]);
-	                    //refresh();
+	                    refresh();
 	                }, function (err) {
 	                    (0, _toaster2.default)(actions_r[1]);
 	                });

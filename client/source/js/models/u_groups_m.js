@@ -129,7 +129,7 @@ var UserGroup = React.createClass({
                         response_status = 1;
                     }
                     toast(actions_r[response_status]);
-                    //refresh();
+                    refresh();
                 }, function (err) {
                     toast(actions_r[1]);
                 });
