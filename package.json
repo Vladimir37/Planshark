@@ -1,6 +1,6 @@
 {
     "name": "Planshark",
-    "version": "0.8.0",
+    "version": "1.0.4",
     "license": "MIT",
     "main": "planshark.js",
     "repository": {
