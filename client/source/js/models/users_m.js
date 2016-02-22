@@ -7,7 +7,7 @@ import toast from '../toaster.js';
 
 //responses
 var actions_r = ['Success!', 'Server error' , 'Required fields are empty'];
-var creating_r = ['Success!', 'Server error', 'Name is exist!', 'Mail is exist!'];
+var creating_r = ['Success!', 'Server error', 'Name is busy!', 'Mail is busy!'];
 
 //refresh groups list
 var refresh;
