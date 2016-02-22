@@ -37268,6 +37268,15 @@
 	        //define task classes
 	        var color_class = state.t_group_num ? 'task_group_color_' + state.t_group_num : '';
 	        var task_classes = 'task task_group_color ' + color_class;
+	        //render times
+	        var time_counter = '';
+	        if (state.active) {
+	            time_counter = _react2.default.createElement(
+	                'article',
+	                { className: 'task_time' },
+	                expiration_result
+	            );
+	        }
 	        //render
 	        return _react2.default.createElement(
 	            'article',
@@ -37311,11 +37320,7 @@
 	                    priority_blocks
 	                ),
 	                _react2.default.createElement('article', { className: 'task_expand', onClick: this.expand }),
-	                _react2.default.createElement(
-	                    'article',
-	                    { className: 'task_time' },
-	                    expiration_result
-	                )
+	                time_counter
 	            ),
 	            _react2.default.createElement(
 	                'article',
