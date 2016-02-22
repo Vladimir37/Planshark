@@ -445,6 +445,13 @@ var Task = React.createClass({
         //define task classes
         var color_class = state.t_group_num ? 'task_group_color_' + state.t_group_num : '';
         var task_classes = 'task task_group_color ' + color_class;
+        //render times
+        var time_counter = '';
+        if(state.active) {
+            time_counter = <article className="task_time">
+                {expiration_result}
+            </article>;
+        }
         //render
         return <article className={task_classes}>
             <article className="task_top">
@@ -460,9 +467,7 @@ var Task = React.createClass({
                     {priority_blocks}
                 </article>
                 <article className="task_expand" onClick={this.expand}></article>
-                <article className="task_time">
-                    {expiration_result}
-                </article>
+                {time_counter}
             </article>
             <article className="task_additional">
                 <article className="task_middle">
